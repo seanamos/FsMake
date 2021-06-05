@@ -10,7 +10,7 @@ module Pipeline =
     module internal Internal =
         type StepResult =
             | Success of step: Step * stat: Step.RunStat
-            | Failed of step: Step * stat: Step.RunStat * ex: exn
+            | Failed of step: Step * stat: Step.RunStat * err: StepError
             | Skipped of step: Step
 
         module StepResult =
@@ -88,10 +88,10 @@ module Pipeline =
             | Ok stat ->
                 args.RemainingStages
                 |> args.RunNextStage (args.AccResults @ [ Success (step, stat) ])
-            | Error (stat, ex) ->
-                Console.error (sprintf "%A" ex) |> args.Context.Console.WriteLine
+            | Error (stat, err) ->
+                err |> StepError.toConsoleMessage |> args.Context.Console.WriteLine
 
-                args.AccResults @ [ Failed (step, stat, ex) ]
+                args.AccResults @ [ Failed (step, stat, err) ]
 
         let runParallelSteps (args: RunStepArgs) (steps: Step list) : StepResult list =
             let results =
@@ -110,16 +110,20 @@ module Pipeline =
                 |> Array.map
                     (function
                     | (step, Ok stat) -> Success (step, stat)
-                    | (step, Error (stat, ex)) ->
+                    | (step, Error (stat, err)) ->
                         let prefix = sprintf "%-*s | " args.Context.LongestStepNameLength step.Name
 
-                        let error =
-                            ex.ToString().Split (Environment.NewLine)
-                            |> Array.fold (fun state text -> state + prefix + text + Environment.NewLine) ""
+                        err
+                        |> StepError.toConsoleMessage
+                        |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
+                        |> args.Context.Console.WriteLine
 
-                        Console.error error |> args.Context.Console.Write
+                        err
+                        |> StepError.toConsoleMessage
+                        |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
+                        |> args.Context.Console.WriteLine
 
-                        Failed (step, stat, ex))
+                        Failed (step, stat, err))
                 |> List.ofArray
 
             if results |> StepResult.anyFailed then
@@ -282,13 +286,13 @@ module Pipeline =
 
         if failed then
             Console.Info
-            |> Console.prefix Console.errorColor ""
+            |> Console.statusMessage Console.errorColor ""
             |> Console.appendToken pipeline.Name
             |> Console.append " pipeline failed"
             |> writer.WriteLine
         else
             Console.Info
-            |> Console.prefix Console.successColor ""
+            |> Console.statusMessage Console.successColor ""
             |> Console.appendToken pipeline.Name
             |> Console.append " pipeline complete"
             |> writer.WriteLine

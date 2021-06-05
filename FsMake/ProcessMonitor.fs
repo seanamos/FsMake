@@ -24,7 +24,7 @@ module ProcessMonitor =
                     proc.Kill ()
                 with ex ->
                     Console.Verbose
-                    |> Console.prefix Console.warnColor "Failed to kill process "
+                    |> Console.statusMessage Console.warnColor "Failed to kill process "
                     |> Console.appendParts [ proc.Id.ToString () |> Console.Token
                                              sprintf " exception: %s" Environment.NewLine |> Console.Text
                                              ex.ToString () |> Console.Token ]
