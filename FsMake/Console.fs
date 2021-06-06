@@ -91,27 +91,27 @@ module Console =
             | _ when level |> Verbosity.matchLevel verbosity -> true
             | _ -> false
 
-        // let writeText (doEachLine: unit -> unit) (format: string -> string) isPrefix text : unit =
-        //     if isPrefix then
-        //         format text |> Console.Write
-        //     else
-        //         let split = text.Split (Environment.NewLine)
+    // let writeText (doEachLine: unit -> unit) (format: string -> string) isPrefix text : unit =
+    //     if isPrefix then
+    //         format text |> Console.Write
+    //     else
+    //         let split = text.Split (Environment.NewLine)
 
-        //         split
-        //         |> Array.iteri (fun i x ->
-        //             doEachLine ()
+    //         split
+    //         |> Array.iteri (fun i x ->
+    //             doEachLine ()
 
-        //             let textfmt = format x
+    //             let textfmt = format x
 
-        //             if i + 1 = split.Length then
-        //                 textfmt |> Console.Write
-        //             else
-        //                 textfmt + Environment.NewLine |> Console.Write
-        //         )
+    //             if i + 1 = split.Length then
+    //                 textfmt |> Console.Write
+    //             else
+    //                 textfmt + Environment.NewLine |> Console.Write
+    //         )
 
     type IWriter =
         abstract member Write : messages: Message list -> unit
-        // abstract member WritePrefixed : prefix: TextPart -> messages: Message list -> unit
+    // abstract member WritePrefixed : prefix: TextPart -> messages: Message list -> unit
 
     let private locker = obj ()
 
@@ -130,12 +130,10 @@ module Console =
             let sb = StringBuilder ()
 
             textParts
-            |> List.iter (fun x -> x |> formatTextPart tokenColor |> sb.Append |> ignore)
-
-            sb
+            |> List.fold (fun (sb: StringBuilder) x -> x |> formatTextPart tokenColor |> sb.Append) sb
 
         interface IWriter with
-            member _.Write (messages: Message list) : unit =
+            member _.Write(messages: Message list) : unit =
                 lock locker
                 <| fun () ->
                     messages
@@ -144,60 +142,15 @@ module Console =
                             let tokenColor = message.TokenColor |> Color.toAnsiCode
 
                             let sb = message.TextParts |> textPartsToStringBuilder tokenColor
+
                             match message.Prefix with
                             | Some x ->
                                 let prefixfmt = x |> formatTextPart tokenColor
-                                sb.Insert(0, prefixfmt) |> ignore
+                                sb.Insert (0, prefixfmt) |> ignore
                             | None -> ()
 
-                            Console.Write (sb.ToString())
+                            Console.Write (sb.ToString ())
                     )
-
-            // member _.WritePrefixed (prefix: TextPart) (messages: Message list) : unit =
-            //     lock locker
-            //     <| fun () ->
-            //         messages
-            //         |> List.iter (fun message ->
-            //             if message.Level |> checkLevel verbosity then
-            //                 let tokenColor = message.TokenColor |> Color.toAnsiCode
-            //                 let prefixfmt = prefix |> formatTextPart tokenColor
-
-            //                 let sb = message.TextParts |> textPartsToStringBuilder tokenColor
-            //                 sb.Insert(0, prefixfmt) |> ignore
-
-            //                 Console.Write (sb.ToString())
-            //         )
-
-    // if message.Level |> checkLevel verbosity then
-    //     let tokenColor = message.TokenColor |> Color.toAnsiCode
-
-    //     message.TextParts
-    //     |> List.iter
-    //         (function
-    //         | Text x -> Console.Write (x)
-    //         | Token x -> Console.Write ($"{tokenColor}{x}{ansiReset}")
-    //         | Colorized (text, color) ->
-    //             let ansiColor = color |> Color.toAnsiCode
-    //             Console.Write ($"{ansiColor}{text}{ansiReset}"))
-
-    // let tokenColor = message.TokenColor |> Color.toAnsiCode
-
-    // let rec writeTextPart isPrefix textPart =
-    //     let writePrefix () =
-    //         prefix |> writeTextPart true
-
-    //     let writeText = writeText writePrefix
-
-    //     match textPart with
-    //     | Text x -> x |> writeText id isPrefix
-    //     | Token x -> x |> writeText (fun x -> $"{tokenColor}{x}{ansiReset}") isPrefix
-    //     | Colorized (text, color) ->
-    //         let ansiColor = color |> Color.toAnsiCode
-
-    //         text |> writeText (fun x -> $"{ansiColor}{x}{ansiReset}") isPrefix
-
-    // message.TextParts |> List.iter (writeTextPart false)
-
 
     type StandardWriter(verbosity: Verbosity) =
         let writeColor color (text: string) =
@@ -206,25 +159,30 @@ module Console =
             Console.Write (text)
             Console.ForegroundColor <- prevColor
 
+        let writeTextPart tokenColor textPart =
+            match textPart with
+            | Text x -> Console.Write (x)
+            | Token x -> x |> writeColor tokenColor
+            | Colorized (text, color) ->
+                let consoleColor = color |> Color.toConsoleColor
+                text |> writeColor consoleColor
+
         interface IWriter with
-            member _.Write message =
-                ()
-                // lock locker
-                // <| fun () ->
-                //     if message.Level |> checkLevel verbosity then
-                //         let tokenColor = message.TokenColor |> Color.toConsoleColor
+            member _.Write(messages: Message list) =
+                lock locker
+                <| fun () ->
+                    messages
+                    |> List.iter (fun message ->
+                        if message.Level |> checkLevel verbosity then
+                            let tokenColor = message.TokenColor |> Color.toConsoleColor
+                            let writeTextPart = writeTextPart tokenColor
 
-                //         message.TextParts
-                //         |> List.iter
-                //             (function
-                //             | Text x -> Console.Write (x)
-                //             | Token x -> x |> writeColor tokenColor
-                //             | Colorized (text, color) ->
-                //                 let consoleColor = color |> Color.toConsoleColor
-                //                 text |> writeColor consoleColor)
+                            match message.Prefix with
+                            | Some x -> writeTextPart x
+                            | None -> ()
 
-            // member _.WritePrefixed prefix message =
-            //     ()
+                            message.TextParts |> List.iter (writeTextPart)
+                    )
 
     let defaultWriter = StandardWriter (Normal) :> IWriter
 
@@ -289,21 +247,20 @@ module Console =
 [<AutoOpenAttribute>]
 module IWriterExtensions =
     type Console.IWriter with
-        member this.Write (message: Console.Message) : unit =
+        member this.Write(message: Console.Message) : unit =
             this.Write [ message ]
 
-        member this.WriteLine (level: Console.Level) : unit =
+        member this.WriteLine(level: Console.Level) : unit =
             level |> Console.message Environment.NewLine |> this.Write
 
-        member this.WriteLine (message: Console.Message) : unit =
+        member this.WriteLine(message: Console.Message) : unit =
             [ { message with
-                  TextParts = message.TextParts @ [ Console.Text Environment.NewLine ] } ]
+                    TextParts = message.TextParts @ [ Console.Text Environment.NewLine ] } ]
             |> this.Write
 
-        member this.WriteLine (messages: Console.Message list) : unit =
+        member this.WriteLine(messages: Console.Message list) : unit =
             let head = messages |> List.tryHead
+
             match head with
-            | Some x ->
-                messages @ [ x.Level |> Console.message Environment.NewLine ]
-                |> this.Write
+            | Some x -> messages @ [ x.Level |> Console.message Environment.NewLine ] |> this.Write
             | None -> ()

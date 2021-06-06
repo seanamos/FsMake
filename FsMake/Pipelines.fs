@@ -51,7 +51,7 @@ module Pipelines =
 
     let create = Builder ()
 
-    let default_pipeline (pipeline: Pipeline) =
+    let setDefault (pipeline: Pipeline) =
         Builder.DefaultPipeline pipeline
 
     [<AutoOpen>]

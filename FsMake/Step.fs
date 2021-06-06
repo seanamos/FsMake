@@ -12,25 +12,27 @@ type StepContext =
       LongestStepNameLength: int }
 
 type StepError =
-    | StepUserAbort of message: string
-    | StepError of consoleMessage: Console.Message list
+    | StepUserAbort of message: Console.Message list
+    | StepError of message: Console.Message list
     | StepUnhandledEx of ex: exn
 
 module StepError =
     let toConsoleMessage (error: StepError) : Console.Message list =
         match error with
-        | StepUserAbort x -> [ Console.error x ]
+        | StepUserAbort x -> x
         | StepError x -> x
         | StepUnhandledEx ex ->
             let split = ex.ToString().Split (Environment.NewLine)
 
             Console.error $"Exception:{Environment.NewLine}"
             :: [ for i in 0 .. split.Length - 1 ->
-                     if not <| (i + 1 = split.Length) then
-                         Console.Error
-                         |> Console.messageColor Console.errorColor $"{split.[i]}{Environment.NewLine}"
-                     else
-                         Console.Error |> Console.messageColor Console.errorColor split.[i] ]
+                     let text =
+                         if i + 1 <> split.Length then
+                             $"{split.[i]}{Environment.NewLine}"
+                         else
+                             split.[i]
+
+                     Console.Error |> Console.messageColor Console.errorColor text ]
 
 type StepPart<'T> = StepContext -> Result<'T, StepError>
 
@@ -60,7 +62,8 @@ module StepPart =
             | Error e, _ -> Error e
             | _, Error e -> Error e
 
-    // modified from https://github.com/demystifyfp/FsToolkit.ErrorHandling
+    let context : StepPart<StepContext> = Ok
+
     type Builder() =
         member _.Return(value: 'T) : StepPart<'T> =
             fun _ -> Ok value
@@ -111,12 +114,15 @@ module StepPart =
         member _.BindReturn(part: StepPart<'T>, f: 'T -> 'U) =
             map f part
 
-        member _.MergeSources(t1: StepPart<'T>, t2: StepPart<'T1>) : StepContext -> Result<('T * 'T1), StepError> =
-            zip t1 t2
+        member _.MergeSources(source1: StepPart<'T>, source2: StepPart<'T1>) : StepContext -> Result<('T * 'T1), StepError> =
+            zip source1 source2
 
         member inline _.Source(part: StepPart<_>) : StepPart<_> =
             part
 
+[<AutoOpen>]
+module StepPartBuilder =
+    let stepPart = StepPart.Builder ()
 
 type Step =
     { Name: string
@@ -183,8 +189,8 @@ module Step =
         member _.BindReturn(part: StepPart<'T>, f: 'T -> 'U) =
             StepPart.map f part
 
-        member _.MergeSources(t1: StepPart<'T>, t2: StepPart<'T1>) =
-            StepPart.zip t1 t2
+        member _.MergeSources(source1: StepPart<'T>, source2: StepPart<'T1>) =
+            StepPart.zip source1 source2
 
         member inline _.Source(part: StepPart<_>) : StepPart<_> =
             part

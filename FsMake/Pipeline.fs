@@ -118,11 +118,6 @@ module Pipeline =
                         |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
                         |> args.Context.Console.WriteLine
 
-                        err
-                        |> StepError.toConsoleMessage
-                        |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
-                        |> args.Context.Console.WriteLine
-
                         Failed (step, stat, err))
                 |> List.ofArray
 
