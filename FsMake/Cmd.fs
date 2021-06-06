@@ -292,13 +292,13 @@ module Cmd =
 
                 [ Console.error ""
                   |> Console.appendToken fullCommand
-                  |> Console.append "failed to complete before timeout expired" ]
+                  |> Console.append " failed to complete before timeout expired" ]
                 |> StepError
                 |> Error
             else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
                 [ Console.error ""
                   |> Console.appendToken fullCommand
-                  |> Console.append "was aborted" ]
+                  |> Console.append " was aborted" ]
                 |> StepUserAbort
                 |> Error
             else
