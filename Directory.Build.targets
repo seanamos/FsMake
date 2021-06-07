@@ -1,7 +1,0 @@
-<Project>
-    <!-- <Target Name="FSharpLint" AfterTargets="BeforeBuild">
-        <Exec Command="dotnet fsharplint -f msbuild lint $(MSBuildProjectFullPath)"
-              ConsoleToMsBuild="true"
-              IgnoreExitCode="false" />
-    </Target> -->
-</Project>

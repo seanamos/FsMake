@@ -14,8 +14,7 @@ module Glob =
         | File of path: string
         | Directory of path: string
 
-    let defaultDirectory = Path.GetFullPath "."
-    let matchWildcardRegex = Regex (@"^.*(\*|\?).*$")
+    let internal defaultDirectory = Path.GetFullPath "."
 
     let create (pattern: string) : Glob =
         { RootDirectory = defaultDirectory
@@ -37,6 +36,8 @@ module Glob =
 
     [<AutoOpen>]
     module internal Internal =
+        let matchWildcardRegex = Regex (@"^.*(\*|\?).*$")
+
         let normalizePathSeperator (path: string) : string =
             path
                 .Replace('\\', Path.DirectorySeparatorChar)
