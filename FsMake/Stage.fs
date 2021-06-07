@@ -3,11 +3,11 @@ namespace FsMake
 open System
 
 type Stage =
-    | Sequential of step: Step
-    | Parallel of steps: Step list
-    | SequentialMaybe of step: Step * condition: bool
-    | ParallelMaybe of steps: Step list * condition: bool
-    | ParallelMaybes of steps: ParallelMaybe list
+    | SequentialStage of step: Step
+    | ParallelStage of steps: Step list
+    | SequentialMaybeStage of step: Step * condition: bool
+    | ParallelMaybeStage of steps: Step list * condition: bool
+    | ParallelMaybesStage of steps: ParallelMaybe list
 
 module internal Stage =
     let longestStepNameLength (stages: Stage list) : int =
@@ -16,16 +16,16 @@ module internal Stage =
             | [] -> longest
             | x :: xs ->
                 match x with
-                | Sequential step -> xs |> nextStage (Math.Max (step.Name.Length, longest))
-                | Parallel steps ->
+                | SequentialStage step -> xs |> nextStage (Math.Max (step.Name.Length, longest))
+                | ParallelStage steps ->
                     let longestStep = steps |> Seq.map (fun x -> x.Name.Length) |> Seq.max
                     xs |> nextStage (Math.Max (longestStep, longest))
-                | SequentialMaybe (step, _) -> xs |> nextStage (Math.Max (step.Name.Length, longest))
-                | ParallelMaybe (steps, _) ->
+                | SequentialMaybeStage (step, _) -> xs |> nextStage (Math.Max (step.Name.Length, longest))
+                | ParallelMaybeStage (steps, _) ->
                     let longestStep = steps |> Seq.map (fun x -> x.Name.Length) |> Seq.max
                     xs |> nextStage (Math.Max (longestStep, longest))
-                | ParallelMaybes steps ->
-                    let steps = steps |> ParallelMaybe.toSteps
+                | ParallelMaybesStage steps ->
+                    let steps = steps |> ParallelMaybe.Internal.toSteps
 
                     let longestStep = steps |> Seq.map (fun x -> x.Name.Length) |> Seq.max
                     xs |> nextStage (Math.Max (longestStep, longest))

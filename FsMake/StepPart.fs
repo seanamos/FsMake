@@ -111,6 +111,7 @@ module StepPart =
         member inline _.Source(part: StepPart<_>) : StepPart<_> =
             part
 
+    [<Sealed>]
     type Builder() =
         inherit BaseBuilder()
 

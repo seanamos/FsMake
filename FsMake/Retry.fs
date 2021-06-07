@@ -36,6 +36,7 @@ module Retry =
 
             nextRetry 1
 
+    [<Sealed>]
     type Builder(attempts: int) =
         inherit StepPart.BaseBuilder()
 

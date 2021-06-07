@@ -14,6 +14,7 @@ module Step =
 
     type RunResult = Result<RunStat, RunStat * StepError>
 
+    [<Sealed>]
     type Builder(name: string) =
         inherit StepPart.BaseBuilder()
 

@@ -96,7 +96,8 @@ module Console =
 
     let private locker = obj ()
 
-    type AnsiWriter(verbosity: Verbosity) =
+    [<Sealed>]
+    type internal AnsiWriter(verbosity: Verbosity) =
         let ansiReset = "\u001b[0m"
 
         let formatTextPart tokenColor textPart =
@@ -133,7 +134,8 @@ module Console =
                             Console.Write (sb.ToString ())
                     )
 
-    type StandardWriter(verbosity: Verbosity) =
+    [<Sealed>]
+    type internal StandardWriter(verbosity: Verbosity) =
         let writeColor color (text: string) =
             let prevColor = Console.ForegroundColor
             Console.ForegroundColor <- color

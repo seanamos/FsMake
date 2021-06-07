@@ -5,6 +5,7 @@ type ParallelMaybe =
     | PMaybe of step: Step * condition: bool
 
 module ParallelMaybe =
+    [<AutoOpen>]
     module internal Internal =
         let partition (pmaybes: ParallelMaybe list) : (ParallelMaybe list * ParallelMaybe list) =
             pmaybes
@@ -26,7 +27,7 @@ module ParallelMaybe =
 
             (run |> toSteps, skip |> toSteps)
 
-    type ParallelMaybeBuilder() =
+    type Builder() =
         member _.Yield(_) : ParallelMaybe list =
             []
 
@@ -41,4 +42,4 @@ module ParallelMaybe =
 [<AutoOpen>]
 module ParallelMaybeBuilder =
     // fsharplint:disable-next-line
-    let run_parallel_maybes = ParallelMaybe.ParallelMaybeBuilder ()
+    let run_parallel_maybes = ParallelMaybe.Builder ()

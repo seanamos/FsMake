@@ -138,18 +138,18 @@ module Pipeline =
                           RemainingStages = xs }
 
                     match x with
-                    | Sequential step ->
+                    | SequentialStage step ->
                         Console.info "Running " |> Console.appendToken step.Name |> writer.WriteLine
 
                         step |> runStep stepArgs
-                    | Parallel steps ->
+                    | ParallelStage steps ->
                         Console.info "Running "
                         |> Console.appendToken (steps |> Step.Internal.concatNames)
                         |> Console.append " in parallel"
                         |> writer.WriteLine
 
                         steps |> runParallelSteps stepArgs
-                    | SequentialMaybe (step, cond) ->
+                    | SequentialMaybeStage (step, cond) ->
                         if cond then
                             Console.info "Running "
                             |> Console.appendToken step.Name
@@ -164,7 +164,7 @@ module Pipeline =
                             |> writer.WriteLine
 
                             xs |> nextStage (accResults @ [ Skipped step ])
-                    | ParallelMaybe (steps, cond) ->
+                    | ParallelMaybeStage (steps, cond) ->
                         let stepNames = steps |> Step.Internal.concatNames
 
                         if cond then
@@ -183,8 +183,8 @@ module Pipeline =
                             let skipResults = steps |> StepResult.createSkippedList
 
                             xs |> nextStage (accResults @ skipResults)
-                    | ParallelMaybes (pmaybes) ->
-                        let (toRun, toSkip) = pmaybes |> ParallelMaybe.partionedSteps
+                    | ParallelMaybesStage (pmaybes) ->
+                        let (toRun, toSkip) = pmaybes |> ParallelMaybe.Internal.partionedSteps
 
                         if toSkip.Length > 0 then
                             Console.warn "Skipping step(s) "
@@ -194,7 +194,7 @@ module Pipeline =
 
                         let skipResults = toSkip |> StepResult.createSkippedList
 
-                        [ Parallel toRun ] @ xs |> nextStage (accResults @ skipResults)
+                        [ ParallelStage toRun ] @ xs |> nextStage (accResults @ skipResults)
 
             stages |> nextStage []
 
@@ -216,7 +216,7 @@ module Pipeline =
         member _.Yield(pmaybes: ParallelMaybe list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybes pmaybes ] }
+                      Stages = pipeline.Stages @ [ ParallelMaybesStage pmaybes ] }
 
         member _.Run(_: unit) =
             pipeline
@@ -228,25 +228,25 @@ module Pipeline =
         member _.RunStep(_: unit, step: Step) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ Sequential step ] }
+                      Stages = pipeline.Stages @ [ SequentialStage step ] }
 
         [<CustomOperation("maybe_run")>]
         member _.MaybeRun(_: unit, step: Step, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ SequentialMaybe (step, cond) ] }
+                      Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ] }
 
         [<CustomOperation("run_parallel")>]
         member _.RunParallel(_: unit, steps: Step list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ Parallel steps ] }
+                      Stages = pipeline.Stages @ [ ParallelStage steps ] }
 
         [<CustomOperation("maybe_run_parallel")>]
         member _.MaybeRunParallel(_: unit, steps: Step list, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybe (steps, cond) ] }
+                      Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ] }
 
 
     let create (name: string) : Builder =
