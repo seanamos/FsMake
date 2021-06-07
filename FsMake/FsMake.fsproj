@@ -7,12 +7,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties/AssemblyInfo.fs" />
-    <Compile Include="Errors.fs" />
     <Compile Include="Glob.fs" />
     <Compile Include="Console.fs" />
     <Compile Include="Cli.fs" />
     <Compile Include="EnvVar.fs" />
     <Compile Include="ProcessMonitor.fs" />
+    <Compile Include="StepPart.fs" />
+    <Compile Include="Retry.fs" />
     <Compile Include="Step.fs" />
     <Compile Include="Cmd.fs" />
     <Compile Include="ParallelMaybe.fs" />

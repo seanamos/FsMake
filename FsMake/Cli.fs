@@ -57,7 +57,7 @@ module internal Cli =
         let version = assemblyAttr.InformationalVersion.ToString ()
 
         let usage = @"
-Usage: dotnet fsi <script>.fsx <pipeline> [options]
+Usage: dotnet fsi <script>.fsx [pipeline] [options]
 
 Options:
   --help                                       Shows help and usage information

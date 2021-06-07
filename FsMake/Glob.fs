@@ -161,8 +161,6 @@ module Glob =
                         let files =
                             paths
                             |> List.collect (fun dir ->
-                                printfn "%s" dir
-
                                 Directory.EnumerateFileSystemEntries (dir, x, SearchOption.TopDirectoryOnly)
                                 |> List.ofSeq
                             )

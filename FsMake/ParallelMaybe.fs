@@ -5,25 +5,26 @@ type ParallelMaybe =
     | PMaybe of step: Step * condition: bool
 
 module ParallelMaybe =
-    let partition (pmaybes: ParallelMaybe list) : (ParallelMaybe list * ParallelMaybe list) =
-        pmaybes
-        |> List.partition
-            (function
-            | PMaybe (_, cond) when cond -> true
-            | PMaybe _ -> false
-            | PStep _ -> true)
+    module internal Internal =
+        let partition (pmaybes: ParallelMaybe list) : (ParallelMaybe list * ParallelMaybe list) =
+            pmaybes
+            |> List.partition
+                (function
+                | PMaybe (_, cond) when cond -> true
+                | PMaybe _ -> false
+                | PStep _ -> true)
 
-    let toSteps (pmaybes: ParallelMaybe list) : Step list =
-        pmaybes
-        |> List.map
-            (function
-            | PMaybe (x, _) -> x
-            | PStep x -> x)
+        let toSteps (pmaybes: ParallelMaybe list) : Step list =
+            pmaybes
+            |> List.map
+                (function
+                | PMaybe (x, _) -> x
+                | PStep x -> x)
 
-    let partionedSteps (pmaybes: ParallelMaybe list) : (Step list * Step list) =
-        let (run, skip) = pmaybes |> partition
+        let partionedSteps (pmaybes: ParallelMaybe list) : (Step list * Step list) =
+            let (run, skip) = pmaybes |> partition
 
-        (run |> toSteps, skip |> toSteps)
+            (run |> toSteps, skip |> toSteps)
 
     type ParallelMaybeBuilder() =
         member _.Yield(_) : ParallelMaybe list =

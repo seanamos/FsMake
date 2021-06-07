@@ -91,27 +91,8 @@ module Console =
             | _ when level |> Verbosity.matchLevel verbosity -> true
             | _ -> false
 
-    // let writeText (doEachLine: unit -> unit) (format: string -> string) isPrefix text : unit =
-    //     if isPrefix then
-    //         format text |> Console.Write
-    //     else
-    //         let split = text.Split (Environment.NewLine)
-
-    //         split
-    //         |> Array.iteri (fun i x ->
-    //             doEachLine ()
-
-    //             let textfmt = format x
-
-    //             if i + 1 = split.Length then
-    //                 textfmt |> Console.Write
-    //             else
-    //                 textfmt + Environment.NewLine |> Console.Write
-    //         )
-
     type IWriter =
         abstract member Write : messages: Message list -> unit
-    // abstract member WritePrefixed : prefix: TextPart -> messages: Message list -> unit
 
     let private locker = obj ()
 
@@ -258,9 +239,10 @@ module IWriterExtensions =
                     TextParts = message.TextParts @ [ Console.Text Environment.NewLine ] } ]
             |> this.Write
 
-        member this.WriteLine(messages: Console.Message list) : unit =
-            let head = messages |> List.tryHead
-
-            match head with
-            | Some x -> messages @ [ x.Level |> Console.message Environment.NewLine ] |> this.Write
-            | None -> ()
+        member this.WriteLines(messages: Console.Message list) : unit =
+            messages
+            |> List.map (fun x ->
+                { x with
+                      TextParts = x.TextParts @ [ Console.Text Environment.NewLine ] }
+            )
+            |> this.Write

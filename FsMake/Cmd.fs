@@ -4,7 +4,6 @@ open System
 open System.Diagnostics
 open System.Runtime.InteropServices
 open System.Text
-open System.Collections.Generic
 
 module Cmd =
     type RedirectOption =
@@ -124,7 +123,7 @@ module Cmd =
                     sb.Append x |> ignore
                     sb.Append '"' |> ignore
 
-                    if  i <> args.Length - 1 then sb.Append ';' |> ignore
+                    if i <> args.Length - 1 then sb.Append ';' |> ignore
                 )
 
                 sb.Append " ]" |> ignore
@@ -250,68 +249,72 @@ module Cmd =
             writeOutput (fun x -> x |> Console.appendColor Console.infoColor cmdText)
 
             proc.Start () |> ignore
-            ctx.ProcessMonitor |> ProcessMonitor.add proc
 
-            let stdBuilder = StringBuilder ()
-            let stdErrBuilder = StringBuilder ()
+            try
+                ctx.ProcessMonitor |> ProcessMonitor.add proc
 
-            let evNotNullThen action (ev: DataReceivedEventArgs) =
-                if not <| isNull ev.Data then action ev.Data
+                let stdBuilder = StringBuilder ()
+                let stdErrBuilder = StringBuilder ()
 
-            let addOutputConsoleWriters (process': Process) =
-                process'.OutputDataReceived.Add (evNotNullThen (Console.append >> writeOutput))
-                process'.ErrorDataReceived.Add (evNotNullThen (Console.append >> writeOutput))
-                process'
+                let evNotNullThen action (ev: DataReceivedEventArgs) =
+                    if not <| isNull ev.Data then action ev.Data
 
-            let addOutputBuilderWriters (process': Process) =
-                process'.OutputDataReceived.Add (evNotNullThen (stdBuilder.AppendLine >> ignore))
-                process'.ErrorDataReceived.Add (evNotNullThen (stdErrBuilder.AppendLine >> ignore))
-                process'
+                let addOutputConsoleWriters (process': Process) =
+                    process'.OutputDataReceived.Add (evNotNullThen (Console.append >> writeOutput))
+                    process'.ErrorDataReceived.Add (evNotNullThen (Console.append >> writeOutput))
+                    process'
 
-            let beginDataRead (process': Process) =
-                process'.BeginOutputReadLine ()
-                process'.BeginErrorReadLine ()
+                let addOutputBuilderWriters (process': Process) =
+                    process'.OutputDataReceived.Add (evNotNullThen (stdBuilder.AppendLine >> ignore))
+                    process'.ErrorDataReceived.Add (evNotNullThen (stdErrBuilder.AppendLine >> ignore))
+                    process'
 
-            let redirectDecision = opts.Redirect |> redirectDecision shouldPrefix
+                let beginDataRead (process': Process) =
+                    process'.BeginOutputReadLine ()
+                    process'.BeginErrorReadLine ()
 
-            match redirectDecision with
-            | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
-            | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
-            | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputConsoleWriters) |> beginDataRead
-            | NoRedirect -> ()
+                let redirectDecision = opts.Redirect |> redirectDecision shouldPrefix
 
-            let processCompleted =
-                match opts.Timeout with
-                | Some x -> proc.WaitForExit (x.TotalMilliseconds |> int)
-                | None ->
-                    proc.WaitForExit ()
-                    true
+                match redirectDecision with
+                | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
+                | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
+                | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputConsoleWriters) |> beginDataRead
+                | NoRedirect -> ()
 
-            if not processCompleted then
-                ctx.ProcessMonitor |> ProcessMonitor.kill proc
+                let processCompleted =
+                    match opts.Timeout with
+                    | Some x -> proc.WaitForExit (x.TotalMilliseconds |> int)
+                    | None ->
+                        proc.WaitForExit ()
+                        true
 
-                [ Console.error ""
-                  |> Console.appendToken fullCommand
-                  |> Console.append " failed to complete before timeout expired" ]
-                |> StepError
-                |> Error
-            else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
-                [ Console.error ""
-                  |> Console.appendToken fullCommand
-                  |> Console.append " was aborted" ]
-                |> StepUserAbort
-                |> Error
-            else
-                let exitCode = proc.ExitCode
+                if not processCompleted then
+                    ctx.ProcessMonitor |> ProcessMonitor.kill proc
 
-                let exitCodeDecision = exitCode |> exitCodeDecision opts.ExitCodeCheck fullCommand
+                    [ Console.error ""
+                      |> Console.appendToken fullCommand
+                      |> Console.append " failed to complete before timeout expired" ]
+                    |> StepError
+                    |> Error
+                else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
+                    [ Console.error ""
+                      |> Console.appendToken fullCommand
+                      |> Console.append " was aborted" ]
+                    |> StepUserAbort
+                    |> Error
+                else
+                    let exitCode = proc.ExitCode
 
-                match exitCodeDecision with
-                | UnexpectedExitCode x -> StepError [ x ] |> Error
-                | ExpectedExitCode ->
-                    OutputProcessorArgs (exitCode, stdBuilder.ToString (), stdErrBuilder.ToString ())
-                    |> opts.OutputProcessor
-                    |> Ok
+                    let exitCodeDecision = exitCode |> exitCodeDecision opts.ExitCodeCheck fullCommand
+
+                    match exitCodeDecision with
+                    | UnexpectedExitCode x -> StepError [ x ] |> Error
+                    | ExpectedExitCode ->
+                        OutputProcessorArgs (exitCode, stdBuilder.ToString (), stdErrBuilder.ToString ())
+                        |> opts.OutputProcessor
+                        |> Ok
+            finally
+                ctx.ProcessMonitor |> ProcessMonitor.remove proc
 
     let run (opts: CmdOptions<'a>) : StepPart<unit> =
         fun (ctx: StepContext) ->

@@ -9,7 +9,7 @@ type Stage =
     | ParallelMaybe of steps: Step list * condition: bool
     | ParallelMaybes of steps: ParallelMaybe list
 
-module Stage =
+module internal Stage =
     let longestStepNameLength (stages: Stage list) : int =
         let rec nextStage longest rem =
             match rem with

@@ -89,7 +89,7 @@ module Pipeline =
                 args.RemainingStages
                 |> args.RunNextStage (args.AccResults @ [ Success (step, stat) ])
             | Error (stat, err) ->
-                err |> StepError.toConsoleMessage |> args.Context.Console.WriteLine
+                err |> StepError.toConsoleMessage |> args.Context.Console.WriteLines
 
                 args.AccResults @ [ Failed (step, stat, err) ]
 
@@ -116,7 +116,7 @@ module Pipeline =
                         err
                         |> StepError.toConsoleMessage
                         |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
-                        |> args.Context.Console.WriteLine
+                        |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))
                 |> List.ofArray
@@ -168,7 +168,10 @@ module Pipeline =
                         let stepNames = steps |> Step.Internal.concatNames
 
                         if cond then
-                            printfn "Running %s in parallel" stepNames
+                            Console.info "Running "
+                            |> Console.appendToken (stepNames)
+                            |> Console.append " in parallel"
+                            |> writer.WriteLine
 
                             steps |> runParallelSteps stepArgs
                         else

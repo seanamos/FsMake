@@ -5,28 +5,27 @@ open System.Diagnostics
 
 module ProcessMonitor =
     type Message =
-        | Add of proc: Process
-        | Remove of proc: Process
+        | Add of proc: Process * reply: AsyncReplyChannel<unit>
+        | Remove of proc: Process * reply: AsyncReplyChannel<unit>
         | Kill of proc: Process * reply: AsyncReplyChannel<unit>
         | IsKilled of proc: Process * reply: AsyncReplyChannel<bool>
         | KillAll of reply: AsyncReplyChannel<unit>
         | Shutdown of reply: AsyncReplyChannel<unit>
 
-    type internal State =
-        { Processes: Process list
-          Killed: int list }
-
     [<AutoOpen>]
     module Internal =
+        type State =
+            { Processes: (int * Process) list
+              Killed: int list }
+
         let killProcess (console: Console.IWriter) (proc: Process) : bool =
             if not proc.HasExited then
                 try
                     proc.Kill ()
                 with ex ->
-                    Console.Verbose
-                    |> Console.statusMessage Console.warnColor "Failed to kill process "
+                    Console.warn "Failed to kill process "
                     |> Console.appendParts [ proc.Id.ToString () |> Console.Token
-                                             sprintf " exception: %s" Environment.NewLine |> Console.Text
+                                             $". Exception: {Environment.NewLine}" |> Console.Text
                                              ex.ToString () |> Console.Token ]
                     |> console.WriteLine
 
@@ -43,32 +42,36 @@ module ProcessMonitor =
                         let! msg = inbox.Receive ()
 
                         match msg with
-                        | Add proc ->
+                        | Add (proc, replyChannel) ->
                             if not proc.HasExited then
-                                proc.EnableRaisingEvents <- true
-                                proc.Exited.Add (fun _ -> Remove proc |> inbox.Post)
-
-                                return!
+                                let newState =
                                     { state with
-                                          Processes = proc :: state.Processes }
-                                    |> receiveNext
-                            else
-                                return! receiveNext state
-                        | Remove proc ->
-                            return!
-                                { state with
-                                      Processes = state.Processes |> List.filter (fun x -> x.Id <> proc.Id) }
-                                |> receiveNext
-                        | Kill (proc, replyChannel) ->
-                            Remove proc |> inbox.Post
+                                          Processes = (proc.Id, proc) :: state.Processes }
 
-                            if proc |> killProcess console then
                                 replyChannel.Reply ()
 
-                                return!
+                                return! newState |> receiveNext
+                            else
+                                replyChannel.Reply ()
+                                return! receiveNext state
+                        | Remove (proc, replyChannel) ->
+                            let newState =
+                                { state with
+                                      Processes = state.Processes |> List.filter (fun (pid, _) -> pid <> proc.Id) }
+
+                            replyChannel.Reply ()
+
+                            return! newState |> receiveNext
+                        | Kill (proc, replyChannel) ->
+                            if proc |> killProcess console then
+                                let newState =
                                     { state with
+                                          Processes = state.Processes |> List.filter (fun (pid, _) -> pid <> proc.Id)
                                           Killed = proc.Id :: state.Killed }
-                                    |> receiveNext
+
+                                replyChannel.Reply ()
+
+                                return! newState |> receiveNext
                             else
                                 replyChannel.Reply ()
                                 return! receiveNext state
@@ -82,14 +85,15 @@ module ProcessMonitor =
                         | KillAll replyChannel ->
                             let results =
                                 state.Processes
-                                |> List.fold (fun fstate x -> if x |> killProcess console then x.Id :: fstate else fstate) []
+                                |> List.fold (fun fstate (pid, p) -> if p |> killProcess console then pid :: fstate else fstate) []
+
+                            let newState =
+                                { state with
+                                      Killed = results @ state.Killed }
 
                             replyChannel.Reply ()
 
-                            return!
-                                { state with
-                                      Killed = results @ state.Killed }
-                                |> receiveNext
+                            return! newState |> receiveNext
                         | Shutdown replyChannel ->
                             replyChannel.Reply ()
 
@@ -112,7 +116,10 @@ module ProcessMonitor =
         new Agent (console)
 
     let add (proc: Process) (monitor: Agent) : unit =
-        Add proc |> monitor.Post
+        monitor.PostAndReply (fun x -> Add (proc, x))
+
+    let remove (proc: Process) (monitor: Agent) : unit =
+        monitor.PostAndReply (fun x -> Remove (proc, x))
 
     let kill (proc: Process) (monitor: Agent) : unit =
         monitor.PostAndReply (fun x -> Kill (proc, x))
