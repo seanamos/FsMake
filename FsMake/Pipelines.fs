@@ -114,8 +114,12 @@ module Pipelines =
                 | NoDefault ->
                     Console.error "No default pipeline was defined and no pipeline was specified"
                     |> writer.WriteLine
+
+                    exit 1
                 | PipelineNotFound arg ->
                     sprintf "Could not find a pipeline with the name "
                     |> Console.error
                     |> Console.appendToken arg
                     |> writer.WriteLine
+
+                    exit 1

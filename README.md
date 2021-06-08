@@ -35,10 +35,30 @@ let build =
             |> Cmd.run
     }
 
-let testUnit = Step.create "test:unit" { do! Cmd.createWithArgs "dotnet" [ "test"; "MyProject.UnitTests" ] |> Cmd.run }
+let testUnit =
+    Step.create "test:unit" {
+        do!
+            Cmd.create "dotnet"
+            |> Cmd.args [ "test"
+                          "--no-build"
+                          "--no-restore"
+                          "MyProject.UnitTests" ]
+            |> Cmd.run
+    }
 
 let testInt =
-    Step.create "test:integration" { do! retry 2 { do! Cmd.createWithArgs "dotnet" [ "test"; "MyProject.IntegrationTests" ] |> Cmd.run } }
+    Step.create "test:integration" {
+        do!
+            retry 2 {
+                do!
+                    Cmd.create "dotnet"
+                    |> Cmd.args [ "test"
+                                  "--no-build"
+                                  "--no-restore"
+                                  "MyProject.IntegrationTests" ]
+                    |> Cmd.run
+            }
+    }
 
 Pipelines.create {
     let! build =
@@ -49,7 +69,13 @@ Pipelines.create {
         }
 
     Pipeline.createFrom build "test" { run_parallel [ testUnit; testInt ] }
+
+    Pipelines.defaultPipeline build
 }
 |> Pipelines.runWithArgs args
+```
 
+To run:
+```sh
+dotnet fsi build.fsx
 ```
