@@ -105,7 +105,7 @@ module ProcessMonitor =
         member internal _.Post(msg: Message) : unit =
             msg |> mailbox.Post
 
-        member internal _.PostAndReply(builder: AsyncReplyChannel<'a> -> Message) : 'a =
+        member internal _.PostAndReply(builder: AsyncReplyChannel<'T> -> Message) : 'T =
             builder |> mailbox.PostAndReply
 
         interface IDisposable with

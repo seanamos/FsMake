@@ -14,13 +14,13 @@ module Pipelines =
     type Builder() =
         let mutable pipelines = { Default = None; Pipelines = [] }
 
-        member _.Delay(f: unit -> 'a) : 'a =
+        member _.Delay(f: unit -> 'T) : 'T =
             f ()
 
         member _.For(_: unit, x: unit -> unit) : unit =
             x ()
 
-        member _.Combine(_: 'a, _: 'a) : unit =
+        member _.Combine(_: 'T, _: 'T) : unit =
             ()
 
         member _.Yield() : unit =

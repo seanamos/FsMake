@@ -12,15 +12,15 @@ module EnvVar =
 
         if isNull var then None else Some var
 
-    let getAs<'a when 'a: struct> (name: string) : 'a =
+    let getAs<'T when 'T: struct> (name: string) : 'T =
         let var = get name
 
-        let converter = TypeDescriptor.GetConverter (typeof<'a>)
-        converter.ConvertFromString (var) :?> 'a
+        let converter = TypeDescriptor.GetConverter (typeof<'T>)
+        converter.ConvertFromString (var) :?> 'T
 
-    let getOptionAs<'a when 'a: struct> (name: string) =
+    let getOptionAs<'T when 'T: struct> (name: string) =
         try
-            let var = getAs<'a> name
+            let var = getAs<'T> name
 
             Some var
         with _ -> None

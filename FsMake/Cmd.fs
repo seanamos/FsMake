@@ -44,7 +44,7 @@ module Cmd =
           Redirect = None
           OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
 
-    let createWithArgs (args: string list) (cmd: string) : CmdOptions<unit> =
+    let createWithArgs (cmd: string) (args: string list) : CmdOptions<unit> =
         { create cmd with Args = args }
 
     let args (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
@@ -55,6 +55,14 @@ module Cmd =
 
     let argMaybe (cond: bool) (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         opts |> argsMaybe cond [ arg ]
+
+    let argsOption (arg: string list option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
+        match arg with
+        | Some x -> { opts with Args = opts.Args @ x }
+        | None -> opts
+
+    let argOption (arg: string option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
+        opts |> argsOption (arg |> Option.map (fun x -> [ x ]))
 
     let envVars (envVars: (string * string) list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with EnvVars = envVars }

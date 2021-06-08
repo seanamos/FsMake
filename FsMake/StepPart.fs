@@ -46,8 +46,8 @@ module StepPart =
 
             match result with
             | Ok x ->
-                let binded = binder x
-                binded ctx
+                let bound = binder x
+                bound ctx
             | Error x -> Error x
 
     let zip (part1: StepPart<'T>) (part2: StepPart<'T1>) : StepContext -> Result<('T * 'T1), StepError> =
@@ -57,18 +57,22 @@ module StepPart =
             | Error e, _ -> Error e
             | _, Error e -> Error e
 
+    let zero : StepPart<unit> = fun _ -> Ok ()
+
+    let return' (value: 'T) : StepPart<'T> = fun _ -> Ok value
+
     let context : StepPart<StepContext> = Ok
 
     [<AbstractClass>]
     type BaseBuilder() =
         member _.Return(value: 'T) : StepPart<'T> =
-            fun _ -> Ok value
+            return' value
 
         member inline _.ReturnFrom(part: StepPart<'T>) : StepPart<'T> =
             part
 
-        member this.Zero() : StepPart<unit> =
-            this.Return ()
+        member _.Zero() : StepPart<unit> =
+            zero
 
         member inline _.Bind(part: StepPart<'T>, binder: 'T -> StepPart<'U>) : StepPart<'U> =
             bind binder part
@@ -102,14 +106,11 @@ module StepPart =
         member this.For(sequence: #seq<'T>, binder: 'T -> StepPart<unit>) : StepPart<unit> =
             this.Using (sequence.GetEnumerator (), (fun enum -> this.While (enum.MoveNext, this.Delay (fun () -> binder enum.Current))))
 
-        member _.BindReturn(part: StepPart<'T>, f: 'T -> 'U) =
+        member _.BindReturn(part: StepPart<'T>, f: 'T -> 'U) : StepPart<'U> =
             map f part
 
-        member _.MergeSources(source1: StepPart<'T>, source2: StepPart<'T1>) : StepContext -> Result<('T * 'T1), StepError> =
+        member _.MergeSources(source1: StepPart<'T>, source2: StepPart<'T1>) : StepPart<('T * 'T1)> =
             zip source1 source2
-
-        member inline _.Source(part: StepPart<_>) : StepPart<_> =
-            part
 
     [<Sealed>]
     type Builder() =

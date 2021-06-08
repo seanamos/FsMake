@@ -204,7 +204,7 @@ module Pipeline =
             | Some x -> { x with Name = name }
             | None -> { Name = name; Stages = [] }
 
-        member _.Delay(f: unit -> 'a) : 'a =
+        member _.Delay(f: unit -> 'T) : 'T =
             f ()
 
         member _.For(_: unit, x: unit -> unit) : unit =
@@ -221,7 +221,7 @@ module Pipeline =
         member _.Run(_: unit) =
             pipeline
 
-        member _.Combine(_: 'a, _: 'a) : unit =
+        member _.Combine(_: 'T, _: 'T) : unit =
             ()
 
         [<CustomOperation("run")>]

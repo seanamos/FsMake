@@ -1,7 +1,7 @@
 namespace FsMake
 
 module Retry =
-    let retry (attempts: int) (retryFunc: unit -> StepPart<'a>) : StepPart<'a> =
+    let retry (attempts: int) (retryFunc: unit -> StepPart<'T>) : StepPart<'T> =
         fun ctx ->
             let rec nextRetry attempt =
                 let retryMessage () =
