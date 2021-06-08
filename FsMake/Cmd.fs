@@ -6,6 +6,11 @@ open System.Runtime.InteropServices
 open System.Text
 
 module Cmd =
+    type PrefixOption =
+        | PrefixAlways
+        | PrefixNever
+        | PrefixWhenParallel
+
     type RedirectOption =
         | Redirect
         | RedirectToBoth
@@ -15,10 +20,10 @@ module Cmd =
     type ProcessResult<'a> = { ExitCode: int; Output: 'a }
 
     type ExitCodeCheckOption =
-        | Zero
-        | ZeroWithMessage of message: string
-        | Code of code: int
-        | CodeWithMessage of code: int * message: string
+        | CheckCodeZero
+        | CheckCodeZeroWithMessage of message: string
+        | CheckCode of code: int
+        | CheckCodeWithMessage of code: int * message: string
 
     type CmdOptions<'a> =
         { Command: string
@@ -27,7 +32,7 @@ module Cmd =
           WorkingDirectory: string option
           UseMono: bool
           Timeout: TimeSpan option
-          Prefix: bool
+          Prefix: PrefixOption
           ExitCodeCheck: ExitCodeCheckOption option
           Redirect: RedirectOption option
           OutputProcessor: OutputProcessorArgs -> ProcessResult<'a> }
@@ -39,8 +44,8 @@ module Cmd =
           WorkingDirectory = None
           UseMono = false
           Timeout = None
-          Prefix = true
-          ExitCodeCheck = Some Zero
+          Prefix = PrefixWhenParallel
+          ExitCodeCheck = Some CheckCodeZero
           Redirect = None
           OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
 
@@ -74,8 +79,8 @@ module Cmd =
     let useMono (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with UseMono = true }
 
-    let prefix (usePrefix: bool) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with Prefix = usePrefix }
+    let prefix (prefix: PrefixOption) (opts: CmdOptions<'a>) : CmdOptions<'a> =
+        { opts with Prefix = prefix }
 
     let timeout (seconds: int) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
@@ -214,15 +219,15 @@ module Cmd =
                         ExpectedExitCode
 
                 match x with
-                | Zero ->
+                | CheckCodeZero ->
                     Console.error ""
                     |> Console.appendToken fullCommand
                     |> Console.append " failed with "
                     |> Console.appendToken (exitCode.ToString ())
                     |> Console.append " exit code"
                     |> checkCode 0
-                | ZeroWithMessage msg -> Console.error msg |> checkCode 0
-                | Code code ->
+                | CheckCodeZeroWithMessage msg -> Console.error msg |> checkCode 0
+                | CheckCode code ->
                     Console.error ""
                     |> Console.appendToken fullCommand
                     |> Console.append " failed with "
@@ -230,12 +235,17 @@ module Cmd =
                     |> Console.append " exit code, expected "
                     |> Console.appendToken (code.ToString ())
                     |> checkCode code
-                | CodeWithMessage (code, msg) -> Console.error msg |> checkCode code
+                | CheckCodeWithMessage (code, msg) -> Console.error msg |> checkCode code
             | None -> ExpectedExitCode
 
     let runAndGetResult (opts: CmdOptions<'a>) : StepPart<ProcessResult<'a>> =
         fun (ctx: StepContext) ->
-            let shouldPrefix = ctx.IsParallel && opts.Prefix
+            let shouldPrefix =
+                match opts.Prefix with
+                | PrefixNever -> false
+                | PrefixAlways -> true
+                | PrefixWhenParallel -> ctx.IsParallel
+
             let isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows)
 
             let startInfo = opts |> createProcessStartInfo isWindows shouldPrefix
