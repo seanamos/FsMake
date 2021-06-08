@@ -49,7 +49,8 @@ module internal Cli =
         { PrintHelp: bool
           Pipeline: string option
           ConsoleOutput: ConsoleOutput
-          Verbosity: Verbosity }
+          Verbosity: Verbosity
+          ExtraArgs: string list }
 
     let printUsage (writer: Console.IWriter) (errors: ParseError list) : unit =
         let assembly = Assembly.GetExecutingAssembly ()
@@ -57,7 +58,7 @@ module internal Cli =
         let version = assemblyAttr.InformationalVersion.ToString ()
 
         let usage = @"
-Usage: dotnet fsi <script>.fsx [pipeline] [options]
+Usage: dotnet fsi <script>.fsx [pipeline] [options] [-- extra args]
 
 Options:
   --help                                       Shows help and usage information
@@ -75,49 +76,61 @@ Options:
 
         Console.Important |> Console.message usage |> writer.WriteLine
 
+    type ParserState =
+        | NormalArgs
+        | ExtraArgs
+
     let parseArgs (args: string array) : Result<Args, ParseError list> =
         let args = args |> List.ofArray
 
-        let rec parseNextArg remArgs errors options =
-            match remArgs with
-            | [] -> (options, errors)
-            | "--help" :: _ -> ({ options with PrintHelp = true }, [])
-            | "-v" :: xs
-            | "--verbosity" :: xs ->
+        let rec parseNextArg remArgs errors idx state options =
+            match (state, remArgs) with
+            | (_, []) -> (options, errors)
+            | (NormalArgs, "--help" :: _) -> ({ options with PrintHelp = true }, [])
+            | (NormalArgs, "-v" :: xs)
+            | (NormalArgs, "--verbosity" :: xs) ->
                 match xs with
-                | "disabled" :: xss -> { options with Verbosity = Disabled } |> parseNextArg xss errors
-                | "quiet" :: xss -> { options with Verbosity = Quiet } |> parseNextArg xss errors
-                | "normal" :: xss -> { options with Verbosity = Normal } |> parseNextArg xss errors
-                | "all" :: xss -> { options with Verbosity = All } |> parseNextArg xss errors
+                | "disabled" :: xss -> { options with Verbosity = Disabled } |> parseNextArg xss errors (idx + 1) state
+                | "quiet" :: xss -> { options with Verbosity = Quiet } |> parseNextArg xss errors (idx + 1) state
+                | "normal" :: xss -> { options with Verbosity = Normal } |> parseNextArg xss errors (idx + 1) state
+                | "all" :: xss -> { options with Verbosity = All } |> parseNextArg xss errors (idx + 1) state
                 | x :: xss ->
                     options
-                    |> parseNextArg xss (InvalidOptionParam ("-v, --verbosity", x) :: errors)
-                | xss -> options |> parseNextArg xss (OptionParamMissing "-v, --verbosity" :: errors)
-            | "-o" :: xs
-            | "--console-output" :: xs ->
+                    |> parseNextArg xss (InvalidOptionParam ("-v, --verbosity", x) :: errors) (idx + 1) state
+                | xss ->
+                    options
+                    |> parseNextArg xss (OptionParamMissing "-v, --verbosity" :: errors) (idx + 1) state
+            | (NormalArgs, "-o" :: xs)
+            | (NormalArgs, "--console-output" :: xs) ->
                 match xs with
-                | "ansi" :: xss -> { options with ConsoleOutput = Ansi } |> parseNextArg xss errors
+                | "ansi" :: xss -> { options with ConsoleOutput = Ansi } |> parseNextArg xss errors (idx + 1) state
                 | "standard" :: xss ->
                     { options with
                           ConsoleOutput = Standard }
-                    |> parseNextArg xss errors
+                    |> parseNextArg xss errors (idx + 1) state
                 | x :: xss ->
                     options
-                    |> parseNextArg xss (InvalidOptionParam ("-o, --console-output", x) :: errors)
+                    |> parseNextArg xss (InvalidOptionParam ("-o, --console-output", x) :: errors) (idx + 1) state
                 | xss ->
                     options
-                    |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors)
-            | x :: xs ->
-                if args.[0] = x then
-                    { options with Pipeline = Some x } |> parseNextArg xs errors
+                    |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
+            | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
+            | (NormalArgs, x :: xs) ->
+                if idx = 0 then
+                    { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
                 else
-                    options |> parseNextArg xs (InvalidArgument x :: errors)
+                    options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
+            | (ExtraArgs, x :: xs) ->
+                { options with
+                      ExtraArgs = options.ExtraArgs @ [ x ] }
+                |> parseNextArg xs errors (idx + 1) state
 
         let (args, errors) =
             { PrintHelp = false
               Pipeline = None
               ConsoleOutput = Standard
-              Verbosity = Normal }
-            |> parseNextArg args []
+              Verbosity = Normal
+              ExtraArgs = [] }
+            |> parseNextArg args [] 0 NormalArgs
 
         if errors.IsEmpty then Ok args else Error errors

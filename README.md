@@ -17,9 +17,14 @@ let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 
 let clean =
     Step.create "clean" {
-        Glob.create "nupkgs/*.nupkg" |> Glob.toPaths |> Seq.iter (File.Delete)
+        let! ctx = StepPart.context
 
-        do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
+        if ctx.ExtraArgs |> List.exists (fun x -> x = "--clean") then
+            Glob.create "nupkgs/*.nupkg" |> Glob.toPaths |> Seq.iter (File.Delete)
+
+            do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
+        else
+            Console.warn "Skipping clean" |> ctx.Console.WriteLine
     }
 
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }

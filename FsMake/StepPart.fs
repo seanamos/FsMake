@@ -8,7 +8,8 @@ type StepContext =
       IsParallel: bool
       Console: Console.IWriter
       ProcessMonitor: ProcessMonitor.Agent
-      LongestStepNameLength: int }
+      LongestStepNameLength: int
+      ExtraArgs: string list }
 
 module internal Exception =
     let toConsoleMessage (ex: Exception) : Console.Message list =

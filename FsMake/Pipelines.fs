@@ -111,7 +111,7 @@ module Pipelines =
 
                     Console.CancelKeyPress.AddHandler (cancelHandler)
 
-                    let success = x |> Pipeline.run writer cts.Token
+                    let success = x |> Pipeline.run writer args.ExtraArgs cts.Token
 
                     Console.CancelKeyPress.RemoveHandler (cancelHandler)
 

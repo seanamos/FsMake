@@ -255,7 +255,7 @@ module Pipeline =
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
-    let run (writer: Console.IWriter) (ct: CancellationToken) (pipeline: Pipeline) : bool =
+    let run (writer: Console.IWriter) (extraArgs: string list) (ct: CancellationToken) (pipeline: Pipeline) : bool =
         let longestNameLength = pipeline.Stages |> Stage.longestStepNameLength
         use procMonitor = ProcessMonitor.create (writer)
 
@@ -267,7 +267,8 @@ module Pipeline =
               IsParallel = false
               Console = writer
               ProcessMonitor = procMonitor
-              LongestStepNameLength = longestNameLength }
+              LongestStepNameLength = longestNameLength
+              ExtraArgs = extraArgs }
 
         Console.info "Running pipeline "
         |> Console.appendToken pipeline.Name
