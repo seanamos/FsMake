@@ -7,6 +7,8 @@ A task runner library for F# scripting.
 ```fsharp
 // build.fsx
 #r "nuget: FsMake"
+// or a specific version
+// #r "nuget: FsMake, 1.0.0"
 
 open FsMake
 open System.IO
@@ -17,14 +19,9 @@ let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 
 let clean =
     Step.create "clean" {
-        let! ctx = StepPart.context
+        Glob.create "nupkgs/*.nupkg" |> Glob.toPaths |> Seq.iter (File.Delete)
 
-        if ctx.ExtraArgs |> List.exists (fun x -> x = "--clean") then
-            Glob.create "nupkgs/*.nupkg" |> Glob.toPaths |> Seq.iter (File.Delete)
-
-            do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
-        else
-            Console.warn "Skipping clean" |> ctx.Console.WriteLine
+        do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
     }
 
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }

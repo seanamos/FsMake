@@ -27,6 +27,9 @@ module Pipelines =
         member _.Yield(vars: 'a) : unit * 'a =
             ((), vars)
 
+        member _.For(_: _, binder: unit -> unit * 'a) : unit * 'a =
+            binder ()
+
         member _.Bind(pipeline: Pipeline, binder: Pipeline -> unit * 'a) : unit * 'a =
             pipelines <-
                 { pipelines with
