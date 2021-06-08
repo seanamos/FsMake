@@ -8,51 +8,56 @@ type Pipelines =
       Pipelines: Pipeline list }
 
 module Pipelines =
-    module Builder =
-        type DefaultPipeline = DefaultPipeline of Pipeline
-
     type Builder() =
         let mutable pipelines = { Default = None; Pipelines = [] }
+
+        member internal _.Pipelines
+            with get () = pipelines
+            and set (value) = pipelines <- value
+
+        member _.Zero(vars: 'a) =
+            ((), vars)
 
         member _.Delay(f: unit -> 'T) : 'T =
             f ()
 
-        member _.For(_: unit, x: unit -> unit) : unit =
-            x ()
-
         member _.Combine(_: 'T, _: 'T) : unit =
             ()
 
-        member _.Yield() : unit =
-            ()
+        member _.Yield(vars: 'a) : unit * 'a =
+            ((), vars)
 
-        member _.Yield(pipeline: Pipeline) : unit =
-            pipelines <-
-                { pipelines with
-                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
-
-        member _.Yield(Builder.DefaultPipeline pipeline) : unit =
-            pipelines <-
-                { pipelines with
-                      Default = Some pipeline }
-
-        member _.Bind(pipeline: Pipeline, binder: Pipeline -> unit) : unit =
+        member _.Bind(pipeline: Pipeline, binder: Pipeline -> unit * 'a) : unit * 'a =
             pipelines <-
                 { pipelines with
                       Pipelines = pipelines.Pipelines @ [ pipeline ] }
 
             binder pipeline
 
-        member _.Return(_) =
-            ()
+        [<CustomOperation("add", MaintainsVariableSpace = true)>]
+        member _.Add(((), vars: 'a), [<ProjectionParameter>] f: 'a -> Pipeline) : unit * 'a =
+            let pipeline = f vars
 
-        member _.Run(_: unit) : Pipelines =
+            pipelines <-
+                { pipelines with
+                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+
+            ((), vars)
+
+        [<CustomOperation("default_pipeline", MaintainsVariableSpace = true)>]
+        member _.DefaultPipeline(((), vars: 'a), [<ProjectionParameter>] f: 'a -> Pipeline) : unit * 'a =
+            let pipeline = f vars
+
+            pipelines <-
+                { pipelines with
+                      Default = Some pipeline }
+
+            ((), vars)
+
+        member _.Run(_: 'a) : Pipelines =
             pipelines
 
     let create = Builder ()
-
-    let defaultPipeline (pipeline: Pipeline) =
-        Builder.DefaultPipeline pipeline
 
     [<AutoOpen>]
     module internal Internal =
@@ -123,3 +128,15 @@ module Pipelines =
                     |> writer.WriteLine
 
                     exit 1
+
+[<AutoOpen>]
+module PipelinesBuilderExtensions =
+
+    // pretty horrible hack, but it allows us to use do! syntax
+    type Pipelines.Builder with
+        member this.Bind(pipeline: Pipeline, binder: unit -> unit * 'a) : unit * 'a =
+            this.Pipelines <-
+                { this.Pipelines with
+                      Pipelines = this.Pipelines.Pipelines @ [ pipeline ] }
+
+            binder ()

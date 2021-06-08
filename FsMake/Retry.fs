@@ -6,7 +6,7 @@ module Retry =
             let rec nextRetry attempt =
                 let retryMessage () =
                     Console.warn "Retrying, attempt "
-                    |> Console.appendToken (attempt.ToString ())
+                    |> Console.appendToken ((attempt + 1).ToString ())
                     |> ctx.Console.WriteLine
 
                 try

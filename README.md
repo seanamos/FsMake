@@ -19,7 +19,7 @@ let clean =
     Step.create "clean" {
         Glob.create "nupkgs/*.nupkg" |> Glob.toPaths |> Seq.iter (File.Delete)
 
-        do! Cmd.createWithArgs "dotnet" [ "clean"; "-v m" ] |> Cmd.run
+        do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
     }
 
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
@@ -68,9 +68,9 @@ Pipelines.create {
             run build
         }
 
-    Pipeline.createFrom build "test" { run_parallel [ testUnit; testInt ] }
+    do! Pipeline.createFrom build "test" { run_parallel [ testUnit; testInt ] }
 
-    Pipelines.defaultPipeline build
+    default_pipeline build
 }
 |> Pipelines.runWithArgs args
 ```
