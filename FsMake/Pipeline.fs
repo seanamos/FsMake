@@ -8,6 +8,13 @@ type Pipeline = { Name: string; Stages: Stage list }
 module Pipeline =
     [<AutoOpen>]
     module internal Internal =
+        type Context =
+            { Pipeline: Pipeline
+              Console: Console.IWriter
+              ProcessMonitor: ProcessMonitor.Agent
+              LongestStepNameLength: int
+              ExtraArgs: string list }
+
         type StepResult =
             | Success of step: Step * stat: Step.RunStat
             | Failed of step: Step * stat: Step.RunStat * err: StepError
@@ -71,17 +78,40 @@ module Pipeline =
                 |> Console.message (sprintf "%-35s: %s" "Total" (totalTime |> formatTime))
                 |> writer.WriteLine
 
+        let prefixColors =
+            [ Console.Cyan
+              Console.DarkCyan
+              Console.DarkYellow
+              Console.Green
+              Console.Magenta
+              Console.Yellow ]
+
+        let createOutputPrefix (stepMaxLength: int) (stepName: string) : (Console.TextPart) =
+            let prefix = sprintf "%-*s | " stepMaxLength stepName
+            let prefixColorIdx = Math.Abs (stepName.GetHashCode ()) % prefixColors.Length
+            let prefixColor = prefixColors.[prefixColorIdx]
+
+            Console.Colorized (prefix, prefixColor)
+
+        let createStepContext (ctx: Context) (isParallel: bool) (step: Step) : StepContext =
+            let prefix = createOutputPrefix ctx.LongestStepNameLength step.Name
+
+            { PipelineName = ctx.Pipeline.Name
+              StepName = step.Name
+              IsParallel = isParallel
+              Console = ctx.Console
+              ConsolePrefix = prefix
+              ProcessMonitor = ctx.ProcessMonitor
+              ExtraArgs = ctx.ExtraArgs }
+
         type RunStepArgs =
             { RunNextStage: StepResult list -> Stage list -> StepResult list
-              Context: StepContext
+              Context: Context
               AccResults: StepResult list
               RemainingStages: Stage list }
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
-            let stepContext =
-                { args.Context with
-                      StepName = step.Name }
-
+            let stepContext = createStepContext args.Context false step
             let stepResult = step |> Step.run stepContext
 
             match stepResult with
@@ -98,24 +128,18 @@ module Pipeline =
                 steps
                 |> Array.ofList
                 |> Array.Parallel.map (fun step ->
-                    let stepContext =
-                        { args.Context with
-                              StepName = step.Name
-                              IsParallel = true }
-
+                    let stepContext = createStepContext args.Context true step
                     let stepResult = step |> Step.run stepContext
 
-                    (step, stepResult)
+                    (step, stepContext, stepResult)
                 )
                 |> Array.map
                     (function
-                    | (step, Ok stat) -> Success (step, stat)
-                    | (step, Error (stat, err)) ->
-                        let prefix = sprintf "%-*s | " args.Context.LongestStepNameLength step.Name
-
+                    | (step, _, Ok stat) -> Success (step, stat)
+                    | (step, ctx, Error (stat, err)) ->
                         err
                         |> StepError.toConsoleMessage
-                        |> List.map (Console.prefix (Console.Colorized (prefix, Console.errorColor)))
+                        |> List.map (Console.prefix (ctx.ConsolePrefix))
                         |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))
@@ -126,7 +150,7 @@ module Pipeline =
             else
                 args.RemainingStages |> args.RunNextStage (args.AccResults @ results)
 
-        let runStages (writer: Console.IWriter) (context: StepContext) (stages: Stage list) : StepResult list =
+        let runStages (writer: Console.IWriter) (context: Context) (stages: Stage list) : StepResult list =
             let rec nextStage accResults remStages =
                 match remStages with
                 | [] -> accResults
@@ -261,10 +285,8 @@ module Pipeline =
 
         use __ = ct.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
-        let context : StepContext =
-            { PipelineName = pipeline.Name
-              StepName = ""
-              IsParallel = false
+        let context : Context =
+            { Pipeline = pipeline
               Console = writer
               ProcessMonitor = procMonitor
               LongestStepNameLength = longestNameLength

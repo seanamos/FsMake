@@ -2,7 +2,6 @@ namespace FsMake
 
 open System
 open System.Diagnostics
-open System.Runtime.InteropServices
 open System.Text
 
 module Cmd =
@@ -20,6 +19,7 @@ module Cmd =
     type ProcessResult<'a> = { ExitCode: int; Output: 'a }
 
     type ExitCodeCheckOption =
+        | CheckCodeNone
         | CheckCodeZero
         | CheckCodeZeroWithMessage of message: string
         | CheckCode of code: int
@@ -33,7 +33,7 @@ module Cmd =
           UseMono: bool
           Timeout: TimeSpan option
           Prefix: PrefixOption
-          ExitCodeCheck: ExitCodeCheckOption option
+          ExitCodeCheck: ExitCodeCheckOption
           Redirect: RedirectOption option
           OutputProcessor: OutputProcessorArgs -> ProcessResult<'a> }
 
@@ -45,7 +45,7 @@ module Cmd =
           UseMono = false
           Timeout = None
           Prefix = PrefixWhenParallel
-          ExitCodeCheck = Some CheckCodeZero
+          ExitCodeCheck = CheckCodeZero
           Redirect = None
           OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
 
@@ -76,9 +76,6 @@ module Cmd =
         { opts with
               WorkingDirectory = Some path }
 
-    let useMono (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with UseMono = true }
-
     let prefix (prefix: PrefixOption) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with Prefix = prefix }
 
@@ -102,24 +99,10 @@ module Cmd =
                     Output = { Std = std; StdErr = stdErr } } }
 
     let checkExitCode (check: ExitCodeCheckOption) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with ExitCodeCheck = Some check }
+        { opts with ExitCodeCheck = check }
 
     [<AutoOpen>]
     module internal Internal =
-        let prefixColors =
-            [ Console.Cyan
-              Console.DarkCyan
-              Console.DarkYellow
-              Console.Green
-              Console.Magenta
-              Console.Yellow ]
-
-        let createCmdArgs (isWindows: bool) (opts: CmdOptions<'a>) =
-            if opts.UseMono && (isWindows |> not) then
-                ("mono", opts.Command :: opts.Args)
-            else
-                (opts.Command, opts.Args)
-
         let prettyCommand (command: string) (args: string list) =
             if args.Length = 0 then
                 command
@@ -142,11 +125,9 @@ module Cmd =
                 sb.Append " ]" |> ignore
                 sb.ToString ()
 
-        let createProcessStartInfo (isWindows: bool) (shouldPrefix: bool) (opts: CmdOptions<'a>) : ProcessStartInfo =
-            let (command, args) = opts |> createCmdArgs isWindows
-
-            let startInfo = ProcessStartInfo (command)
-            args |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
+        let createProcessStartInfo (shouldPrefix: bool) (opts: CmdOptions<'a>) : ProcessStartInfo =
+            let startInfo = ProcessStartInfo (opts.Command)
+            opts.Args |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
 
             startInfo.UseShellExecute <- false
             startInfo.CreateNoWindow <- true
@@ -168,14 +149,15 @@ module Cmd =
             startInfo
 
         type WriteOutputOptions =
-            | WithPrefix of color: Console.Color * prefix: string
+            | WithPrefix of prefix: Console.TextPart
             | NoPrefix
 
         let writeOutput (opt: WriteOutputOptions) (console: Console.IWriter) (msgOpts: Console.Message -> Console.Message) : unit =
             match opt with
-            | WithPrefix (color, prefix) ->
+            | WithPrefix prefix ->
                 Console.Info
-                |> Console.messageColor color prefix
+                |> Console.messageEmpty Console.infoColor
+                |> Console.prefix prefix
                 |> msgOpts
                 |> console.WriteLine
             | NoPrefix ->
@@ -183,12 +165,6 @@ module Cmd =
                 |> Console.messageEmpty Console.infoColor
                 |> msgOpts
                 |> console.WriteLine
-
-        let createOutputPrefix (stepMaxLength: int) (stepName: string) : (Console.Color * string) =
-            let prefix = sprintf "%-*s | " stepMaxLength stepName
-            let prefixColorIdx = Math.Abs (stepName.GetHashCode ()) % prefixColors.Length
-            let prefixColor = prefixColors.[prefixColorIdx]
-            (prefixColor, prefix)
 
         type RedirectDecision =
             | ToConsole
@@ -209,34 +185,32 @@ module Cmd =
             | UnexpectedExitCode of msg: Console.Message
             | ExpectedExitCode
 
-        let exitCodeDecision (exitCodeCheck: ExitCodeCheckOption option) (fullCommand: string) (exitCode: int) : ExitCodeDecision =
-            match exitCodeCheck with
-            | Some x ->
-                let checkCode expected message =
-                    if exitCode <> expected then
-                        UnexpectedExitCode message
-                    else
-                        ExpectedExitCode
+        let exitCodeDecision (exitCodeCheck: ExitCodeCheckOption) (fullCommand: string) (exitCode: int) : ExitCodeDecision =
+            let checkCode expected message =
+                if exitCode <> expected then
+                    UnexpectedExitCode message
+                else
+                    ExpectedExitCode
 
-                match x with
-                | CheckCodeZero ->
-                    Console.error ""
-                    |> Console.appendToken fullCommand
-                    |> Console.append " failed with "
-                    |> Console.appendToken (exitCode.ToString ())
-                    |> Console.append " exit code"
-                    |> checkCode 0
-                | CheckCodeZeroWithMessage msg -> Console.error msg |> checkCode 0
-                | CheckCode code ->
-                    Console.error ""
-                    |> Console.appendToken fullCommand
-                    |> Console.append " failed with "
-                    |> Console.appendToken (exitCode.ToString ())
-                    |> Console.append " exit code, expected "
-                    |> Console.appendToken (code.ToString ())
-                    |> checkCode code
-                | CheckCodeWithMessage (code, msg) -> Console.error msg |> checkCode code
-            | None -> ExpectedExitCode
+            match exitCodeCheck with
+            | CheckCodeNone -> ExpectedExitCode
+            | CheckCodeZero ->
+                Console.error ""
+                |> Console.appendToken fullCommand
+                |> Console.append " failed with "
+                |> Console.appendToken (exitCode.ToString ())
+                |> Console.append " exit code"
+                |> checkCode 0
+            | CheckCodeZeroWithMessage msg -> Console.error msg |> checkCode 0
+            | CheckCode code ->
+                Console.error ""
+                |> Console.appendToken fullCommand
+                |> Console.append " failed with "
+                |> Console.appendToken (exitCode.ToString ())
+                |> Console.append " exit code, expected "
+                |> Console.appendToken (code.ToString ())
+                |> checkCode code
+            | CheckCodeWithMessage (code, msg) -> Console.error msg |> checkCode code
 
     let runAndGetResult (opts: CmdOptions<'a>) : StepPart<ProcessResult<'a>> =
         fun (ctx: StepContext) ->
@@ -246,19 +220,15 @@ module Cmd =
                 | PrefixAlways -> true
                 | PrefixWhenParallel -> ctx.IsParallel
 
-            let isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows)
-
-            let startInfo = opts |> createProcessStartInfo isWindows shouldPrefix
+            let startInfo = opts |> createProcessStartInfo shouldPrefix
             use proc = new Process ()
             proc.StartInfo <- startInfo
 
-            let (command, args) = (startInfo.FileName, startInfo.ArgumentList :> string seq |> List.ofSeq)
-            let (prefixColor, prefix) = ctx.StepName |> createOutputPrefix ctx.LongestStepNameLength
-            let fullCommand = prettyCommand command args
+            let fullCommand = prettyCommand opts.Command opts.Args
 
             let writeOutputOpts =
                 match shouldPrefix with
-                | true -> WithPrefix (prefixColor, prefix)
+                | true -> WithPrefix ctx.ConsolePrefix
                 | _ -> NoPrefix
 
             let writeOutput = writeOutput writeOutputOpts ctx.Console

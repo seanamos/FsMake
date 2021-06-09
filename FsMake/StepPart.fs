@@ -7,10 +7,11 @@ type StepContext =
       StepName: string
       IsParallel: bool
       Console: Console.IWriter
+      ConsolePrefix: Console.TextPart
       ProcessMonitor: ProcessMonitor.Agent
-      LongestStepNameLength: int
       ExtraArgs: string list }
 
+// TODO: move this somewhere else
 module internal Exception =
     let toConsoleMessage (ex: Exception) : Console.Message list =
         let split = ex.ToString().Split (Environment.NewLine)
