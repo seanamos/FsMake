@@ -8,7 +8,7 @@ module Cmd =
     type PrefixOption =
         | PrefixAlways
         | PrefixNever
-        | PrefixWhenParallel
+        | PrefixPipeline
 
     type RedirectOption =
         | Redirect
@@ -44,7 +44,7 @@ module Cmd =
           WorkingDirectory = None
           UseMono = false
           Timeout = None
-          Prefix = PrefixWhenParallel
+          Prefix = PrefixPipeline
           ExitCodeCheck = CheckCodeZero
           Redirect = None
           OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
@@ -218,7 +218,7 @@ module Cmd =
                 match opts.Prefix with
                 | PrefixNever -> false
                 | PrefixAlways -> true
-                | PrefixWhenParallel -> ctx.IsParallel
+                | PrefixPipeline -> Prefix.Internal.shouldPrefix ctx.IsParallel ctx.PrefixOption
 
             let startInfo = opts |> createProcessStartInfo shouldPrefix
             use proc = new Process ()
@@ -228,7 +228,7 @@ module Cmd =
 
             let writeOutputOpts =
                 match shouldPrefix with
-                | true -> WithPrefix ctx.ConsolePrefix
+                | true -> WithPrefix ctx.Prefix
                 | _ -> NoPrefix
 
             let writeOutput = writeOutput writeOutputOpts ctx.Console

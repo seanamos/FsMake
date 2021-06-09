@@ -7,6 +7,7 @@ module Retry =
                 let retryMessage () =
                     Console.warn "Retrying, attempt "
                     |> Console.appendToken ((attempt + 1).ToString ())
+                    |> Prefix.Internal.addOptionalPrefix ctx.IsParallel ctx.PrefixOption ctx.Prefix
                     |> ctx.Console.WriteLine
 
                 try
@@ -17,7 +18,9 @@ module Retry =
                     | Ok x -> Ok x
                     | Error x ->
                         if attempt < attempts then
-                            StepError.toConsoleMessage x |> ctx.Console.WriteLines
+                            StepError.toConsoleMessage x
+                            |> Prefix.Internal.addOptionalPrefixes ctx.IsParallel ctx.PrefixOption ctx.Prefix
+                            |> ctx.Console.WriteLines
 
                             retryMessage ()
 
@@ -26,7 +29,9 @@ module Retry =
                             Error x
                 with ex ->
                     if attempt < attempts then
-                        ex |> Exception.toConsoleMessage |> ctx.Console.WriteLines
+                        Exception.toConsoleMessage ex
+                        |> Prefix.Internal.addOptionalPrefixes ctx.IsParallel ctx.PrefixOption ctx.Prefix
+                        |> ctx.Console.WriteLines
 
                         retryMessage ()
 

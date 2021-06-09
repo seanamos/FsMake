@@ -7,7 +7,8 @@ type StepContext =
       StepName: string
       IsParallel: bool
       Console: Console.IWriter
-      ConsolePrefix: Console.TextPart
+      Prefix: Console.TextPart
+      PrefixOption: Prefix.PrefixOption
       ProcessMonitor: ProcessMonitor.Agent
       ExtraArgs: string list }
 

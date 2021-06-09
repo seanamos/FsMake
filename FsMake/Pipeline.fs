@@ -11,6 +11,7 @@ module Pipeline =
         type Context =
             { Pipeline: Pipeline
               Console: Console.IWriter
+              PrefixOption: Prefix.PrefixOption
               ProcessMonitor: ProcessMonitor.Agent
               LongestStepNameLength: int
               ExtraArgs: string list }
@@ -78,29 +79,15 @@ module Pipeline =
                 |> Console.message (sprintf "%-35s: %s" "Total" (totalTime |> formatTime))
                 |> writer.WriteLine
 
-        let prefixColors =
-            [ Console.Cyan
-              Console.DarkCyan
-              Console.DarkYellow
-              Console.Green
-              Console.Magenta
-              Console.Yellow ]
-
-        let createOutputPrefix (stepMaxLength: int) (stepName: string) : (Console.TextPart) =
-            let prefix = sprintf "%-*s | " stepMaxLength stepName
-            let prefixColorIdx = Math.Abs (stepName.GetHashCode ()) % prefixColors.Length
-            let prefixColor = prefixColors.[prefixColorIdx]
-
-            Console.Colorized (prefix, prefixColor)
-
         let createStepContext (ctx: Context) (isParallel: bool) (step: Step) : StepContext =
-            let prefix = createOutputPrefix ctx.LongestStepNameLength step.Name
+            let prefix = Prefix.Internal.createPrefix ctx.LongestStepNameLength step.Name
 
             { PipelineName = ctx.Pipeline.Name
               StepName = step.Name
               IsParallel = isParallel
               Console = ctx.Console
-              ConsolePrefix = prefix
+              Prefix = prefix
+              PrefixOption = ctx.PrefixOption
               ProcessMonitor = ctx.ProcessMonitor
               ExtraArgs = ctx.ExtraArgs }
 
@@ -111,15 +98,18 @@ module Pipeline =
               RemainingStages: Stage list }
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
-            let stepContext = createStepContext args.Context false step
-            let stepResult = step |> Step.run stepContext
+            let ctx = createStepContext args.Context false step
+            let stepResult = step |> Step.run ctx
 
             match stepResult with
             | Ok stat ->
                 args.RemainingStages
                 |> args.RunNextStage (args.AccResults @ [ Success (step, stat) ])
             | Error (stat, err) ->
-                err |> StepError.toConsoleMessage |> args.Context.Console.WriteLines
+                err
+                |> StepError.toConsoleMessage
+                |> Prefix.Internal.addOptionalPrefixes false ctx.PrefixOption ctx.Prefix
+                |> args.Context.Console.WriteLines
 
                 args.AccResults @ [ Failed (step, stat, err) ]
 
@@ -139,7 +129,7 @@ module Pipeline =
                     | (step, ctx, Error (stat, err)) ->
                         err
                         |> StepError.toConsoleMessage
-                        |> List.map (Console.prefix (ctx.ConsolePrefix))
+                        |> Prefix.Internal.addOptionalPrefixes true ctx.PrefixOption ctx.Prefix
                         |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))
@@ -279,29 +269,36 @@ module Pipeline =
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
-    let run (writer: Console.IWriter) (extraArgs: string list) (ct: CancellationToken) (pipeline: Pipeline) : bool =
-        let longestNameLength = pipeline.Stages |> Stage.longestStepNameLength
-        use procMonitor = ProcessMonitor.create (writer)
+    type RunArgs =
+        { Writer: Console.IWriter
+          ExtraArgs: string list
+          PrefixOption: Prefix.PrefixOption
+          CancellationToken: CancellationToken }
 
-        use __ = ct.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
+    let run (args: RunArgs) (pipeline: Pipeline) : bool =
+        let longestNameLength = pipeline.Stages |> Stage.longestStepNameLength
+        use procMonitor = ProcessMonitor.create (args.Writer)
+
+        use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
         let context : Context =
             { Pipeline = pipeline
-              Console = writer
+              Console = args.Writer
+              PrefixOption = args.PrefixOption
               ProcessMonitor = procMonitor
               LongestStepNameLength = longestNameLength
-              ExtraArgs = extraArgs }
+              ExtraArgs = args.ExtraArgs }
 
         Console.info "Running pipeline "
         |> Console.appendToken pipeline.Name
-        |> writer.WriteLine
+        |> args.Writer.WriteLine
 
-        let results = pipeline.Stages |> runStages writer context
+        let results = pipeline.Stages |> runStages args.Writer context
 
-        writer.WriteLine (Console.Info)
-        results |> StepResult.printResults writer
+        args.Writer.WriteLine (Console.Info)
+        results |> StepResult.printResults args.Writer
 
-        writer.WriteLine (Console.Info)
+        args.Writer.WriteLine (Console.Info)
 
         let failed = results |> StepResult.anyFailed
 
@@ -310,12 +307,12 @@ module Pipeline =
             |> Console.statusMessage Console.errorColor ""
             |> Console.appendToken pipeline.Name
             |> Console.append " pipeline failed"
-            |> writer.WriteLine
+            |> args.Writer.WriteLine
         else
             Console.Info
             |> Console.statusMessage Console.successColor ""
             |> Console.appendToken pipeline.Name
             |> Console.append " pipeline complete"
-            |> writer.WriteLine
+            |> args.Writer.WriteLine
 
         not failed

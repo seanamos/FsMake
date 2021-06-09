@@ -5,7 +5,8 @@ open System.Threading
 
 type Pipelines =
     { Default: Pipeline option
-      Pipelines: Pipeline list }
+      Pipelines: Pipeline list
+      StepPrefix: Prefix.PrefixOption }
 
 module Pipelines =
     type Builder() =
@@ -19,7 +20,7 @@ module Pipelines =
             ()
 
         member _.Yield(vars: 'a) : Pipelines * 'a =
-            ({ Default = None; Pipelines = [] }, vars)
+            ({ Default = None; Pipelines = []; StepPrefix = Prefix.WhenParallel }, vars)
 
         member _.For(_: _, binder: unit -> Pipelines * 'a) : Pipelines * 'a =
             binder ()
@@ -49,6 +50,16 @@ module Pipelines =
             let pipelines =
                 { pipelines with
                       Default = Some pipeline }
+
+            (pipelines, vars)
+
+        [<CustomOperation("step_prefix", MaintainsVariableSpace = true)>]
+        member _.StepPrefix((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>]f: 'a -> Prefix.PrefixOption) :Pipelines * 'a =
+            let option = f vars
+
+            let pipelines =
+                { pipelines with
+                    StepPrefix = option }
 
             (pipelines, vars)
 
@@ -109,7 +120,13 @@ module Pipelines =
 
                     Console.CancelKeyPress.AddHandler (cancelHandler)
 
-                    let success = x |> Pipeline.run writer args.ExtraArgs cts.Token
+                    let args : Pipeline.RunArgs =
+                        { Writer = writer
+                          ExtraArgs = args.ExtraArgs
+                          PrefixOption = pipelines.StepPrefix
+                          CancellationToken = cts.Token }
+
+                    let success = x |> Pipeline.run args
 
                     Console.CancelKeyPress.RemoveHandler (cancelHandler)
 
