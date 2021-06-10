@@ -93,17 +93,17 @@ module Pipelines =
         let parsedArgs = Cli.parseArgs args
 
         match parsedArgs with
-        | Error x ->
+        | Error (args, errors) ->
             let writer = Console.defaultWriter
 
-            Cli.printUsage writer x
+            Cli.printUsage writer args errors
         | Ok args ->
             let consoleOutput = args.ConsoleOutput |> Cli.ConsoleOutput.toConsoleOutputType
             let verbosity = args.Verbosity |> Cli.Verbosity.toConsoleVerbosity
             let writer = Console.createWriter consoleOutput verbosity
 
             match args.PrintHelp with
-            | true -> Cli.printUsage writer []
+            | true -> Cli.printUsage writer args []
             | false ->
                 let findResult = args.Pipeline |> findPipelineFromArg pipelines
 

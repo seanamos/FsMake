@@ -288,7 +288,7 @@ module Cmd =
                     [ Console.error ""
                       |> Console.appendToken fullCommand
                       |> Console.append " was aborted" ]
-                    |> StepUserAbort
+                    |> StepAbort
                     |> Error
                 else
                     let exitCode = proc.ExitCode

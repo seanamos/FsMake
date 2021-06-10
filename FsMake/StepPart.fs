@@ -12,23 +12,15 @@ type StepContext =
       ProcessMonitor: ProcessMonitor.Agent
       ExtraArgs: string list }
 
-// TODO: move this somewhere else
-module internal Exception =
-    let toConsoleMessage (ex: Exception) : Console.Message list =
-        let split = ex.ToString().Split (Environment.NewLine)
-
-        Console.error $"Exception:"
-        :: [ for exLine in split -> Console.Error |> Console.messageColor Console.errorColor exLine ]
-
 type StepError =
-    | StepUserAbort of message: Console.Message list
+    | StepAbort of message: Console.Message list
     | StepError of message: Console.Message list
     | StepUnhandledEx of ex: exn
 
 module StepError =
     let toConsoleMessage (error: StepError) : Console.Message list =
         match error with
-        | StepUserAbort x -> x
+        | StepAbort x -> x
         | StepError x -> x
         | StepUnhandledEx ex -> ex |> Exception.toConsoleMessage
 

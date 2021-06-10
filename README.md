@@ -13,7 +13,7 @@ A task runner library for F# scripting.
 open FsMake
 open System.IO
 
-let args = fsi.CommandLineArgs |> Array.skip 1 // first arg is the name of script
+let args = fsi.CommandLineArgs
 let useAnsi = EnvVar.getOption "ANSI" |> Option.isSome
 let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 

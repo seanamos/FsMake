@@ -47,18 +47,20 @@ module internal Cli =
 
     type Args =
         { PrintHelp: bool
+          ScriptFile: string option
           Pipeline: string option
           ConsoleOutput: ConsoleOutput
           Verbosity: Verbosity
           ExtraArgs: string list }
 
-    let printUsage (writer: Console.IWriter) (errors: ParseError list) : unit =
+    let printUsage (writer: Console.IWriter) (args: Args) (errors: ParseError list) : unit =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
+        let scriptFile = args.ScriptFile |> Option.defaultValue "<script>.fsx"
 
-        let usage = @"
-Usage: dotnet fsi <script>.fsx [pipeline] [options] [-- extra args]
+        let usage = @$"
+Usage: dotnet fsi {scriptFile} [pipeline] [options] [-- extra args]
 
 Options:
   --help                                       Shows help and usage information
@@ -80,7 +82,7 @@ Options:
         | NormalArgs
         | ExtraArgs
 
-    let parseArgs (args: string array) : Result<Args, ParseError list> =
+    let parseArgs (args: string array) : Result<Args, Args * ParseError list> =
         let args = args |> List.ofArray
 
         let rec parseNextArg remArgs errors idx state options =
@@ -116,10 +118,11 @@ Options:
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
             | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
-                if idx = 0 then
-                    { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
-                else
-                    options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
+                match (idx, options.ScriptFile) with
+                | (0, _) when x.EndsWith (".fsx") -> { options with ScriptFile = Some x } |> parseNextArg xs errors (idx + 1) state
+                | (0, _)
+                | (1, Some _) -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
+                | _ -> options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
             | (ExtraArgs, x :: xs) ->
                 { options with
                       ExtraArgs = options.ExtraArgs @ [ x ] }
@@ -127,10 +130,13 @@ Options:
 
         let (args, errors) =
             { PrintHelp = false
+              ScriptFile = None
               Pipeline = None
               ConsoleOutput = Standard
               Verbosity = Normal
               ExtraArgs = [] }
             |> parseNextArg args [] 0 NormalArgs
 
-        if errors.IsEmpty then Ok args else Error errors
+        printfn "%A" args
+
+        if errors.IsEmpty then Ok args else Error (args, errors)
