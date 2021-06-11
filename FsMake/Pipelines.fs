@@ -21,16 +21,20 @@ module Pipelines =
             ()
 
         member _.Yield(vars: 'a) : Pipelines * 'a =
-            ({ Default = None; Pipelines = []; StepPrefix = Prefix.WhenParallel }, vars)
+            ({ Default = None
+               Pipelines = []
+               StepPrefix = Prefix.WhenParallel },
+             vars)
 
         member _.For(_: _, binder: unit -> Pipelines * 'a) : Pipelines * 'a =
             binder ()
 
         member _.Bind(pipeline: Pipeline, binder: Pipeline -> Pipelines * 'a) : Pipelines * 'a =
-            let (pipelines, vars) =  binder pipeline
+            let (pipelines, vars) = binder pipeline
+
             let pipelines =
                 { pipelines with
-                    Pipelines = pipelines.Pipelines @ [ pipeline ] }
+                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
 
             (pipelines, vars)
 
@@ -55,12 +59,10 @@ module Pipelines =
             (pipelines, vars)
 
         [<CustomOperation("step_prefix", MaintainsVariableSpace = true)>]
-        member _.StepPrefix((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>]f: 'a -> Prefix.PrefixOption) :Pipelines * 'a =
+        member _.StepPrefix((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>] f: 'a -> Prefix.PrefixOption) : Pipelines * 'a =
             let option = f vars
 
-            let pipelines =
-                { pipelines with
-                    StepPrefix = option }
+            let pipelines = { pipelines with StepPrefix = option }
 
             (pipelines, vars)
 
@@ -151,7 +153,7 @@ module PipelinesBuilderExtensions =
     // pretty horrible hack, but it allows us to use do! syntax
     type Pipelines.Builder with
         member _.Bind(pipeline: Pipeline, binder: unit -> Pipelines * 'a) : Pipelines * 'a =
-            let (pipelines, vars) =  binder ()
+            let (pipelines, vars) = binder ()
 
             let pipelines =
                 { pipelines with

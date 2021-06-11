@@ -1,17 +1,22 @@
 namespace FsMake
 
 module Retry =
-    let retry (attempts: int) (retryFunc: unit -> StepPart<'T>) : StepPart<'T> =
+    let stepPart (attempts: int) (retryFunc: unit -> StepPart<'T>) : StepPart<'T> =
         let rec nextRetry attempt ctx =
+            let prefixArgs : Prefix.Internal.OptionalPrefixArgs =
+                { IsParallel = ctx.IsParallel
+                  PrefixOption = ctx.PrefixOption
+                  Prefix = ctx.Prefix }
+
             let errorMessage (messages: Console.Message list) =
                 messages
-                |> Prefix.Internal.addOptionalPrefixes ctx.IsParallel ctx.PrefixOption ctx.Prefix
+                |> Prefix.Internal.addOptionalPrefixes prefixArgs
                 |> ctx.Console.WriteLines
 
             let retryMessage () =
                 Console.warn "Retrying, attempt "
                 |> Console.appendToken ((attempt + 1).ToString ())
-                |> Prefix.Internal.addOptionalPrefix ctx.IsParallel ctx.PrefixOption ctx.Prefix
+                |> Prefix.Internal.addOptionalPrefix prefixArgs
                 |> ctx.Console.WriteLine
 
             try
@@ -45,7 +50,7 @@ module Retry =
         inherit StepPart.BaseBuilder()
 
         member _.Run(generator: unit -> StepPart<'T>) : StepPart<'T> =
-            generator |> retry attempts
+            generator |> stepPart attempts
 
 [<AutoOpen>]
 module RetryBuilder =

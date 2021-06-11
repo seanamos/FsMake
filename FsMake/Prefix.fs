@@ -31,15 +31,19 @@ module Prefix =
             | Never -> false
             | WhenParallel -> isParallel
 
-        let addOptionalPrefixes (isParallel: bool) (pipelineOpt: PrefixOption) (prefix: Console.TextPart) (messages: Console.Message list) : Console.Message list =
-            if shouldPrefix isParallel pipelineOpt then
-                messages |> List.map (Console.prefix prefix)
+        type OptionalPrefixArgs =
+            { IsParallel: bool
+              PrefixOption: PrefixOption
+              Prefix: Console.TextPart }
+
+        let addOptionalPrefixes (args: OptionalPrefixArgs) (messages: Console.Message list) : Console.Message list =
+            if shouldPrefix args.IsParallel args.PrefixOption then
+                messages |> List.map (Console.prefix args.Prefix)
             else
                 messages
 
-        let addOptionalPrefix (isParallel: bool) (pipelineOpt: PrefixOption) (prefix: Console.TextPart) (message: Console.Message) : Console.Message =
-            if shouldPrefix isParallel pipelineOpt then
-                message |> Console.prefix prefix
+        let addOptionalPrefix (args: OptionalPrefixArgs) (message: Console.Message) : Console.Message =
+            if shouldPrefix args.IsParallel args.PrefixOption then
+                message |> Console.prefix args.Prefix
             else
                 message
-

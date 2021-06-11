@@ -108,7 +108,10 @@ module Pipeline =
             | Error (stat, err) ->
                 err
                 |> StepError.toConsoleMessage
-                |> Prefix.Internal.addOptionalPrefixes false ctx.PrefixOption ctx.Prefix
+                |> Prefix.Internal.addOptionalPrefixes
+                    { IsParallel = false
+                      PrefixOption = ctx.PrefixOption
+                      Prefix = ctx.Prefix }
                 |> args.Context.Console.WriteLines
 
                 args.AccResults @ [ Failed (step, stat, err) ]
@@ -129,7 +132,10 @@ module Pipeline =
                     | (step, ctx, Error (stat, err)) ->
                         err
                         |> StepError.toConsoleMessage
-                        |> Prefix.Internal.addOptionalPrefixes true ctx.PrefixOption ctx.Prefix
+                        |> Prefix.Internal.addOptionalPrefixes
+                            { IsParallel = true
+                              PrefixOption = ctx.PrefixOption
+                              Prefix = ctx.Prefix }
                         |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))

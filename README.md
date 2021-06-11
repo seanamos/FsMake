@@ -1,6 +1,6 @@
 # FsMake
 
-A pipeline step/task runner using F#.
+F# pipeline step/task runner.
 
 ## Development :construction:
 

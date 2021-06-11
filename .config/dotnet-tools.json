@@ -19,6 +19,12 @@
       "commands": [
         "dotnet-fsharplint"
       ]
+    },
+    "gitversion.tool": {
+      "version": "5.6.10",
+      "commands": [
+        "dotnet-gitversion"
+      ]
     }
   }
 }

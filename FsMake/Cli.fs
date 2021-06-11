@@ -59,9 +59,9 @@ module internal Cli =
         let version = assemblyAttr.InformationalVersion.ToString ()
         let scriptFile = args.ScriptFile |> Option.defaultValue "<script>.fsx"
 
-        let usage = @$"
+        let usage =
+            @$"
 Usage: dotnet fsi {scriptFile} [pipeline] [options] [-- extra args]
-
 Options:
   --help                                       Shows help and usage information
   -v, --verbosity <disabled|quiet|normal|all>  The verbosity level of FsMake's output [default: normal]
@@ -136,7 +136,5 @@ Options:
               Verbosity = Normal
               ExtraArgs = [] }
             |> parseNextArg args [] 0 NormalArgs
-
-        printfn "%A" args
 
         if errors.IsEmpty then Ok args else Error (args, errors)

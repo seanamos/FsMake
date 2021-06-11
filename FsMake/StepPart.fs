@@ -54,7 +54,8 @@ module StepPart =
 
     let zero : StepPart<unit> = fun _ -> Ok ()
 
-    let return' (value: 'T) : StepPart<'T> = fun _ -> Ok value
+    let return' (value: 'T) : StepPart<'T> =
+        fun _ -> Ok value
 
     let context : StepPart<StepContext> = Ok
 
