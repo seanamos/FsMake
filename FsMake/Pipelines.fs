@@ -9,6 +9,7 @@ type Pipelines =
       StepPrefix: Prefix.PrefixOption }
 
 module Pipelines =
+    [<Sealed>]
     type Builder() =
         member _.Zero(vars: 'a) =
             ((), vars)

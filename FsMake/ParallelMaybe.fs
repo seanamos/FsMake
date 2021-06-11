@@ -27,6 +27,7 @@ module ParallelMaybe =
 
             (run |> toSteps, skip |> toSteps)
 
+    [<Sealed>]
     type Builder() =
         member _.Yield(_) : ParallelMaybe list =
             []

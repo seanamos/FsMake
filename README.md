@@ -1,6 +1,6 @@
 # FsMake
 
-A task runner library for F# scripting.
+A pipeline step/task runner using F#.
 
 ## Usage
 

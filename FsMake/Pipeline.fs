@@ -212,6 +212,7 @@ module Pipeline =
 
             stages |> nextStage []
 
+    [<Sealed>]
     type Builder(name: string, ?from: Pipeline) =
         let mutable pipeline =
             match from with
