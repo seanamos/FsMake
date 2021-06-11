@@ -95,7 +95,7 @@ module Console =
             | _ -> false
 
         [<Sealed>]
-        type internal AnsiWriter(verbosity: Verbosity) =
+        type AnsiWriter(verbosity: Verbosity) =
             let locker = obj ()
             let ansiReset = "\u001b[0m"
 
@@ -134,7 +134,7 @@ module Console =
                     )
 
         [<Sealed>]
-        type internal StandardWriter(verbosity: Verbosity) =
+        type StandardWriter(verbosity: Verbosity) =
             let locker = obj ()
 
             let writeColor color (text: string) =
