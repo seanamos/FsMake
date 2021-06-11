@@ -1,5 +1,7 @@
 type project
 id FsMake
+licenseExpression MIT
+copyright Copyright (c) 2021 Sean Amos
 
 authors Sean Amos
 description F# pipeline step/task runner
@@ -7,4 +9,4 @@ description F# pipeline step/task runner
 tags fsmake build fsi f# make pipeline step
 repositoryType git
 repositoryUrl https://github.com/seanamos/FsMake
-licenseExpression MIT
+projectUrl https://github.com/seanamos/FsMake
