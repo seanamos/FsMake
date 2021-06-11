@@ -160,3 +160,13 @@ module PipelinesBuilderExtensions =
                       Pipelines = pipelines.Pipelines @ [ pipeline ] }
 
             (pipelines, vars)
+
+    type Pipelines.Builder with
+        member this.Bind(pipeline: Pipeline, binder: unit -> unit * unit) : Pipelines * unit =
+            let (pipelines, vars) = this.Yield (())
+
+            let pipelines =
+                { pipelines with
+                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+
+            (pipelines, vars)

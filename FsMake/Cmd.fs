@@ -30,7 +30,6 @@ module Cmd =
           Args: string list
           EnvVars: (string * string) list
           WorkingDirectory: string option
-          UseMono: bool
           Timeout: TimeSpan option
           Prefix: PrefixOption
           ExitCodeCheck: ExitCodeCheckOption
@@ -42,7 +41,6 @@ module Cmd =
           Args = []
           EnvVars = []
           WorkingDirectory = None
-          UseMono = false
           Timeout = None
           Prefix = PrefixPipeline
           ExitCodeCheck = CheckCodeZero
@@ -88,7 +86,6 @@ module Cmd =
           Args = opts.Args
           EnvVars = opts.EnvVars
           WorkingDirectory = opts.WorkingDirectory
-          UseMono = opts.UseMono
           Timeout = opts.Timeout
           Prefix = opts.Prefix
           ExitCodeCheck = opts.ExitCodeCheck
