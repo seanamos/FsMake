@@ -4,16 +4,16 @@ open System
 open System.Diagnostics
 
 module ProcessMonitor =
-    type Message =
-        | Add of proc: Process * reply: AsyncReplyChannel<unit>
-        | Remove of proc: Process * reply: AsyncReplyChannel<unit>
-        | Kill of proc: Process * reply: AsyncReplyChannel<unit>
-        | IsKilled of proc: Process * reply: AsyncReplyChannel<bool>
-        | KillAll of reply: AsyncReplyChannel<unit>
-        | Shutdown of reply: AsyncReplyChannel<unit>
-
     [<AutoOpen>]
     module Internal =
+        type Message =
+            | Add of proc: Process * reply: AsyncReplyChannel<unit>
+            | Remove of proc: Process * reply: AsyncReplyChannel<unit>
+            | Kill of proc: Process * reply: AsyncReplyChannel<unit>
+            | IsKilled of proc: Process * reply: AsyncReplyChannel<bool>
+            | KillAll of reply: AsyncReplyChannel<unit>
+            | Shutdown of reply: AsyncReplyChannel<unit>
+
         type State =
             { Processes: (int * Process) list
               Killed: int list }

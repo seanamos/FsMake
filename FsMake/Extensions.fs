@@ -2,7 +2,7 @@ namespace FsMake
 
 open System
 
-module Exception =
+module internal Exception =
     let toConsoleMessage (ex: Exception) : Console.Message list =
         let split = ex.ToString().Split (Environment.NewLine)
 
