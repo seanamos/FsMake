@@ -2,6 +2,10 @@
 
 A pipeline step/task runner using F#.
 
+## Development :construction:
+
+> :warning: While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
+
 ## Usage
 
 ```fsharp
