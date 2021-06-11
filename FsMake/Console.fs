@@ -84,6 +84,9 @@ module Console =
         | Ansi
         | Standard
 
+    type IWriter =
+        abstract member Write : messages: Message list -> unit
+
     [<AutoOpen>]
     module internal Internal =
         let checkLevel (verbosity: Verbosity) (level: Level) =
@@ -91,83 +94,81 @@ module Console =
             | _ when level |> Verbosity.matchLevel verbosity -> true
             | _ -> false
 
-    type IWriter =
-        abstract member Write : messages: Message list -> unit
+        [<Sealed>]
+        type internal AnsiWriter(verbosity: Verbosity) =
+            let locker = obj ()
+            let ansiReset = "\u001b[0m"
 
-    let private locker = obj ()
+            let formatTextPart tokenColor textPart =
+                match textPart with
+                | Text x -> x
+                | Token x -> $"{tokenColor}{x}{ansiReset}"
+                | Colorized (text, color) ->
+                    let ansiColor = color |> Color.toAnsiCode
+                    $"{ansiColor}{text}{ansiReset}"
 
-    [<Sealed>]
-    type internal AnsiWriter(verbosity: Verbosity) =
-        let ansiReset = "\u001b[0m"
+            let textPartsToStringBuilder tokenColor textParts =
+                let sb = StringBuilder ()
 
-        let formatTextPart tokenColor textPart =
-            match textPart with
-            | Text x -> x
-            | Token x -> $"{tokenColor}{x}{ansiReset}"
-            | Colorized (text, color) ->
-                let ansiColor = color |> Color.toAnsiCode
-                $"{ansiColor}{text}{ansiReset}"
+                textParts
+                |> List.fold (fun (sb: StringBuilder) x -> x |> formatTextPart tokenColor |> sb.Append) sb
 
-        let textPartsToStringBuilder tokenColor textParts =
-            let sb = StringBuilder ()
+            interface IWriter with
+                member _.Write(messages: Message list) : unit =
+                    lock locker
+                    <| fun () ->
+                        messages
+                        |> List.iter (fun message ->
+                            if message.Level |> checkLevel verbosity then
+                                let tokenColor = message.TokenColor |> Color.toAnsiCode
 
-            textParts
-            |> List.fold (fun (sb: StringBuilder) x -> x |> formatTextPart tokenColor |> sb.Append) sb
+                                let sb = message.TextParts |> textPartsToStringBuilder tokenColor
 
-        interface IWriter with
-            member _.Write(messages: Message list) : unit =
-                lock locker
-                <| fun () ->
-                    messages
-                    |> List.iter (fun message ->
-                        if message.Level |> checkLevel verbosity then
-                            let tokenColor = message.TokenColor |> Color.toAnsiCode
+                                match message.Prefix with
+                                | Some x ->
+                                    let prefixfmt = x |> formatTextPart tokenColor
+                                    sb.Insert (0, prefixfmt) |> ignore
+                                | None -> ()
 
-                            let sb = message.TextParts |> textPartsToStringBuilder tokenColor
-
-                            match message.Prefix with
-                            | Some x ->
-                                let prefixfmt = x |> formatTextPart tokenColor
-                                sb.Insert (0, prefixfmt) |> ignore
-                            | None -> ()
-
-                            Console.Write (sb.ToString ())
+                                Console.Write (sb.ToString ())
                     )
 
-    [<Sealed>]
-    type internal StandardWriter(verbosity: Verbosity) =
-        let writeColor color (text: string) =
-            let prevColor = Console.ForegroundColor
-            Console.ForegroundColor <- color
-            Console.Write (text)
-            Console.ForegroundColor <- prevColor
+        [<Sealed>]
+        type internal StandardWriter(verbosity: Verbosity) =
+            let locker = obj ()
 
-        let writeTextPart tokenColor textPart =
-            match textPart with
-            | Text x -> Console.Write (x)
-            | Token x -> x |> writeColor tokenColor
-            | Colorized (text, color) ->
-                let consoleColor = color |> Color.toConsoleColor
-                text |> writeColor consoleColor
+            let writeColor color (text: string) =
+                let prevColor = Console.ForegroundColor
+                Console.ForegroundColor <- color
+                Console.Write (text)
+                Console.ForegroundColor <- prevColor
 
-        interface IWriter with
-            member _.Write(messages: Message list) =
-                lock locker
-                <| fun () ->
-                    messages
-                    |> List.iter (fun message ->
-                        if message.Level |> checkLevel verbosity then
-                            let tokenColor = message.TokenColor |> Color.toConsoleColor
-                            let writeTextPart = writeTextPart tokenColor
+            let writeTextPart tokenColor textPart =
+                match textPart with
+                | Text x -> Console.Write (x)
+                | Token x -> x |> writeColor tokenColor
+                | Colorized (text, color) ->
+                    let consoleColor = color |> Color.toConsoleColor
+                    text |> writeColor consoleColor
 
-                            match message.Prefix with
-                            | Some x -> writeTextPart x
-                            | None -> ()
+            interface IWriter with
+                member _.Write(messages: Message list) =
+                    lock locker
+                    <| fun () ->
+                        messages
+                        |> List.iter (fun message ->
+                            if message.Level |> checkLevel verbosity then
+                                let tokenColor = message.TokenColor |> Color.toConsoleColor
+                                let writeTextPart = writeTextPart tokenColor
 
-                            message.TextParts |> List.iter (writeTextPart)
-                    )
+                                match message.Prefix with
+                                | Some x -> writeTextPart x
+                                | None -> ()
 
-    let defaultWriter = StandardWriter (Normal) :> IWriter
+                                message.TextParts |> List.iter (writeTextPart)
+                        )
+
+        let defaultWriter = StandardWriter (Normal) :> IWriter
 
     let createWriter (outputType: OutputType) (verbosity: Verbosity) : IWriter =
         match outputType with
@@ -227,7 +228,7 @@ module Console =
     let success (text: string) : Message =
         Info |> statusMessage successColor text
 
-[<AutoOpenAttribute>]
+[<AutoOpen>]
 module IWriterExtensions =
     type Console.IWriter with
         member this.Write(message: Console.Message) : unit =

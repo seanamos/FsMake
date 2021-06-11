@@ -17,8 +17,8 @@ module Pipeline =
               ExtraArgs: string list }
 
         type StepResult =
-            | Success of step: Step * stat: Step.RunStat
-            | Failed of step: Step * stat: Step.RunStat * err: StepError
+            | Success of step: Step * stat: Step.Internal.RunStat
+            | Failed of step: Step * stat: Step.Internal.RunStat * err: StepError
             | Skipped of step: Step
 
         module StepResult =
@@ -99,7 +99,7 @@ module Pipeline =
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
             let ctx = createStepContext args.Context false step
-            let stepResult = step |> Step.run ctx
+            let stepResult = step |> Step.Internal.run ctx
 
             match stepResult with
             | Ok stat ->
@@ -122,7 +122,7 @@ module Pipeline =
                 |> Array.ofList
                 |> Array.Parallel.map (fun step ->
                     let stepContext = createStepContext args.Context true step
-                    let stepResult = step |> Step.run stepContext
+                    let stepResult = step |> Step.Internal.run stepContext
 
                     (step, stepContext, stepResult)
                 )

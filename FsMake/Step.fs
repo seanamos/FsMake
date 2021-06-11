@@ -8,12 +8,6 @@ type Step =
       StepPart: StepPart<unit> }
 
 module Step =
-    type RunStat =
-        { StepName: string
-          ExecutionTime: TimeSpan }
-
-    type RunResult = Result<RunStat, RunStat * StepError>
-
     [<Sealed>]
     type Builder(name: string) =
         inherit StepPart.BaseBuilder()
@@ -28,32 +22,38 @@ module Step =
 
     [<AutoOpen>]
     module internal Internal =
+        type RunStat =
+            { StepName: string
+              ExecutionTime: TimeSpan }
+
+        type RunResult = Result<RunStat, RunStat * StepError>
+
         let concatNames (steps: Step list) : string =
             steps
             |> List.fold (fun state x -> if state.Length = 0 then x.Name else $"{state}, {x.Name}") ""
 
+        let run (context: StepContext) (step: Step) : RunResult =
+            let stopwatch = Stopwatch ()
+
+            try
+                stopwatch.Start ()
+                let result = step.StepPart context
+                stopwatch.Stop ()
+
+                let runStat =
+                    { StepName = step.Name
+                      ExecutionTime = stopwatch.Elapsed }
+
+                match result with
+                | Ok _ -> Ok runStat
+                | Error x -> Error (runStat, x)
+            with ex ->
+                stopwatch.Stop ()
+
+                ({ StepName = step.Name
+                   ExecutionTime = stopwatch.Elapsed },
+                 StepUnhandledEx ex)
+                |> Error
+
     let create (name: string) : Builder =
         Builder (name)
-
-    let run (context: StepContext) (step: Step) : RunResult =
-        let stopwatch = Stopwatch ()
-
-        try
-            stopwatch.Start ()
-            let result = step.StepPart context
-            stopwatch.Stop ()
-
-            let runStat =
-                { StepName = step.Name
-                  ExecutionTime = stopwatch.Elapsed }
-
-            match result with
-            | Ok _ -> Ok runStat
-            | Error x -> Error (runStat, x)
-        with ex ->
-            stopwatch.Stop ()
-
-            ({ StepName = step.Name
-               ExecutionTime = stopwatch.Elapsed },
-             StepUnhandledEx ex)
-            |> Error

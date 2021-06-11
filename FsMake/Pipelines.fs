@@ -97,7 +97,7 @@ module Pipelines =
 
         match parsedArgs with
         | Error (args, errors) ->
-            let writer = Console.defaultWriter
+            let writer = Console.Internal.defaultWriter
 
             Cli.printUsage writer args errors
         | Ok args ->
