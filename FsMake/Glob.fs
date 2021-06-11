@@ -10,32 +10,10 @@ type Glob =
       Exclude: string list }
 
 module Glob =
-    type GlobResult =
-        | File of path: string
-        | Directory of path: string
-
-    let internal defaultDirectory = Path.GetFullPath "."
-
-    let create (pattern: string) : Glob =
-        { RootDirectory = defaultDirectory
-          Include = [ pattern ]
-          Exclude = [] }
-
-    let createWithRootDir (directory: string) (pattern: string) : Glob =
-        { RootDirectory = directory
-          Include = [ pattern ]
-          Exclude = [] }
-
-    let add (pattern: string) (glob: Glob) : Glob =
-        { glob with
-              Include = pattern :: glob.Include }
-
-    let exclude (pattern: string) (glob: Glob) : Glob =
-        { glob with
-              Exclude = pattern :: glob.Exclude }
-
     [<AutoOpen>]
     module internal Internal =
+        let defaultDirectory = lazy Path.GetFullPath "."
+
         let matchWildcardRegex = Regex (@"^.*(\*|\?).*$")
 
         let normalizePathSeperator (path: string) : string =
@@ -188,6 +166,28 @@ module Glob =
 
                 tokens |> nextToken []
 
+    type PathType =
+        | File of path: string
+        | Directory of path: string
+
+    let create (pattern: string) : Glob =
+        { RootDirectory = defaultDirectory.Value
+          Include = [ pattern ]
+          Exclude = [] }
+
+    let createWithRootDir (directory: string) (pattern: string) : Glob =
+        { RootDirectory = directory
+          Include = [ pattern ]
+          Exclude = [] }
+
+    let add (pattern: string) (glob: Glob) : Glob =
+        { glob with
+              Include = pattern :: glob.Include }
+
+    let exclude (pattern: string) (glob: Glob) : Glob =
+        { glob with
+              Exclude = pattern :: glob.Exclude }
+
     let toPaths (glob: Glob) : string seq =
         let rootDir = DirectoryInfo(glob.RootDirectory).FullName
         let includePatterns = glob.Include |> List.map (ParsedPattern.create rootDir)
@@ -203,7 +203,7 @@ module Glob =
                     if not excluded then yield path
         }
 
-    let toResults (glob: Glob) : GlobResult seq =
+    let toPathTypes (glob: Glob) : PathType seq =
         glob
         |> toPaths
         |> Seq.map (fun x ->
