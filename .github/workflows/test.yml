@@ -1,0 +1,13 @@
+name: Test incoming commits
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1.8.0
+    - name: Test
+      run: ./build.sh test
