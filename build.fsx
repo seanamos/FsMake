@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.1.0-alpha.33"
+#r "nuget: FsMake, 0.1.0-alpha.35"
 
 open FsMake
 open System.IO
@@ -75,8 +75,9 @@ let nupkgPush =
                 Console.info $"Unlisting FsMake {semver}" |> ctx.Console.WriteLine
 
                 do!
-                    Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver ]
-                    |> Cmd.args [ "--source"; "https://api.nuget.org/v3/index.json"; "--api-key" ]
+                    Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver; ]
+                    |> Cmd.args [ "--non-interactive"; "--source"; "https://api.nuget.org/v3/index.json"; ]
+                    |> Cmd.args [ "--api-key" ]
                     |> Cmd.argSecret key
                     |> Cmd.run
 

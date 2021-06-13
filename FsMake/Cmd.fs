@@ -93,7 +93,8 @@ module Cmd =
         opts |> argsOption (arg |> Option.map (fun x -> [ x ]))
 
     let argSecret (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with Args = opts.Args @ [ ArgSecret arg ] }
+        { opts with
+              Args = opts.Args @ [ ArgSecret arg ] }
 
     let envVars (envVars: (string * string) list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with EnvVars = envVars }
@@ -167,7 +168,10 @@ module Cmd =
 
         let createProcessStartInfo (redirectDecision: RedirectDecision) (opts: CmdOptions<'a>) : ProcessStartInfo =
             let startInfo = ProcessStartInfo (opts.Command)
-            opts.Args |> Arg.toUnsafeStrList |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
+
+            opts.Args
+            |> Arg.toUnsafeStrList
+            |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
 
             startInfo.UseShellExecute <- false
             startInfo.CreateNoWindow <- true
