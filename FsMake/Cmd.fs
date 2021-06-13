@@ -5,6 +5,25 @@ open System.Diagnostics
 open System.Text
 
 module Cmd =
+    type Arg =
+        | ArgText of arg: string
+        | ArgSecret of arg: string
+
+    module internal Arg =
+        let toUnsafeStrList (args: Arg list) : string list =
+            args
+            |> List.map
+                (function
+                | ArgText x -> x
+                | ArgSecret x -> x)
+
+        let toSafeStrList (args: Arg list) : string list =
+            args
+            |> List.map
+                (function
+                | ArgText x -> x
+                | ArgSecret _ -> "****")
+
     type PrefixOption =
         | PrefixAlways
         | PrefixNever
@@ -27,7 +46,7 @@ module Cmd =
 
     type CmdOptions<'a> =
         { Command: string
-          Args: string list
+          Args: Arg list
           EnvVars: (string * string) list
           WorkingDirectory: string option
           Timeout: TimeSpan option
@@ -48,24 +67,33 @@ module Cmd =
           OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
 
     let createWithArgs (cmd: string) (args: string list) : CmdOptions<unit> =
-        { create cmd with Args = args }
+        { create cmd with
+              Args = args |> List.map ArgText }
 
     let args (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with Args = opts.Args @ args }
+        { opts with
+              Args = opts.Args @ (args |> List.map ArgText) }
 
     let argsMaybe (cond: bool) (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        if cond then { opts with Args = opts.Args @ args } else opts
+        if cond then
+            { opts with
+                  Args = opts.Args @ (args |> List.map ArgText) }
+        else
+            opts
 
     let argMaybe (cond: bool) (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         opts |> argsMaybe cond [ arg ]
 
     let argsOption (arg: string list option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         match arg with
-        | Some x -> { opts with Args = opts.Args @ x }
+        | Some x -> opts |> args x
         | None -> opts
 
     let argOption (arg: string option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         opts |> argsOption (arg |> Option.map (fun x -> [ x ]))
+
+    let argSecret (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
+        { opts with Args = opts.Args @ [ ArgSecret arg ] }
 
     let envVars (envVars: (string * string) list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with EnvVars = envVars }
@@ -139,7 +167,7 @@ module Cmd =
 
         let createProcessStartInfo (redirectDecision: RedirectDecision) (opts: CmdOptions<'a>) : ProcessStartInfo =
             let startInfo = ProcessStartInfo (opts.Command)
-            opts.Args |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
+            opts.Args |> Arg.toUnsafeStrList |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
 
             startInfo.UseShellExecute <- false
             startInfo.CreateNoWindow <- true
@@ -221,7 +249,7 @@ module Cmd =
             use proc = new Process ()
             proc.StartInfo <- startInfo
 
-            let fullCommand = prettyCommand opts.Command opts.Args
+            let fullCommand = prettyCommand opts.Command (opts.Args |> Arg.toSafeStrList)
 
             let writeOutputOpts =
                 match shouldPrefix with
