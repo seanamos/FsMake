@@ -59,7 +59,7 @@ let nupkgPush =
         let! ctx = Step.context
         let! semver = semVerPart
         let listPkg = ctx.ExtraArgs |> List.contains "--list-nupkg"
-        let pkg = $"nupkgs/FsMake.{semver}"
+        let pkg = $"nupkgs/FsMake.{semver}.nupkg"
 
         match nugetApiKey with
         | None -> do! Step.fail "NUGET_API_KEY env var not specified!"
