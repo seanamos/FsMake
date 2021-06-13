@@ -1,6 +1,9 @@
 name: Test incoming commits
 
 on: [ push, pull_request ]
+env:
+  ANSI: "true"
+  BUILD_CONFIG: Release
 
 jobs:
   test:
@@ -12,4 +15,4 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1.8.0
     - name: Test
-      run: ./build.sh test
+      run: ./build.sh test -o ansi
