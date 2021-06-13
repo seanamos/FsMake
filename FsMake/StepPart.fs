@@ -117,6 +117,105 @@ module StepPart =
                 let part = generator ()
                 part ctx
 
+    let retry (attempts: int) (part: StepPart<'T>) : StepPart<'T> =
+        let rec nextRetry attempted ctx =
+            let prefixArgs : Prefix.Internal.OptionalPrefixArgs =
+                { IsParallel = ctx.IsParallel
+                  PrefixOption = ctx.PrefixOption
+                  Prefix = ctx.Prefix }
+
+            let errorMessage (messages: Console.Message list) =
+                messages
+                |> Prefix.Internal.addOptionalPrefixes prefixArgs
+                |> ctx.Console.WriteLines
+
+            let retryMessage () =
+                Console.warn "Retrying, attempt "
+                |> Console.appendToken ((attempted + 1).ToString ())
+                |> Prefix.Internal.addOptionalPrefix prefixArgs
+                |> ctx.Console.WriteLine
+
+            try
+                let result = part ctx
+
+                match result with
+                | Ok _ as x -> x
+                | Error (StepAbort _) as x -> x
+                | Error x ->
+                    if attempted < attempts then
+                        x |> StepError.toConsoleMessage |> errorMessage
+                        retryMessage ()
+
+                        ctx |> nextRetry (attempted + 1)
+                    else
+                        Error x
+            with ex ->
+                if attempted < attempts then
+                    ex |> Exception.toConsoleMessage |> errorMessage
+                    retryMessage ()
+
+                    ctx |> nextRetry (attempted + 1)
+                else
+                    StepUnhandledEx ex |> Error
+
+        fun ctx -> ctx |> nextRetry 1
+
+    [<Sealed>]
+    type RetryBuilder(attempts: int) =
+        inherit BaseBuilder()
+
+        member _.Run(generator: unit -> StepPart<'T>) : StepPart<'T> =
+            let part =
+                fun ctx ->
+                    let innerPart = generator ()
+                    innerPart ctx
+
+            part |> retry attempts
+
+    let memo (part: StepPart<'T>) : StepPart<'T> =
+        let locker = obj ()
+        let mutable memoized = None
+
+        fun ctx ->
+            lock locker
+            <| fun () ->
+                match memoized with
+                | Some x -> x
+                | None ->
+                    let result = part ctx
+                    memoized <- result |> Some
+                    result
+
+    [<Sealed>]
+    type MemoBuilder() =
+        inherit BaseBuilder()
+
+        member inline _.Run(generator: unit -> StepPart<'T>) : StepPart<'T> =
+            let part = fun ctx -> ctx |> generator ()
+            memo part
+
+    let memoRace (part: StepPart<'T>) : StepPart<'T> =
+        let mutable memoized = None
+
+        fun ctx ->
+            match memoized with
+            | Some x -> x
+            | None ->
+                let result = part ctx
+                memoized <- result |> Some
+                result
+
+    [<Sealed>]
+    type MemoRaceBuilder() =
+        inherit BaseBuilder()
+
+        member inline _.Run(generator: unit -> StepPart<'T>) : StepPart<'T> =
+            let part = fun ctx -> ctx |> generator ()
+            memoRace part
+
 [<AutoOpen>]
-module StepPartBuilder =
+module StepPartBuilders =
     let stepPart = StepPart.Builder ()
+    let retry (attempts: int) = StepPart.RetryBuilder (attempts)
+    let memo = StepPart.MemoBuilder ()
+    let memoRace = StepPart.MemoRaceBuilder ()

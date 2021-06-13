@@ -41,6 +41,6 @@ module ParallelMaybe =
             maybes @ [ PMaybe (step, cond) ]
 
 [<AutoOpen>]
-module ParallelMaybeBuilder =
+module ParallelMaybeBuilders =
     // fsharplint:disable-next-line
     let run_parallel_maybes = ParallelMaybe.Builder ()

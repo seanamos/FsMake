@@ -57,3 +57,5 @@ module Step =
 
     let create (name: string) : Builder =
         Builder (name)
+
+    let context = StepPart.context

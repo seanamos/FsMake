@@ -131,7 +131,7 @@ module Console =
                                 | None -> ()
 
                                 Console.Write (sb.ToString ())
-                    )
+                        )
 
         [<Sealed>]
         type StandardWriter(verbosity: Verbosity) =

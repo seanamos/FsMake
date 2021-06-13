@@ -12,7 +12,7 @@ type Glob =
 module Glob =
     [<AutoOpen>]
     module internal Internal =
-        let defaultDirectory = lazy Path.GetFullPath "."
+        let defaultDirectory = lazy (Path.GetFullPath ".")
 
         let matchWildcardRegex = Regex (@"^.*(\*|\?).*$")
 

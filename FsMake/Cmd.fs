@@ -51,7 +51,7 @@ module Cmd =
         { create cmd with Args = args }
 
     let args (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with Args = args }
+        { opts with Args = opts.Args @ args }
 
     let argsMaybe (cond: bool) (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         if cond then { opts with Args = opts.Args @ args } else opts
