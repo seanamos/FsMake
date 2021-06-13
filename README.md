@@ -20,6 +20,7 @@ open System.IO
 let args = fsi.CommandLineArgs
 let useAnsi = EnvVar.getOption "ANSI" |> Option.isSome
 let buildConfig = EnvVar.getOption "BUILD_CONFIG"
+let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
 
 let clean =
     Step.create "clean" {
@@ -32,8 +33,6 @@ let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore
 
 let build =
     Step.create "build" {
-        let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
-
         do!
             Cmd.createWithArgs "dotnet" [ "build"; "--no-restore" ]
             |> Cmd.argMaybe useAnsi "/consoleloggerparameters:ForceConsoleColor"
@@ -44,11 +43,8 @@ let build =
 let testUnit =
     Step.create "test:unit" {
         do!
-            Cmd.create "dotnet"
-            |> Cmd.args [ "test"
-                          "--no-build"
-                          "--no-restore"
-                          "MyProject.UnitTests" ]
+            Cmd.createWithArgs "dotnet" [ "test" ]
+            |> Cmd.args [ "--no-build"; "--no-restore"; "MyProject.UnitTests" ]
             |> Cmd.run
     }
 
@@ -57,11 +53,8 @@ let testInt =
         do!
             retry 2 {
                 do!
-                    Cmd.create "dotnet"
-                    |> Cmd.args [ "test"
-                                  "--no-build"
-                                  "--no-restore"
-                                  "MyProject.IntegrationTests" ]
+                    Cmd.createWithArgs "dotnet" [ "test" ]
+                    |> Cmd.args [ "--no-build"; "--no-restore"; "MyProject.IntegrationTests" ]
                     |> Cmd.run
             }
     }

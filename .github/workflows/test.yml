@@ -1,0 +1,18 @@
+name: Test incoming commits
+
+on: [ push, pull_request ]
+env:
+  ANSI: "true"
+  BUILD_CONFIG: Release
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1.8.0
+    - name: Test
+      run: ./build.sh test -o ansi

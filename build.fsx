@@ -27,7 +27,9 @@ let clean =
 
             do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
         else
-            Console.warn "Skipping clean, --clean not specified" |> ctx.Console.WriteLine
+            Console.warn "Skipping clean, "
+            |> Console.appendParts [ Console.Token "--clean"; Console.Text " not specified" ]
+            |> ctx.Console.WriteLine
     }
 
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
@@ -75,8 +77,10 @@ let nupkgPush =
                 Console.info $"Unlisting FsMake {semver}" |> ctx.Console.WriteLine
 
                 do!
-                    Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver; ]
-                    |> Cmd.args [ "--non-interactive"; "--source"; "https://api.nuget.org/v3/index.json"; ]
+                    Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver ]
+                    |> Cmd.args [ "--non-interactive"
+                                  "--source"
+                                  "https://api.nuget.org/v3/index.json" ]
                     |> Cmd.args [ "--api-key" ]
                     |> Cmd.argSecret key
                     |> Cmd.run
