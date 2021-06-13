@@ -216,6 +216,9 @@ module StepPart =
 [<AutoOpen>]
 module StepPartBuilders =
     let stepPart = StepPart.Builder ()
-    let retry (attempts: int) = StepPart.RetryBuilder (attempts)
+
+    let retry (attempts: int) : StepPart.RetryBuilder =
+        StepPart.RetryBuilder (attempts)
+
     let memo = StepPart.MemoBuilder ()
     let memoRace = StepPart.MemoRaceBuilder ()
