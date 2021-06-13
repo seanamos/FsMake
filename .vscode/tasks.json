@@ -10,7 +10,8 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "build",
@@ -19,7 +20,15 @@
             },
             "command": "./build.sh",
             "type": "shell",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "format code",
+            "command": "dotnet fantomas -r .",
+            "type": "shell",
+            "group": "none",
+            "problemMatcher": []
         }
     ]
 }

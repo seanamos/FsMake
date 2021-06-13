@@ -59,3 +59,11 @@ module Step =
         Builder (name)
 
     let context = StepPart.context
+
+    let fail (message: string) : StepPart<unit> =
+        fun _ ->
+            let msg = Console.error message
+            StepError [ msg ] |> Error
+
+    let failMessage (messages: Console.Message list) : StepPart<unit> =
+        fun _ -> StepError messages |> Error
