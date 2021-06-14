@@ -26,6 +26,11 @@ let clean =
         if ctx.ExtraArgs |> List.contains "--clean" then
             Glob.create "nupkgs/*" |> Glob.toPaths |> Seq.iter (File.Delete)
 
+            Glob.create "**/bin"
+            |> Glob.add "**/obj"
+            |> Glob.toPaths
+            |> Seq.iter (fun x -> Directory.Delete (x, true))
+
             do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
         else
             Console.warn "Skipping clean, "

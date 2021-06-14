@@ -1,2 +1,3 @@
 assembly-versioning-scheme: Major
 continuous-delivery-fallback-tag: ''
+mode: ContinuousDelivery
