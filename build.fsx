@@ -95,7 +95,7 @@ let tag =
 
         do!
             Cmd.createWithArgs "git" [ "tag" ]
-            |> Cmd.args [ "-a"; semver; $"{semver} release" ]
+            |> Cmd.args [ "-a"; semver; "-m"; $"{semver} release" ]
             |> Cmd.run
 
         do! Cmd.createWithArgs "git" [ "push"; "origin"; semver ] |> Cmd.run
