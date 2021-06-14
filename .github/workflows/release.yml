@@ -7,6 +7,14 @@ on:
         description: "List nupkg on nuget.org (true/false)"
         required: true
         default: "false"
+      username:
+        description: "Name of the user doing the release"
+        required: true
+        default: Sean Amos
+      user_email:
+        description: "Email address of the user doing the release"
+        required: true
+        default: 10598927+seanamos@users.noreply.github.com
 
 env:
   ANSI: "true"
@@ -14,7 +22,7 @@ env:
   NUGET_LIST_PKG: ${{ github.event.inputs.list_pkg }}
 
 jobs:
-  release:
+  package:
     runs-on: ubuntu-20.04
 
     steps:
@@ -32,4 +40,27 @@ jobs:
     - name: Publish Release
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: ./build.sh publish -o ansi -- --clean
+      run: ./build.sh publish:nupkg -o ansi -- --clean
+
+  tag:
+    runs-on: ubuntu-20.04
+
+    needs: package
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+
+    - name: Git settings
+      run: |
+        git config --global user.name '${{ github.event.inputs.username }}'
+        git config --global user.email '${{ github.event.inputs.user_email }}'
+
+    - name: Git release tag
+      run: ./build.sh publish:tag -o ansi
