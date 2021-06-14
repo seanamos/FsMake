@@ -82,11 +82,23 @@ let nupkgPush =
                     Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver ]
                     |> Cmd.args [ "--non-interactive"
                                   "--source"
-                                  "https://api.nuget.org/v3/index.json" ]
-                    |> Cmd.args [ "--api-key" ]
+                                  "https://api.nuget.org/v3/index.json"
+                                  "--api-key" ]
                     |> Cmd.argSecret key
                     |> Cmd.run
 
+    }
+
+let tag =
+    Step.create "tag" {
+        let! semver = semVerPart
+
+        do!
+            Cmd.createWithArgs "git" [ "tag" ]
+            |> Cmd.args [ "-a"; semver; $"{semver} release" ]
+            |> Cmd.run
+
+        do! Cmd.createWithArgs "git" [ "push"; "origin"; semver ] |> Cmd.run
     }
 
 Pipelines.create {
@@ -101,7 +113,9 @@ Pipelines.create {
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run nupkgCreate }
 
-    do! Pipeline.createFrom nupkgCreate "publish" { run nupkgPush }
+    do! Pipeline.createFrom nupkgCreate "publish:nupkg" { run nupkgPush }
+
+    do! Pipeline.create "publish:tag" { run tag }
 
     default_pipeline build
 }
