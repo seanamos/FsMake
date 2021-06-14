@@ -4,10 +4,11 @@ open FsMake
 open System.IO
 
 let args = fsi.CommandLineArgs
-let useAnsi = EnvVar.getOption "ANSI" |> Option.isSome
+let useAnsi = EnvVar.getOptionAs<bool> "ANSI" |> Option.contains true
 let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
 let nugetApiKey = EnvVar.getOption "NUGET_API_KEY"
+let nugetListPkg = EnvVar.getOptionAs<bool> "NUGET_LIST_PKG" |> Option.contains true
 
 let semVerPart =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
@@ -60,7 +61,6 @@ let nupkgPush =
     Step.create "nupkg:push" {
         let! ctx = Step.context
         let! semver = semVerPart
-        let listPkg = ctx.ExtraArgs |> List.contains "--list-nupkg"
         let pkg = $"nupkgs/FsMake.{semver}.nupkg"
 
         match nugetApiKey with
@@ -73,8 +73,10 @@ let nupkgPush =
                 |> Cmd.run
 
             // unlist the package
-            if not listPkg then
-                Console.info $"Unlisting FsMake {semver}" |> ctx.Console.WriteLine
+            if not nugetListPkg then
+                Console.info "Unlisting "
+                |> Console.appendToken $"FsMake {semver}"
+                |> ctx.Console.WriteLine
 
                 do!
                     Cmd.createWithArgs "dotnet" [ "nuget"; "delete"; "FsMake"; semver ]
