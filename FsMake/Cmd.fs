@@ -240,7 +240,7 @@ module Cmd =
                 |> checkCode code
             | CheckCodeWithMessage (code, msg) -> Console.error msg |> checkCode code
 
-    let runAndGetResult (opts: CmdOptions<'a>) : StepPart<ProcessResult<'a>> =
+    let result (opts: CmdOptions<'a>) : StepPart<ProcessResult<'a>> =
         fun (ctx: StepContext) ->
             let shouldPrefix =
                 match opts.Prefix with
@@ -339,8 +339,8 @@ module Cmd =
 
     let run (opts: CmdOptions<'a>) : StepPart<unit> =
         fun (ctx: StepContext) ->
-            let result = runAndGetResult opts ctx
+            let procResult = result opts ctx
 
-            match result with
+            match procResult with
             | Ok _ -> Ok ()
             | Error x -> Error x
