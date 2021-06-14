@@ -2,6 +2,8 @@
 
 F# pipeline step/task runner.
 
+![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)
+
 ## Development :construction:
 
 > :warning: While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
@@ -12,7 +14,7 @@ F# pipeline step/task runner.
 // build.fsx
 #r "nuget: FsMake"
 // or a specific version
-// #r "nuget: FsMake, 1.0.0"
+// #r "nuget: FsMake, 0.1.0"
 
 open FsMake
 open System.IO

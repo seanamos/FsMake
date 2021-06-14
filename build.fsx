@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.1.0-alpha.35"
+#r "nuget: FsMake, 0.1.0"
 
 open FsMake
 open System.IO
@@ -14,7 +14,7 @@ let semVerPart =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
     |> Cmd.args [ "/showvariable"; "semver" ]
     |> Cmd.redirectOutput Cmd.RedirectToBoth
-    |> Cmd.runAndGetResult
+    |> Cmd.result
     |> StepPart.map (fun x -> x.Output.Std)
     |> StepPart.memo
 
