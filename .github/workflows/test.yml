@@ -19,5 +19,8 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
-    - name: Test
-      run: ./build.sh test -o ansi
+    - name: Quick test
+      run: git remote -v
+
+    # - name: Test
+    #   run: ./build.sh test -o ansi
