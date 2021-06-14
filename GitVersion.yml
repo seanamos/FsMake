@@ -1,0 +1,5 @@
+assembly-versioning-scheme: Major
+continuous-delivery-fallback-tag: ''
+branches:
+  develop:
+    mode: ContinuousDelivery

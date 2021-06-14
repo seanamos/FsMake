@@ -1,0 +1,28 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{csproj,fsproj}]
+indent_size = 2
+
+[*.md]
+indent_size = 2
+
+[*.yml]
+indent_size = 2
+
+[*.{fs,fsx}]
+max_line_length=140
+fsharp_max_infix_operator_expression=80
+fsharp_max_value_binding_width=140
+fsharp_max_function_binding_width=0
+fsharp_max_if_then_else_short_width=60
+fsharp_multi_line_lambda_closing_newline=true
+fsharp_space_before_uppercase_invocation=true
+fsharp_max_elmish_width=80
