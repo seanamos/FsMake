@@ -9,7 +9,7 @@ open System.Threading
 type Pipeline = { Name: string; Stages: Stage list }
 
 /// <summary>
-/// Module for creating and working a pipelines.
+/// Module for creating and working with a <see cref="T:Pipeline" />.
 /// </summary>
 module Pipeline =
     [<AutoOpen>]
