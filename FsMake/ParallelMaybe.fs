@@ -11,7 +11,7 @@ module ParallelMaybe =
             pmaybes
             |> List.partition
                 (function
-                | PMaybe (_, cond) when cond -> true
+                | PMaybe (_, true) -> true
                 | PMaybe _ -> false
                 | PStep _ -> true)
 

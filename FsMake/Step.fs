@@ -18,7 +18,7 @@ module Step =
     /// <summary>
     /// A <see cref="T:Step" /> computation expression builder.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="name">Name of the step to build.</param>
     [<Sealed>]
     type Builder(name: string) =
         inherit StepPart.BaseBuilder()

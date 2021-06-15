@@ -3,8 +3,14 @@ namespace FsMake
 open System
 open System.Threading
 
+/// <summary>
+/// Represents a pipeline and it's stages.
+/// </summary>
 type Pipeline = { Name: string; Stages: Stage list }
 
+/// <summary>
+/// Module for creating and working a pipelines.
+/// </summary>
 module Pipeline =
     [<AutoOpen>]
     module internal Internal =
@@ -218,6 +224,11 @@ module Pipeline =
 
             stages |> nextStage []
 
+    /// <summary>
+    /// A <see cref="T:Pipeline" /> computation expression builder.
+    /// </summary>
+    /// <param name="name">Name of the pipeline.</param>
+    /// <param name="from">A pipeline to as a base. A new pipeline will be created from this one and have stages appended.</param>
     [<Sealed>]
     type Builder(name: string, ?from: Pipeline) =
         let mutable pipeline =
@@ -270,18 +281,48 @@ module Pipeline =
                       Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ] }
 
 
+    /// <summary>
+    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// </summary>
+    /// <param name="name">The name of the pipeline.</param>
+    /// <returns>A <see cref="T:Pipeline.Builder" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let emptyStep = Step.create "emptyStep" { () }
+    /// let pipeline =
+    ///     Pipeline.create "pipeline" {
+    ///         run emptyStep
+    ///     }
+    /// </code>
+    /// </example>
     let create (name: string) : Builder =
         Builder (name)
 
+    /// <summary>
+    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// The <c>pipeline</c> parameter is an exsting pipeline to use as a base.
+    /// This does not modify the existing <see cref="T:Pipeline" />, it returns a new <see cref="T:Pipeline" /> with additional stages.
+    /// </summary>
+    /// <param name="pipeline">A <see cref="T:Pipeline" /> to use as a base to build upon. A new <see cref="T:Pipeline" /> will be created from this one and have stages appended.</param>
+    /// <param name="name">The name of the new <see cref="T:Pipeline" />.</param>
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
+    /// <summary>
+    /// Required arguments for running a <see cref="T:Pipeline" />.
+    /// </summary>
     type RunArgs =
         { Writer: Console.IWriter
           ExtraArgs: string list
           PrefixOption: Prefix.PrefixOption
           CancellationToken: CancellationToken }
 
+    /// <summary>
+    /// Runs a pipeline.
+    /// </summary>
+    /// <param name="args">Required arguments.</param>
+    /// <param name="pipeline">The <see cref="T:Pipeline" /> to run.</param>
+    /// <returns><c>true</c> if the pipeline succeeded, <c>false</c> if there was any failure.</returns>
     let run (args: RunArgs) (pipeline: Pipeline) : bool =
         let longestNameLength = pipeline.Stages |> Stage.longestStepNameLength
         use procMonitor = ProcessMonitor.create (args.Writer)
