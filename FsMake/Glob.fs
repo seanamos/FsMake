@@ -4,11 +4,17 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 
+/// <summary>
+/// Represents a file/directory glob.
+/// </summary>
 type Glob =
     { RootDirectory: string
       Include: string list
       Exclude: string list }
 
+/// <summary>
+/// Module for creating and working a <see cref="T:Glob" />.
+/// </summary>
 module Glob =
     [<AutoOpen>]
     module internal Internal =
@@ -166,28 +172,89 @@ module Glob =
 
                 tokens |> nextToken []
 
+    /// <summary>
+    /// Used to represent the type of path.
+    /// </summary>
     type PathType =
         | File of path: string
         | Directory of path: string
 
+    /// <summary>
+    /// Creates a <see cref="T:Glob" /> from a pattern.
+    /// </summary>
+    /// <param name="pattern">The pattern of paths to include.</param>
+    /// <returns>The new <see cref="T:Glob" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let dlls = Glob.create "**/*.dll"
+    /// </code>
+    /// </example>
     let create (pattern: string) : Glob =
         { RootDirectory = defaultDirectory.Value
           Include = [ pattern ]
           Exclude = [] }
 
+    /// <summary>
+    /// Creates a <see cref="T:Glob" /> from a pattern with a root directory.
+    /// The root directory is the path of a directory to start searching from.
+    /// </summary>
+    /// <param name="directory">The root directory.</param>
+    /// <param name="pattern">The pattern of paths to include.</param>
+    /// <returns>The new <see cref="T:Glob" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let logs = Glob.createWithRootDir "/tmp" "**/*.log"
+    /// </code>
+    /// </example>
     let createWithRootDir (directory: string) (pattern: string) : Glob =
         { RootDirectory = directory
           Include = [ pattern ]
           Exclude = [] }
 
+    /// <summary>
+    /// Adds a pattern of paths to include to an existing <see cref="T:Glob" />.
+    /// </summary>
+    /// <param name="pattern">The pattern of paths to include.</param>
+    /// <param name="glob">The <see cref="T:Glob" />.</param>
+    /// <returns>An updated <see cref="T:Glob" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let cleanDirs =
+    ///     Glob.create "**/bin"
+    ///     |> Glob.add "**/obj"
+    /// </code>
+    /// </example>
     let add (pattern: string) (glob: Glob) : Glob =
         { glob with
               Include = pattern :: glob.Include }
 
+    /// <summary>
+    /// Adds a pattern of paths to exclude to an existing <see cref="T:Glob" />.
+    /// </summary>
+    /// <param name="pattern">The pattern of paths to exclude.</param>
+    /// <param name="glob">The <see cref="T:Glob" />.</param>
+    /// <returns>An updated <see cref="T:Glob" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let dlls =
+    ///     Glob.create "**/*.dll"
+    ///     |> Glob.exclude "exclude.dll"
+    /// </code>
+    /// </example>
     let exclude (pattern: string) (glob: Glob) : Glob =
         { glob with
               Exclude = pattern :: glob.Exclude }
 
+    /// <summary>
+    /// Creates a sequence of matched paths from a <see cref="T:Glob" />.
+    /// </summary>
+    /// <param name="glob">The <see cref="T:Glob" /> to create the paths from.</param>
+    /// <returns>A sequence of matched paths.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let dllPaths = Glob.create "**/*.dll" |> Glob.toPaths
+    /// </code>
+    /// </example>
     let toPaths (glob: Glob) : string seq =
         let rootDir = DirectoryInfo(glob.RootDirectory).FullName
         let includePatterns = glob.Include |> List.map (ParsedPattern.create rootDir)
@@ -203,6 +270,21 @@ module Glob =
                     if not excluded then yield path
         }
 
+    /// <summary>
+    /// Creates a sequence of <see cref="T:PathType" /> from a <see cref="T:Glob" />.
+    /// </summary>
+    /// <param name="glob">The <see cref="T:Glob" /> to create the paths from.</param>
+    /// <returns>A sequence of matched paths.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// Glob.create "**/*Things*"
+    /// |> Glob.toPathTypes
+    /// |> Seq.iter
+    ///     (function
+    ///     | Glob.File x -> printfn "File path: %s" x
+    ///     | Glob.Directory x -> printfn "Directory path: %s" x)
+    /// </code>
+    /// </example>
     let toPathTypes (glob: Glob) : PathType seq =
         glob
         |> toPaths
