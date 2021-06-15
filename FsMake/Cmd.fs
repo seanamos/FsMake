@@ -246,7 +246,8 @@ module Cmd =
     /// </code>
     /// </example>
     let envVars (envVars: (string * string) list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
-        { opts with EnvVars = opts.EnvVars @ envVars }
+        { opts with
+              EnvVars = opts.EnvVars @ envVars }
 
     /// <summary>
     /// Sets the working directory on the <see cref="T:Cmd.CmdOption" />.
