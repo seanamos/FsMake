@@ -2,8 +2,8 @@
 
 F# pipeline step/task runner.
 
-![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)
-![develop branch status](https://img.shields.io/github/workflow/status/seanamos/FsMake/Test%20incoming%20commits/develop?style=flat-square)
+[![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)](https://www.nuget.org/packages/FsMake)
+[![develop branch status](https://img.shields.io/github/workflow/status/seanamos/FsMake/Test%20incoming%20commits/develop?style=flat-square)](https://github.com/seanamos/FsMake/actions/workflows/test.yml?query=branch%3Adevelop+)
 
 ## Development 🚧
 
