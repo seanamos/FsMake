@@ -4,9 +4,9 @@ F# pipeline step/task runner.
 
 ![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)
 
-## Development :construction:
+## Development 🚧
 
-> :warning: While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
+> ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
 
 ## Usage
 

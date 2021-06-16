@@ -2,10 +2,26 @@ namespace FsMake
 
 open System
 
+/// <summary>
+/// Module for creating prefixed console output.
+/// </summary>
 module Prefix =
+
+    /// <summary>
+    /// Prefix options that set when to prefix the console output.
+    /// </summary>
     type PrefixOption =
+        ///<summary>
+        /// Always prefix console output.
+        /// </summary>
         | Always
+        /// <summary>
+        /// Never prefix console output.
+        /// </summary>
         | Never
+        /// <summary>
+        /// **Default**. Only prefix console output when the step is being run in parallel.
+        /// </summary>
         | WhenParallel
 
     [<AutoOpen>]

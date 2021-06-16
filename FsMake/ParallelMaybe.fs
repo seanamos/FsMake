@@ -1,7 +1,19 @@
 namespace FsMake
 
+/// <summary>
+/// Represents the conditions of a parallel maybe pipeline stage.
+/// </summary>
 type ParallelMaybe =
+    /// <summary>
+    /// A parallel <see cref="T:Step" /> with no condition that will always run.
+    /// </summary>
+    /// <param name="step">The <see cref="T:Step" /> to run.</param>
     | PStep of step: Step
+    /// <summary>
+    /// A parallel <see cref="T:Step" /> with a condition that will only run when <c>condition</c> is <c>true</c>.
+    /// </summary>
+    /// <param name="step">The <see cref="T:Step" /> to run.</param>
+    /// <param name="condition">The condition that must be <c>true</c> for the step to run.</param>
     | PMaybe of step: Step * condition: bool
 
 module ParallelMaybe =
@@ -11,7 +23,7 @@ module ParallelMaybe =
             pmaybes
             |> List.partition
                 (function
-                | PMaybe (_, cond) when cond -> true
+                | PMaybe (_, true) -> true
                 | PMaybe _ -> false
                 | PStep _ -> true)
 
@@ -27,6 +39,9 @@ module ParallelMaybe =
 
             (run |> toSteps, skip |> toSteps)
 
+    /// <summary>
+    /// A <see cref="T:ParallelMaybe" /> <c>list</c> computation expression builder.
+    /// </summary>
     [<Sealed>]
     type Builder() =
         member _.Yield(_) : ParallelMaybe list =
@@ -42,5 +57,27 @@ module ParallelMaybe =
 
 [<AutoOpen>]
 module ParallelMaybeBuilders =
-    // fsharplint:disable-next-line
+    // fsharplint:disable
+    /// <summary>
+    /// Creates a <see cref="T:ParallelMaybe" /> <c>list</c> using a <see cref="T:ParallelMaybe.Builder" /> computation expression.
+    /// </summary>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let emptyStep1 = Step.create "empty1" { () }
+    /// let emptyStep2 = Step.create "empty2" { () }
+    /// let emptyStep3 = Step.create "empty3" { () }
+    ///
+    /// let condition = true
+    ///
+    /// let pipeline =
+    ///     Pipeline.create "example" {
+    ///         run_parallel_maybes {
+    ///             run emptyStep1
+    ///             maybe_run emptyStep2 condition
+    ///             run emptyStep3
+    ///         }
+    ///     }
+    /// </code>
+    /// </example>
     let run_parallel_maybes = ParallelMaybe.Builder ()
+// fsharplint:enable
