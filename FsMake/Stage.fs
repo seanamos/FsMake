@@ -29,7 +29,7 @@ type Stage =
     /// <param name="condition">The condition that must be <c>true</c> for the step to run.</param>
     | ParallelMaybeStage of steps: Step list * condition: bool
     /// <summary>
-    /// A parallel stage that runs steps if their individual conditions are <c>true</c>.
+    /// A parallel stage that runs steps in parallel if their individual conditions are <c>true</c>.
     /// </summary>
     /// <param name="steps">The steps to run.</param>
     | ParallelMaybesStage of steps: ParallelMaybe list
