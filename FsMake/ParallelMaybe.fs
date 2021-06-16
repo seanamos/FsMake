@@ -57,7 +57,7 @@ module ParallelMaybe =
 
 [<AutoOpen>]
 module ParallelMaybeBuilders =
-    // fsharplint:disable-next-line
+    // fsharplint:disable
     /// <summary>
     /// Creates a <see cref="T:ParallelMaybe" /> <c>list</c> using a <see cref="T:ParallelMaybe.Builder" /> computation expression.
     /// </summary>
@@ -80,3 +80,4 @@ module ParallelMaybeBuilders =
     /// </code>
     /// </example>
     let run_parallel_maybes = ParallelMaybe.Builder ()
+    // fsharplint:enable
