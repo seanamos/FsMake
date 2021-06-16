@@ -80,4 +80,4 @@ module ParallelMaybeBuilders =
     /// </code>
     /// </example>
     let run_parallel_maybes = ParallelMaybe.Builder ()
-    // fsharplint:enable
+// fsharplint:enable
