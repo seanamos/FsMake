@@ -135,10 +135,12 @@ module Console =
     /// A message to write the console.
     /// </summary>
     type Message =
-        { Level: Level
-          Prefix: TextPart option
-          TextParts: TextPart list
-          TokenColor: Color }
+        {
+            Level: Level
+            Prefix: TextPart option
+            TextParts: TextPart list
+            TokenColor: Color
+        }
 
     /// <summary>
     /// The output of the console writer.
@@ -264,10 +266,12 @@ module Console =
     /// <param name="level">The level of the message.</param>
     /// <returns>The new message.</returns>
     let messageEmpty (tokenColor: Color) (level: Level) : Message =
-        { Level = level
-          Prefix = None
-          TokenColor = tokenColor
-          TextParts = [] }
+        {
+            Level = level
+            Prefix = None
+            TokenColor = tokenColor
+            TextParts = []
+        }
 
     /// <summary>
     /// Creates a <see cref="Console.Message" /> from the given parts.
@@ -287,10 +291,12 @@ module Console =
     /// </code>
     /// </example>
     let messageParts (tokenColor: Color) (textParts: TextPart list) (level: Level) : Message =
-        { Level = level
-          Prefix = None
-          TokenColor = tokenColor
-          TextParts = textParts }
+        {
+            Level = level
+            Prefix = None
+            TokenColor = tokenColor
+            TextParts = textParts
+        }
 
     /// <summary>
     /// Creates a message with colorized text.
@@ -337,7 +343,8 @@ module Console =
     /// </example>
     let appendParts (textParts: TextPart list) (message: Message) : Message =
         { message with
-              TextParts = message.TextParts @ textParts }
+            TextParts = message.TextParts @ textParts
+        }
 
     /// <summary>
     /// Appends a <see cref="T:Console.Textpart" /> to a message.
@@ -355,7 +362,8 @@ module Console =
     /// </example>
     let appendPart (textPart: TextPart) (message: Message) : Message =
         { message with
-              TextParts = message.TextParts @ [ textPart ] }
+            TextParts = message.TextParts @ [ textPart ]
+        }
 
     /// <summary>
     /// Appends colorized text to a message.
@@ -452,8 +460,11 @@ module IWriterExtensions =
         /// </summary>
         /// <param name="message">The message to write.</param>
         member this.WriteLine(message: Console.Message) : unit =
-            [ { message with
-                    TextParts = message.TextParts @ [ Console.Text Environment.NewLine ] } ]
+            [
+                { message with
+                    TextParts = message.TextParts @ [ Console.Text Environment.NewLine ]
+                }
+            ]
             |> this.Write
 
         /// <summary>
@@ -464,6 +475,7 @@ module IWriterExtensions =
             messages
             |> List.map (fun x ->
                 { x with
-                      TextParts = x.TextParts @ [ Console.Text Environment.NewLine ] }
+                    TextParts = x.TextParts @ [ Console.Text Environment.NewLine ]
+                }
             )
             |> this.Write

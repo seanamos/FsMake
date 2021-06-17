@@ -8,9 +8,11 @@ open System.Text.RegularExpressions
 /// Represents a file/directory glob.
 /// </summary>
 type Glob =
-    { RootDirectory: string
-      Include: string list
-      Exclude: string list }
+    {
+        RootDirectory: string
+        Include: string list
+        Exclude: string list
+    }
 
 /// <summary>
 /// Module for creating and working a <see cref="T:Glob" />.
@@ -62,7 +64,10 @@ module Glob =
                     | [ x ] -> FileOrDirectoryToken x :: parts
                     | x :: xs -> xs |> parseNext (DirectoryToken x :: parts)
 
-                splitPattern |> parseNext initialParts |> List.rev |> ParsedPattern
+                splitPattern
+                |> parseNext initialParts
+                |> List.rev
+                |> ParsedPattern
 
             let value (ParsedPattern value) : PatternToken list =
                 value
@@ -190,9 +195,11 @@ module Glob =
     /// </code>
     /// </example>
     let create (pattern: string) : Glob =
-        { RootDirectory = defaultDirectory.Value
-          Include = [ pattern ]
-          Exclude = [] }
+        {
+            RootDirectory = defaultDirectory.Value
+            Include = [ pattern ]
+            Exclude = []
+        }
 
     /// <summary>
     /// Creates a <see cref="T:Glob" /> from a pattern with a root directory.
@@ -207,9 +214,11 @@ module Glob =
     /// </code>
     /// </example>
     let createWithRootDir (directory: string) (pattern: string) : Glob =
-        { RootDirectory = directory
-          Include = [ pattern ]
-          Exclude = [] }
+        {
+            RootDirectory = directory
+            Include = [ pattern ]
+            Exclude = []
+        }
 
     /// <summary>
     /// Adds a pattern of paths to include to an existing <see cref="T:Glob" />.
@@ -226,7 +235,8 @@ module Glob =
     /// </example>
     let add (pattern: string) (glob: Glob) : Glob =
         { glob with
-              Include = pattern :: glob.Include }
+            Include = pattern :: glob.Include
+        }
 
     /// <summary>
     /// Adds a pattern of paths to exclude to an existing <see cref="T:Glob" />.
@@ -243,7 +253,8 @@ module Glob =
     /// </example>
     let exclude (pattern: string) (glob: Glob) : Glob =
         { glob with
-              Exclude = pattern :: glob.Exclude }
+            Exclude = pattern :: glob.Exclude
+        }
 
     /// <summary>
     /// Creates a sequence of matched paths from a <see cref="T:Glob" />.
@@ -257,15 +268,21 @@ module Glob =
     /// </example>
     let toPaths (glob: Glob) : string seq =
         let rootDir = DirectoryInfo(glob.RootDirectory).FullName
+
         let includePatterns = glob.Include |> List.map (ParsedPattern.create rootDir)
-        let excludePatternRegexes = glob.Exclude |> List.map (ParsedPattern.create rootDir >> ParsedPattern.toRegex)
+
+        let excludePatternRegexes =
+            glob.Exclude
+            |> List.map (ParsedPattern.create rootDir >> ParsedPattern.toRegex)
 
         seq {
             for pattern in includePatterns do
                 let paths = pattern |> ParsedPattern.toPaths
 
                 for path in paths do
-                    let excluded = excludePatternRegexes |> List.exists (fun x -> x.IsMatch (path))
+                    let excluded =
+                        excludePatternRegexes
+                        |> List.exists (fun x -> x.IsMatch (path))
 
                     if not excluded then yield path
         }

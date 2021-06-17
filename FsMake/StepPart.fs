@@ -6,14 +6,16 @@ open System
 /// The context passed to each running step.
 /// </summary>
 type StepContext =
-    { PipelineName: string
-      StepName: string
-      IsParallel: bool
-      Console: Console.IWriter
-      Prefix: Console.TextPart
-      PrefixOption: Prefix.PrefixOption
-      ProcessMonitor: ProcessMonitor.Agent
-      ExtraArgs: string list }
+    {
+        PipelineName: string
+        StepName: string
+        IsParallel: bool
+        Console: Console.IWriter
+        Prefix: Console.TextPart
+        PrefixOption: Prefix.PrefixOption
+        ProcessMonitor: ProcessMonitor.Agent
+        ExtraArgs: string list
+    }
 
 /// <summary>
 /// The types of errors that can occur while running a step.
@@ -279,9 +281,11 @@ module StepPart =
     let retry (attempts: int) (part: StepPart<'T>) : StepPart<'T> =
         let rec nextRetry attempted ctx =
             let prefixArgs : Prefix.Internal.OptionalPrefixArgs =
-                { IsParallel = ctx.IsParallel
-                  PrefixOption = ctx.PrefixOption
-                  Prefix = ctx.Prefix }
+                {
+                    IsParallel = ctx.IsParallel
+                    PrefixOption = ctx.PrefixOption
+                    Prefix = ctx.Prefix
+                }
 
             let errorMessage (messages: Console.Message list) =
                 messages

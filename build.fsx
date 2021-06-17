@@ -8,7 +8,10 @@ let useAnsi = EnvVar.getOptionAs<bool> "ANSI" |> Option.contains true
 let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
 let nugetApiKey = EnvVar.getOption "NUGET_API_KEY"
-let nugetListPkg = EnvVar.getOptionAs<bool> "NUGET_LIST_PKG" |> Option.contains true
+
+let nugetListPkg =
+    EnvVar.getOptionAs<bool> "NUGET_LIST_PKG"
+    |> Option.contains true
 
 let semVerPart =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
@@ -24,14 +27,18 @@ let clean =
 
         // only clean if --clean is specified
         if ctx.ExtraArgs |> List.contains "--clean" then
-            Glob.create "nupkgs/*" |> Glob.toPaths |> Seq.iter (File.Delete)
+            Glob.create "nupkgs/*"
+            |> Glob.toPaths
+            |> Seq.iter (File.Delete)
 
             Glob.create "**/bin"
             |> Glob.add "**/obj"
             |> Glob.toPaths
             |> Seq.iter (fun x -> Directory.Delete (x, true))
 
-            do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
+            do!
+                Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ]
+                |> Cmd.run
         else
             Console.warn "Skipping clean, "
             |> Console.appendParts [ Console.Token "--clean"; Console.Text " not specified" ]
@@ -49,8 +56,19 @@ let build =
             |> Cmd.run
     }
 
-let testFormat = Step.create "test:format" { do! Cmd.createWithArgs "dotnet" [ "fantomas"; "-r"; "."; "--check" ] |> Cmd.run }
-let testLint = Step.create "test:lint" { do! Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ] |> Cmd.run }
+let testFormat =
+    Step.create "test:format" {
+        do!
+            Cmd.createWithArgs "dotnet" [ "fantomas"; "-r"; "."; "--check" ]
+            |> Cmd.run
+    }
+
+let testLint =
+    Step.create "test:lint" {
+        do!
+            Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ]
+            |> Cmd.run
+    }
 
 let nupkgCreate =
     Step.create "nupkg:create" {
@@ -103,7 +121,9 @@ let tag =
             |> Cmd.args [ "-a"; semver; "-m"; $"{semver} release" ]
             |> Cmd.run
 
-        do! Cmd.createWithArgs "git" [ "push"; "origin"; semver ] |> Cmd.run
+        do!
+            Cmd.createWithArgs "git" [ "push"; "origin"; semver ]
+            |> Cmd.run
     }
 
 Pipelines.create {

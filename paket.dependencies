@@ -1,0 +1,8 @@
+storage: none
+framework: netcoreapp3.1
+source https://api.nuget.org/v3/index.json
+
+nuget Expecto ~> 9
+nuget Microsoft.NET.Test.Sdk ~> 16
+nuget Unquote ~> 6
+nuget YoloDev.Expecto.TestSdk ~> 0

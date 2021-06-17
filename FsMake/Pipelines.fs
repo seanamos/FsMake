@@ -7,9 +7,11 @@ open System.Threading
 /// Represents a set of pipelines and settings.
 /// </summary>
 type Pipelines =
-    { Default: Pipeline option
-      Pipelines: Pipeline list
-      StepPrefix: Prefix.PrefixOption }
+    {
+        Default: Pipeline option
+        Pipelines: Pipeline list
+        StepPrefix: Prefix.PrefixOption
+    }
 
 /// <summary>
 /// Module for creating and working with <see cref="T:Pipelines" />.
@@ -33,9 +35,11 @@ module Pipelines =
             ()
 
         member _.Yield(vars: 'a) : Pipelines * 'a =
-            ({ Default = None
-               Pipelines = []
-               StepPrefix = Prefix.WhenParallel },
+            ({
+                 Default = None
+                 Pipelines = []
+                 StepPrefix = Prefix.WhenParallel
+             },
              vars)
 
         member _.For(_: _, binder: unit -> Pipelines * 'a) : Pipelines * 'a =
@@ -46,7 +50,8 @@ module Pipelines =
 
             let pipelines =
                 { pipelines with
-                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+                    Pipelines = pipelines.Pipelines @ [ pipeline ]
+                }
 
             (pipelines, vars)
 
@@ -56,7 +61,8 @@ module Pipelines =
 
             let pipelines =
                 { pipelines with
-                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+                    Pipelines = pipelines.Pipelines @ [ pipeline ]
+                }
 
             (pipelines, vars)
 
@@ -66,7 +72,8 @@ module Pipelines =
 
             let pipelines =
                 { pipelines with
-                      Default = Some pipeline }
+                    Default = Some pipeline
+                }
 
             (pipelines, vars)
 
@@ -147,6 +154,7 @@ module Pipelines =
             Cli.printUsage writer args errors
         | Ok args ->
             let consoleOutput = args.ConsoleOutput |> Cli.ConsoleOutput.toConsoleOutputType
+
             let verbosity = args.Verbosity |> Cli.Verbosity.toConsoleVerbosity
             let writer = Console.createWriter consoleOutput verbosity
 
@@ -169,10 +177,12 @@ module Pipelines =
                     Console.CancelKeyPress.AddHandler (cancelHandler)
 
                     let args : Pipeline.RunArgs =
-                        { Writer = writer
-                          ExtraArgs = args.ExtraArgs
-                          PrefixOption = pipelines.StepPrefix
-                          CancellationToken = cts.Token }
+                        {
+                            Writer = writer
+                            ExtraArgs = args.ExtraArgs
+                            PrefixOption = pipelines.StepPrefix
+                            CancellationToken = cts.Token
+                        }
 
                     let success = x |> Pipeline.run args
 
@@ -202,7 +212,8 @@ module PipelinesBuilderExtensions =
 
             let pipelines =
                 { pipelines with
-                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+                    Pipelines = pipelines.Pipelines @ [ pipeline ]
+                }
 
             (pipelines, vars)
 
@@ -212,6 +223,7 @@ module PipelinesBuilderExtensions =
 
             let pipelines =
                 { pipelines with
-                      Pipelines = pipelines.Pipelines @ [ pipeline ] }
+                    Pipelines = pipelines.Pipelines @ [ pipeline ]
+                }
 
             (pipelines, vars)

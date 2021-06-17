@@ -7,8 +7,10 @@ open System.Diagnostics
 /// Represents a pipeline step.
 /// </summary>
 type Step =
-    { Name: string
-      StepPart: StepPart<unit> }
+    {
+        Name: string
+        StepPart: StepPart<unit>
+    }
 
 /// <summary>
 /// Module for creating and working with steps.
@@ -34,8 +36,10 @@ module Step =
     [<AutoOpen>]
     module internal Internal =
         type RunStat =
-            { StepName: string
-              ExecutionTime: TimeSpan }
+            {
+                StepName: string
+                ExecutionTime: TimeSpan
+            }
 
         type RunResult = Result<RunStat, RunStat * StepError>
 
@@ -52,8 +56,10 @@ module Step =
                 stopwatch.Stop ()
 
                 let runStat =
-                    { StepName = step.Name
-                      ExecutionTime = stopwatch.Elapsed }
+                    {
+                        StepName = step.Name
+                        ExecutionTime = stopwatch.Elapsed
+                    }
 
                 match result with
                 | Ok _ -> Ok runStat
@@ -61,8 +67,10 @@ module Step =
             with ex ->
                 stopwatch.Stop ()
 
-                ({ StepName = step.Name
-                   ExecutionTime = stopwatch.Elapsed },
+                ({
+                     StepName = step.Name
+                     ExecutionTime = stopwatch.Elapsed
+                 },
                  StepUnhandledEx ex)
                 |> Error
 

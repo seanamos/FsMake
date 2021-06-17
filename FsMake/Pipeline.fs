@@ -15,12 +15,14 @@ module Pipeline =
     [<AutoOpen>]
     module internal Internal =
         type Context =
-            { Pipeline: Pipeline
-              Console: Console.IWriter
-              PrefixOption: Prefix.PrefixOption
-              ProcessMonitor: ProcessMonitor.Agent
-              LongestStepNameLength: int
-              ExtraArgs: string list }
+            {
+                Pipeline: Pipeline
+                Console: Console.IWriter
+                PrefixOption: Prefix.PrefixOption
+                ProcessMonitor: ProcessMonitor.Agent
+                LongestStepNameLength: int
+                ExtraArgs: string list
+            }
 
         type StepResult =
             | Success of step: Step * stat: Step.Internal.RunStat
@@ -88,20 +90,24 @@ module Pipeline =
         let createStepContext (ctx: Context) (isParallel: bool) (step: Step) : StepContext =
             let prefix = Prefix.Internal.createPrefix ctx.LongestStepNameLength step.Name
 
-            { PipelineName = ctx.Pipeline.Name
-              StepName = step.Name
-              IsParallel = isParallel
-              Console = ctx.Console
-              Prefix = prefix
-              PrefixOption = ctx.PrefixOption
-              ProcessMonitor = ctx.ProcessMonitor
-              ExtraArgs = ctx.ExtraArgs }
+            {
+                PipelineName = ctx.Pipeline.Name
+                StepName = step.Name
+                IsParallel = isParallel
+                Console = ctx.Console
+                Prefix = prefix
+                PrefixOption = ctx.PrefixOption
+                ProcessMonitor = ctx.ProcessMonitor
+                ExtraArgs = ctx.ExtraArgs
+            }
 
         type RunStepArgs =
-            { RunNextStage: StepResult list -> Stage list -> StepResult list
-              Context: Context
-              AccResults: StepResult list
-              RemainingStages: Stage list }
+            {
+                RunNextStage: StepResult list -> Stage list -> StepResult list
+                Context: Context
+                AccResults: StepResult list
+                RemainingStages: Stage list
+            }
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
             let ctx = createStepContext args.Context false step
@@ -115,9 +121,11 @@ module Pipeline =
                 err
                 |> StepError.toConsoleMessage
                 |> Prefix.Internal.addOptionalPrefixes
-                    { IsParallel = false
-                      PrefixOption = ctx.PrefixOption
-                      Prefix = ctx.Prefix }
+                    {
+                        IsParallel = false
+                        PrefixOption = ctx.PrefixOption
+                        Prefix = ctx.Prefix
+                    }
                 |> args.Context.Console.WriteLines
 
                 args.AccResults @ [ Failed (step, stat, err) ]
@@ -139,9 +147,11 @@ module Pipeline =
                         err
                         |> StepError.toConsoleMessage
                         |> Prefix.Internal.addOptionalPrefixes
-                            { IsParallel = true
-                              PrefixOption = ctx.PrefixOption
-                              Prefix = ctx.Prefix }
+                            {
+                                IsParallel = true
+                                PrefixOption = ctx.PrefixOption
+                                Prefix = ctx.Prefix
+                            }
                         |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))
@@ -150,29 +160,34 @@ module Pipeline =
             if results |> StepResult.anyFailed then
                 args.AccResults @ results
             else
-                args.RemainingStages |> args.RunNextStage (args.AccResults @ results)
+                args.RemainingStages
+                |> args.RunNextStage (args.AccResults @ results)
 
-        let runStages (writer: Console.IWriter) (context: Context) (stages: Stage list) : StepResult list =
+        let runStages (ctx: Context) (stages: Stage list) : StepResult list =
             let rec nextStage accResults remStages =
                 match remStages with
                 | [] -> accResults
                 | x :: xs ->
                     let stepArgs =
-                        { RunNextStage = nextStage
-                          Context = context
-                          AccResults = accResults
-                          RemainingStages = xs }
+                        {
+                            RunNextStage = nextStage
+                            Context = ctx
+                            AccResults = accResults
+                            RemainingStages = xs
+                        }
 
                     match x with
                     | SequentialStage step ->
-                        Console.info "Running " |> Console.appendToken step.Name |> writer.WriteLine
+                        Console.info "Running "
+                        |> Console.appendToken step.Name
+                        |> ctx.Console.WriteLine
 
                         step |> runStep stepArgs
                     | ParallelStage steps ->
                         Console.info "Running "
                         |> Console.appendToken (steps |> Step.Internal.concatNames)
                         |> Console.append " in parallel"
-                        |> writer.WriteLine
+                        |> ctx.Console.WriteLine
 
                         steps |> runParallelSteps stepArgs
                     | SequentialMaybeStage (step, cond) ->
@@ -180,14 +195,14 @@ module Pipeline =
                             Console.info "Running "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition passed"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             step |> runStep stepArgs
                         else
                             Console.warn "Skipping step "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             xs |> nextStage (accResults @ [ Skipped step ])
                     | ParallelMaybeStage (steps, cond) ->
@@ -197,14 +212,14 @@ module Pipeline =
                             Console.info "Running "
                             |> Console.appendToken (stepNames)
                             |> Console.append " in parallel"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             steps |> runParallelSteps stepArgs
                         else
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken stepNames
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             let skipResults = steps |> StepResult.createSkippedList
 
@@ -216,11 +231,12 @@ module Pipeline =
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken (toSkip |> Step.Internal.concatNames)
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                         let skipResults = toSkip |> StepResult.createSkippedList
 
-                        [ ParallelStage toRun ] @ xs |> nextStage (accResults @ skipResults)
+                        [ ParallelStage toRun ] @ xs
+                        |> nextStage (accResults @ skipResults)
 
             stages |> nextStage []
 
@@ -248,7 +264,8 @@ module Pipeline =
         member _.Yield(pmaybes: ParallelMaybe list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybesStage pmaybes ] }
+                    Stages = pipeline.Stages @ [ ParallelMaybesStage pmaybes ]
+                }
 
         member _.Run(_: unit) =
             pipeline
@@ -260,25 +277,29 @@ module Pipeline =
         member _.RunStep(_: unit, step: Step) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ SequentialStage step ] }
+                    Stages = pipeline.Stages @ [ SequentialStage step ]
+                }
 
         [<CustomOperation("maybe_run")>]
         member _.MaybeRun(_: unit, step: Step, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ] }
+                    Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ]
+                }
 
         [<CustomOperation("run_parallel")>]
         member _.RunParallel(_: unit, steps: Step list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelStage steps ] }
+                    Stages = pipeline.Stages @ [ ParallelStage steps ]
+                }
 
         [<CustomOperation("maybe_run_parallel")>]
         member _.MaybeRunParallel(_: unit, steps: Step list, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ] }
+                    Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ]
+                }
 
 
     /// <summary>
@@ -312,10 +333,12 @@ module Pipeline =
     /// Required arguments for running a <see cref="T:Pipeline" />.
     /// </summary>
     type RunArgs =
-        { Writer: Console.IWriter
-          ExtraArgs: string list
-          PrefixOption: Prefix.PrefixOption
-          CancellationToken: CancellationToken }
+        {
+            Writer: Console.IWriter
+            ExtraArgs: string list
+            PrefixOption: Prefix.PrefixOption
+            CancellationToken: CancellationToken
+        }
 
     /// <summary>
     /// Runs a pipeline.
@@ -330,18 +353,20 @@ module Pipeline =
         use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
         let context : Context =
-            { Pipeline = pipeline
-              Console = args.Writer
-              PrefixOption = args.PrefixOption
-              ProcessMonitor = procMonitor
-              LongestStepNameLength = longestNameLength
-              ExtraArgs = args.ExtraArgs }
+            {
+                Pipeline = pipeline
+                Console = args.Writer
+                PrefixOption = args.PrefixOption
+                ProcessMonitor = procMonitor
+                LongestStepNameLength = longestNameLength
+                ExtraArgs = args.ExtraArgs
+            }
 
         Console.info "Running pipeline "
         |> Console.appendToken pipeline.Name
         |> args.Writer.WriteLine
 
-        let results = pipeline.Stages |> runStages args.Writer context
+        let results = pipeline.Stages |> runStages context
 
         args.Writer.WriteLine (Console.Info)
         results |> StepResult.printResults args.Writer
