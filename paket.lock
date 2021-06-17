@@ -1,5 +1,5 @@
 STORAGE: NONE
-RESTRICTION: == netcoreapp3.1
+RESTRICTION: == net50
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Expecto (9.0.2)
@@ -21,7 +21,6 @@ NUGET
     NuGet.Frameworks (5.10)
     System.Collections.Immutable (5.0)
     System.Reflection.Metadata (5.0)
-      System.Collections.Immutable (>= 5.0)
     Unquote (6.1)
       FSharp.Core (>= 4.7.2)
     YoloDev.Expecto.TestSdk (0.11.1)

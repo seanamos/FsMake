@@ -1,5 +1,5 @@
 storage: none
-framework: netcoreapp3.1
+framework: net5.0
 source https://api.nuget.org/v3/index.json
 
 nuget Expecto ~> 9
