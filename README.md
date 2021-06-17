@@ -9,6 +9,10 @@ F# pipeline step/task runner.
 
 > ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
 
+## Demo
+
+<a href="https://asciinema.org/a/6bj3gszvS8j64PPNYfx7Qe1Q3" target="_blank"><img width="50%" src="https://asciinema.org/a/6bj3gszvS8j64PPNYfx7Qe1Q3.svg" /></a>
+
 ## Usage
 
 ```fsharp
