@@ -70,6 +70,14 @@ let testLint =
             |> Cmd.run
     }
 
+let testUnit =
+    Step.create "test:unit" {
+        do!
+            Cmd.createWithArgs "dotnet" [ "run"; "--no-restore"; "--no-build" ]
+            |> Cmd.workingDir "FsMake.UnitTests"
+            |> Cmd.run
+    }
+
 let nupkgCreate =
     Step.create "nupkg:create" {
         let! semVer = semVerPart
@@ -134,7 +142,7 @@ Pipelines.create {
             run build
         }
 
-    do! Pipeline.createFrom build "test" { run_parallel [ testFormat; testLint ] }
+    do! Pipeline.createFrom build "test" { run_parallel [ testFormat; testLint; testUnit ] }
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run nupkgCreate }
 
