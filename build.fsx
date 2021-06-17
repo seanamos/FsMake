@@ -74,6 +74,7 @@ let testUnit =
     Step.create "test:unit" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-restore"; "--no-build" ]
+            |> Cmd.argsOption buildConfigArg
             |> Cmd.workingDir "FsMake.UnitTests"
             |> Cmd.run
     }
