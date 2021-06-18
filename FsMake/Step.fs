@@ -45,7 +45,13 @@ module Step =
 
         let concatNames (steps: Step list) : string =
             steps
-            |> List.fold (fun state x -> if state.Length = 0 then x.Name else $"{state}, {x.Name}") ""
+            |> List.foldi
+                (fun idx state x ->
+                    if idx = 0 then x.Name
+                    else if idx + 1 = steps.Length then $"{state} and {x.Name}"
+                    else $"{state}, {x.Name}"
+                )
+                ""
 
         let run (context: StepContext) (step: Step) : RunResult =
             let stopwatch = Stopwatch ()

@@ -12,3 +12,14 @@ module internal Exception =
                 Console.Error
                 |> Console.messageColor Console.errorColor exLine
         ]
+
+module internal List =
+    let foldi (folder: int -> 'State -> 'T -> 'State) (state: 'State) (list: 'T list) : 'State =
+        list
+        |> List.fold
+            (fun (idx, state) x ->
+                let innerState = folder idx state x
+                (idx + 1, innerState)
+            )
+            (0, state)
+        |> snd

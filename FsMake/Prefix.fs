@@ -26,6 +26,11 @@ module Prefix =
 
     [<AutoOpen>]
     module internal Internal =
+        // potential new colors
+        // Blue
+        // DarkBlue
+        // DarkGreen
+        // DarkMagenta
         let prefixColors =
             [
                 Console.Cyan

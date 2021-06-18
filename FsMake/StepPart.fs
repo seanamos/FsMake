@@ -51,7 +51,7 @@ module internal StepError =
 /// It allows various "parts" that make up the execution of a step to be "glued" together and thread a <see cref="T:StepContext" /> through.
 /// </para>
 /// <para>
-/// This could possible be renamed. ie. StepElement, StepSegment etc.
+/// This could possibly be renamed. ie. StepElement, StepSegment etc.
 /// </para>
 /// </summary>
 type StepPart<'T> = StepContext -> Result<'T, StepError>
