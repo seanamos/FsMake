@@ -200,7 +200,7 @@ let tests =
 
                 let part : StepPart<string> =
                     fun _ ->
-                        System.Threading.Thread.Sleep 20
+                        System.Threading.Thread.Sleep 100
                         System.Threading.Interlocked.Increment &run |> ignore
                         Ok "hello"
                     |> StepPart.memoRace
