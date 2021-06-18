@@ -120,15 +120,17 @@ module Cmd =
     /// Contains all the options used to run a process.
     /// </summary>
     type CmdOptions<'a> =
-        { Command: string
-          Args: Arg list
-          EnvVars: (string * string) list
-          WorkingDirectory: string option
-          Timeout: TimeSpan option
-          Prefix: PrefixOption
-          ExitCodeCheck: ExitCodeCheckOption
-          Redirect: RedirectOption option
-          OutputProcessor: OutputProcessorArgs -> ProcessResult<'a> }
+        {
+            Command: string
+            Args: Arg list
+            EnvVars: (string * string) list
+            WorkingDirectory: string option
+            Timeout: TimeSpan option
+            Prefix: PrefixOption
+            ExitCodeCheck: ExitCodeCheckOption
+            Redirect: RedirectOption option
+            OutputProcessor: OutputProcessorArgs -> ProcessResult<'a>
+        }
 
     /// <summary>
     /// Creates a <see cref="T:Cmd.CmdOption" /> with a command to run.
@@ -136,15 +138,17 @@ module Cmd =
     /// <param name="cmd">The command to run.</param>
     /// <returns>The new <see cref="T:Cmd.CmdOption" />.</returns>
     let create (cmd: string) : CmdOptions<unit> =
-        { Command = cmd
-          Args = []
-          EnvVars = []
-          WorkingDirectory = None
-          Timeout = None
-          Prefix = PrefixPipeline
-          ExitCodeCheck = CheckCodeZero
-          Redirect = None
-          OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () } }
+        {
+            Command = cmd
+            Args = []
+            EnvVars = []
+            WorkingDirectory = None
+            Timeout = None
+            Prefix = PrefixPipeline
+            ExitCodeCheck = CheckCodeZero
+            Redirect = None
+            OutputProcessor = fun (OutputProcessorArgs (exitCode, _, _)) -> { ExitCode = exitCode; Output = () }
+        }
 
     /// <summary>
     /// Creates a <see cref="T:Cmd.CmdOption" /> with a command to run.
@@ -159,7 +163,8 @@ module Cmd =
     /// <returns>The new <see cref="T:Cmd.CmdOption" />.</returns>
     let createWithArgs (cmd: string) (args: string list) : CmdOptions<unit> =
         { create cmd with
-              Args = args |> List.map ArgText }
+            Args = args |> List.map ArgText
+        }
 
     /// <summary>
     /// **Appends** the given arguments to the <see cref="T:Cmd.CmdOption" />.
@@ -170,7 +175,8 @@ module Cmd =
     /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
     let args (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
-              Args = opts.Args @ (args |> List.map ArgText) }
+            Args = opts.Args @ (args |> List.map ArgText)
+        }
 
     /// <summary>
     /// **Appends** the given arguments to the <see cref="T:Cmd.CmdOption" /> if the condition is <c>true</c>.
@@ -183,7 +189,8 @@ module Cmd =
     let argsMaybe (cond: bool) (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         if cond then
             { opts with
-                  Args = opts.Args @ (args |> List.map ArgText) }
+                Args = opts.Args @ (args |> List.map ArgText)
+            }
         else
             opts
 
@@ -230,7 +237,8 @@ module Cmd =
     /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
     let argSecret (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
-              Args = opts.Args @ [ ArgSecret arg ] }
+            Args = opts.Args @ [ ArgSecret arg ]
+        }
 
     /// <summary>
     /// **Appends** the given environment variables to the <see cref="T:Cmd.CmdOption" />.
@@ -247,7 +255,8 @@ module Cmd =
     /// </example>
     let envVars (envVars: (string * string) list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
-              EnvVars = opts.EnvVars @ envVars }
+            EnvVars = opts.EnvVars @ envVars
+        }
 
     /// <summary>
     /// Sets the working directory on the <see cref="T:Cmd.CmdOption" />.
@@ -258,7 +267,8 @@ module Cmd =
     /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
     let workingDir (path: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
-              WorkingDirectory = Some path }
+            WorkingDirectory = Some path
+        }
 
     /// <summary>
     /// Sets the prefix option on the <see cref="T:Cmd.CmdOption" />.
@@ -282,7 +292,8 @@ module Cmd =
     /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
     let timeout (seconds: int) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
-              Timeout = Some (TimeSpan.FromSeconds (seconds |> float)) }
+            Timeout = Some (TimeSpan.FromSeconds (seconds |> float))
+        }
 
     /// <summary>
     /// Sets the redirect option on the <see cref="T:Cmd.CmdOptions" />.
@@ -302,18 +313,22 @@ module Cmd =
     /// </code>
     /// </example>
     let redirectOutput (redirect: RedirectOption) (opts: CmdOptions<'a>) : CmdOptions<RedirectedOutput> =
-        { Command = opts.Command
-          Args = opts.Args
-          EnvVars = opts.EnvVars
-          WorkingDirectory = opts.WorkingDirectory
-          Timeout = opts.Timeout
-          Prefix = opts.Prefix
-          ExitCodeCheck = opts.ExitCodeCheck
-          Redirect = Some redirect
-          OutputProcessor =
-              fun (OutputProcessorArgs (exitCode, std, stdErr)) ->
-                  { ExitCode = exitCode
-                    Output = { Std = std; StdErr = stdErr } } }
+        {
+            Command = opts.Command
+            Args = opts.Args
+            EnvVars = opts.EnvVars
+            WorkingDirectory = opts.WorkingDirectory
+            Timeout = opts.Timeout
+            Prefix = opts.Prefix
+            ExitCodeCheck = opts.ExitCodeCheck
+            Redirect = Some redirect
+            OutputProcessor =
+                fun (OutputProcessorArgs (exitCode, std, stdErr)) ->
+                    {
+                        ExitCode = exitCode
+                        Output = { Std = std; StdErr = stdErr }
+                    }
+        }
 
     /// <summary>
     /// Sets the check exit code option on the <see cref="T:Cmd.CmdOptions" />.
@@ -530,7 +545,10 @@ module Cmd =
                 match redirectDecision with
                 | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
                 | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
-                | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputBuilderWriters) |> beginDataRead
+                | ToBoth ->
+                    proc
+                    |> (addOutputConsoleWriters >> addOutputBuilderWriters)
+                    |> beginDataRead
                 | NoRedirect -> ()
 
                 let processCompleted =
@@ -543,15 +561,19 @@ module Cmd =
                 if not processCompleted then
                     ctx.ProcessMonitor |> ProcessMonitor.kill proc
 
-                    [ Console.error ""
-                      |> Console.appendToken fullCommand
-                      |> Console.append " failed to complete before timeout expired" ]
+                    [
+                        Console.error ""
+                        |> Console.appendToken fullCommand
+                        |> Console.append " failed to complete before timeout expired"
+                    ]
                     |> StepError
                     |> Error
                 else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
-                    [ Console.error ""
-                      |> Console.appendToken fullCommand
-                      |> Console.append " was aborted" ]
+                    [
+                        Console.error ""
+                        |> Console.appendToken fullCommand
+                        |> Console.append " was aborted"
+                    ]
                     |> StepAbort
                     |> Error
                 else

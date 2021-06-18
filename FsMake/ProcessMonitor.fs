@@ -19,8 +19,10 @@ module ProcessMonitor =
             | Shutdown of reply: AsyncReplyChannel<unit>
 
         type State =
-            { Processes: (int * Process) list
-              Killed: int list }
+            {
+                Processes: (int * Process) list
+                Killed: int list
+            }
 
         let killProcess (console: Console.IWriter) (proc: Process) : bool =
             if not proc.HasExited then
@@ -55,7 +57,8 @@ module ProcessMonitor =
                             if not proc.HasExited then
                                 let newState =
                                     { state with
-                                          Processes = (proc.Id, proc) :: state.Processes }
+                                        Processes = (proc.Id, proc) :: state.Processes
+                                    }
 
                                 replyChannel.Reply ()
 
@@ -66,7 +69,10 @@ module ProcessMonitor =
                         | Remove (proc, replyChannel) ->
                             let newState =
                                 { state with
-                                      Processes = state.Processes |> List.filter (fun (pid, _) -> pid <> proc.Id) }
+                                    Processes =
+                                        state.Processes
+                                        |> List.filter (fun (pid, _) -> pid <> proc.Id)
+                                }
 
                             replyChannel.Reply ()
 
@@ -75,8 +81,11 @@ module ProcessMonitor =
                             if proc |> killProcess console then
                                 let newState =
                                     { state with
-                                          Processes = state.Processes |> List.filter (fun (pid, _) -> pid <> proc.Id)
-                                          Killed = proc.Id :: state.Killed }
+                                        Processes =
+                                            state.Processes
+                                            |> List.filter (fun (pid, _) -> pid <> proc.Id)
+                                        Killed = proc.Id :: state.Killed
+                                    }
 
                                 replyChannel.Reply ()
 
@@ -98,7 +107,8 @@ module ProcessMonitor =
 
                             let newState =
                                 { state with
-                                      Killed = results @ state.Killed }
+                                    Killed = results @ state.Killed
+                                }
 
                             replyChannel.Reply ()
 

@@ -46,17 +46,20 @@ module internal Cli =
             | InvalidArgument arg -> Console.error "Invalid argument " |> Console.appendToken arg
 
     type Args =
-        { PrintHelp: bool
-          ScriptFile: string option
-          Pipeline: string option
-          ConsoleOutput: ConsoleOutput
-          Verbosity: Verbosity
-          ExtraArgs: string list }
+        {
+            PrintHelp: bool
+            ScriptFile: string option
+            Pipeline: string option
+            ConsoleOutput: ConsoleOutput
+            Verbosity: Verbosity
+            ExtraArgs: string list
+        }
 
     let printUsage (writer: Console.IWriter) (args: Args) (errors: ParseError list) : unit =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
+
         let scriptFile = args.ScriptFile |> Option.defaultValue "<script>.fsx"
 
         let usage =
@@ -74,9 +77,13 @@ Options:
 
         if not errors.IsEmpty then
             Console.Error |> writer.WriteLine
-            errors |> List.iter (ParseError.toConsoleMessage >> writer.WriteLine)
 
-        Console.Important |> Console.message usage |> writer.WriteLine
+            errors
+            |> List.iter (ParseError.toConsoleMessage >> writer.WriteLine)
+
+        Console.Important
+        |> Console.message usage
+        |> writer.WriteLine
 
     type ParserState =
         | NormalArgs
@@ -92,10 +99,18 @@ Options:
             | (NormalArgs, "-v" :: xs)
             | (NormalArgs, "--verbosity" :: xs) ->
                 match xs with
-                | "disabled" :: xss -> { options with Verbosity = Disabled } |> parseNextArg xss errors (idx + 1) state
-                | "quiet" :: xss -> { options with Verbosity = Quiet } |> parseNextArg xss errors (idx + 1) state
-                | "normal" :: xss -> { options with Verbosity = Normal } |> parseNextArg xss errors (idx + 1) state
-                | "all" :: xss -> { options with Verbosity = All } |> parseNextArg xss errors (idx + 1) state
+                | "disabled" :: xss ->
+                    { options with Verbosity = Disabled }
+                    |> parseNextArg xss errors (idx + 1) state
+                | "quiet" :: xss ->
+                    { options with Verbosity = Quiet }
+                    |> parseNextArg xss errors (idx + 1) state
+                | "normal" :: xss ->
+                    { options with Verbosity = Normal }
+                    |> parseNextArg xss errors (idx + 1) state
+                | "all" :: xss ->
+                    { options with Verbosity = All }
+                    |> parseNextArg xss errors (idx + 1) state
                 | x :: xss ->
                     options
                     |> parseNextArg xss (InvalidOptionParam ("-v, --verbosity", x) :: errors) (idx + 1) state
@@ -105,10 +120,13 @@ Options:
             | (NormalArgs, "-o" :: xs)
             | (NormalArgs, "--console-output" :: xs) ->
                 match xs with
-                | "ansi" :: xss -> { options with ConsoleOutput = Ansi } |> parseNextArg xss errors (idx + 1) state
+                | "ansi" :: xss ->
+                    { options with ConsoleOutput = Ansi }
+                    |> parseNextArg xss errors (idx + 1) state
                 | "standard" :: xss ->
                     { options with
-                          ConsoleOutput = Standard }
+                        ConsoleOutput = Standard
+                    }
                     |> parseNextArg xss errors (idx + 1) state
                 | x :: xss ->
                     options
@@ -119,22 +137,31 @@ Options:
             | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
                 match (idx, options.ScriptFile) with
-                | (0, _) when x.EndsWith (".fsx") -> { options with ScriptFile = Some x } |> parseNextArg xs errors (idx + 1) state
+                | (0, _) when x.EndsWith (".fsx") ->
+                    { options with ScriptFile = Some x }
+                    |> parseNextArg xs errors (idx + 1) state
                 | (0, _)
-                | (1, Some _) -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
-                | _ -> options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
+                | (1, Some _) ->
+                    { options with Pipeline = Some x }
+                    |> parseNextArg xs errors (idx + 1) state
+                | _ ->
+                    options
+                    |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
             | (ExtraArgs, x :: xs) ->
                 { options with
-                      ExtraArgs = options.ExtraArgs @ [ x ] }
+                    ExtraArgs = options.ExtraArgs @ [ x ]
+                }
                 |> parseNextArg xs errors (idx + 1) state
 
         let (args, errors) =
-            { PrintHelp = false
-              ScriptFile = None
-              Pipeline = None
-              ConsoleOutput = Standard
-              Verbosity = Normal
-              ExtraArgs = [] }
+            {
+                PrintHelp = false
+                ScriptFile = None
+                Pipeline = None
+                ConsoleOutput = Standard
+                Verbosity = Normal
+                ExtraArgs = []
+            }
             |> parseNextArg args [] 0 NormalArgs
 
         if errors.IsEmpty then Ok args else Error (args, errors)
