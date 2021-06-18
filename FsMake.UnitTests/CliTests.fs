@@ -67,7 +67,7 @@ let tests =
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
 
-                teste <@ args.PrintHelp = true @>
+                teste <@ args.PrintHelp @>
 
             test "parseArgs parses -v/--verbosity" {
                 let combos =
