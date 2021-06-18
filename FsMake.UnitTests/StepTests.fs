@@ -115,7 +115,6 @@ let tests =
 
             test "concatNames [1] creates correct result" {
                 let step1 = Step.create "test1" { () }
-                let step2 = Step.create "test2" { () }
 
                 let concat = Step.Internal.concatNames [ step1 ]
 
