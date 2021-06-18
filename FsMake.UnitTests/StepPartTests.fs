@@ -205,7 +205,8 @@ let tests =
                         Ok "hello"
                     |> StepPart.memoRace
 
-                [| part; part |] |> Array.Parallel.iter (fun x -> x ctx |> ignore)
+                [| part; part |]
+                |> Array.Parallel.iter (fun x -> x ctx |> ignore)
 
                 let result = part ctx
 
