@@ -12,7 +12,7 @@ module Gen =
         gen {
             let! strList =
                 Arb.generate<NonNull<string>>
-                |> Gen.filter (fun x -> x <> NonNull "--" )
+                |> Gen.filter (fun x -> x <> NonNull "--")
                 |> Gen.listOf
                 |> Gen.map (List.map (fun (NonNull x) -> x))
 
@@ -64,7 +64,6 @@ let tests =
 
             testPropertyWithConfig Gen.config "parseArgs should parse --help in any position"
             <| fun (Gen.HelpArgs rawArgs) ->
-                printfn "%A" rawArgs
                 let parsed = rawArgs |> Cli.parseArgs
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
