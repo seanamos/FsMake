@@ -11,3 +11,9 @@ tags fsmake build fsi f# make pipeline step
 repositoryType git
 repositoryUrl https://github.com/seanamos/FsMake
 projectUrl https://github.com/seanamos/FsMake
+
+dependencies
+  FSharp.Core >= LOCKEDVERSION
+
+files
+  ../README.md ==> .
