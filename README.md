@@ -7,11 +7,11 @@ F# pipeline step/task runner.
 
 ## Development 🚧
 
-> ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
+> ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the public API.
 
 ## Demo
 
-[![FsMake Demo](https://asciinema.org/a/6bj3gszvS8j64PPNYfx7Qe1Q3.svg)](https://asciinema.org/a/6bj3gszvS8j64PPNYfx7Qe1Q3)
+[![FsMake Demo](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta.svg)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
 
 ## Usage
 
