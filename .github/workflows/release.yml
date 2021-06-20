@@ -10,7 +10,7 @@ on:
       tag_release:
         description: "Create a git tag during the release"
         required: true
-        default: "false"
+        default: "true"
       username:
         description: "Name of the user doing the release"
         required: true
