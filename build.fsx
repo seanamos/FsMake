@@ -4,6 +4,7 @@ open FsMake
 open System.IO
 
 let args = fsi.CommandLineArgs
+let isRelease = EnvVar.getOptionAs<bool> "RELEASING" |> Option.contains true
 let useAnsi = EnvVar.getOptionAs<bool> "ANSI" |> Option.contains true
 let buildConfig = EnvVar.getOption "BUILD_CONFIG"
 let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
@@ -45,12 +46,19 @@ let clean =
             |> ctx.Console.WriteLine
     }
 
+let assemblyInfo =
+    Step.create "assemblyInfo" {
+        do!
+            Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ]
+            |> Cmd.run
+    }
+
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
 
 let build =
     Step.create "build" {
         do!
-            Cmd.createWithArgs "dotnet" [ "build" ]
+            Cmd.createWithArgs "dotnet" [ "build"; "--warnaserror" ]
             |> Cmd.argsOption buildConfigArg
             |> Cmd.argMaybe useAnsi "/consoleloggerparameters:ForceConsoleColor"
             |> Cmd.run
@@ -73,7 +81,7 @@ let testLint =
 let testUnit =
     Step.create "test:unit" {
         do!
-            Cmd.createWithArgs "dotnet" [ "run"; "--no-restore"; "--no-build" ]
+            Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
             |> Cmd.argsOption buildConfigArg
             |> Cmd.workingDir "FsMake.UnitTests"
             |> Cmd.run
@@ -84,8 +92,9 @@ let nupkgCreate =
         let! semVer = semVerPart
 
         do!
-            Cmd.createWithArgs "dotnet" [ "paket"; "pack" ]
-            |> Cmd.args [ "--version"; semVer; "nupkgs" ]
+            Cmd.createWithArgs "dotnet" [ "pack"; "--no-build" ]
+            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ $"/p:Version={semVer}"; "-o"; "nupkgs"; "FsMake" ]
             |> Cmd.run
     }
 
@@ -140,6 +149,7 @@ Pipelines.create {
         Pipeline.create "build" {
             run clean
             run restore
+            maybe_run assemblyInfo isRelease
             run build
         }
 

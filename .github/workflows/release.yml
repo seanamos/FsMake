@@ -7,6 +7,10 @@ on:
         description: "List nupkg on nuget.org (true/false)"
         required: true
         default: "false"
+      tag_release:
+        description: "Create a git tag during the release"
+        required: true
+        default: "true"
       username:
         description: "Name of the user doing the release"
         required: true
@@ -17,6 +21,7 @@ on:
         default: 10598927+seanamos@users.noreply.github.com
 
 env:
+  RELEASING: "true"
   ANSI: "true"
   BUILD_CONFIG: Release
   NUGET_LIST_PKG: ${{ github.event.inputs.list_pkg }}
@@ -43,6 +48,8 @@ jobs:
       run: ./build.sh publish:nupkg -o ansi -- --clean
 
   tag:
+    if: ${{ github.event.inputs.tag_release == 'true' }}
+
     runs-on: ubuntu-20.04
 
     needs: package

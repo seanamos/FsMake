@@ -1,5 +1,12 @@
 STORAGE: NONE
-RESTRICTION: == net50
+RESTRICTION: == netcoreapp3.1
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (5.0)
+
+GROUP test
+STORAGE: NONE
+RESTRICTION: == net5.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Expecto (9.0.2)
