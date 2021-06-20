@@ -11,7 +11,7 @@ F# pipeline step/task runner.
 
 ## Demo
 
-[![FsMake Demo](assets/demo.png)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
+[![FsMake Demo](https://github.com/seanamos/FsMake/blob/89fdca731d437c1459913c6d9775440af6433b37/assets/demo.png)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
 
 ## Usage
 
