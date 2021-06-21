@@ -65,5 +65,4 @@ module EnvVar =
             let var = getAs<'T> name
 
             Some var
-        with
-        | _ -> None
+        with _ -> None
