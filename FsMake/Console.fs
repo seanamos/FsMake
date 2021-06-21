@@ -55,8 +55,12 @@ module Console =
     /// Console colors.
     /// </summary>
     type Color =
+        | Blue
         | Cyan
+        | DarkBlue
         | DarkCyan
+        | DarkGreen
+        | DarkMagenta
         | DarkYellow
         | Gray
         | Green
@@ -68,8 +72,12 @@ module Console =
     module internal Color =
         let toConsoleColor (color: Color) =
             match color with
+            | Blue -> ConsoleColor.Blue
             | Cyan -> ConsoleColor.Cyan
+            | DarkBlue -> ConsoleColor.DarkBlue
             | DarkCyan -> ConsoleColor.DarkCyan
+            | DarkGreen -> ConsoleColor.DarkGreen
+            | DarkMagenta -> ConsoleColor.DarkMagenta
             | DarkYellow -> ConsoleColor.DarkYellow
             | Gray -> ConsoleColor.Gray
             | Green -> ConsoleColor.Green
@@ -80,8 +88,12 @@ module Console =
 
         let toAnsiCode (color: Color) =
             match color with
+            | Blue -> "\u001b[38;5;12m"
             | Cyan -> "\u001b[38;5;14m"
-            | DarkCyan -> "\u001b[38;5;44m"
+            | DarkBlue -> "\u001b[38;5;4m"
+            | DarkCyan -> "\u001b[38;5;6m"
+            | DarkGreen -> "\u001b[38;5;2m"
+            | DarkMagenta -> "\u001b[38;5;5m"
             | DarkYellow -> "\u001b[38;5;3m"
             | Gray -> "\u001b[38;5;7m"
             | Green -> "\u001b[38;5;10m"
