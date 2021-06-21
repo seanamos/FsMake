@@ -25,7 +25,7 @@ module Pipelines =
     /// </summary>
     [<Sealed>]
     type Builder() =
-        member _.Zero(vars: 'a) =
+        member _.Zero(vars: 'a) : unit * 'a =
             ((), vars)
 
         member _.Delay(f: unit -> 'T) : 'T =
@@ -35,12 +35,14 @@ module Pipelines =
             ()
 
         member _.Yield(vars: 'a) : Pipelines * 'a =
-            ({
-                 Default = None
-                 Pipelines = []
-                 StepPrefix = Prefix.WhenParallel
-             },
-             vars)
+            let pipelines =
+                {
+                    Default = None
+                    Pipelines = []
+                    StepPrefix = Prefix.WhenParallel
+                }
+
+            (pipelines, vars)
 
         member _.For(_: _, binder: unit -> Pipelines * 'a) : Pipelines * 'a =
             binder ()
