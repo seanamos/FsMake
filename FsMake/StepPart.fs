@@ -224,7 +224,8 @@ module StepPart =
         member _.TryWith(generator: unit -> StepPart<'T>, handler: exn -> StepPart<'T>) : StepPart<'T> =
             try
                 generator ()
-            with ex -> handler ex
+            with
+            | ex -> handler ex
 
         member _.TryFinally(generator: unit -> StepPart<'T>, compensation: unit -> unit) : StepPart<'T> =
             try
@@ -312,7 +313,8 @@ module StepPart =
                         ctx |> nextRetry (attempted + 1)
                     else
                         Error x
-            with ex ->
+            with
+            | ex ->
                 if attempted < attempts then
                     ex |> Exception.toConsoleMessage |> errorMessage
                     retryMessage ()

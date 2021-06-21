@@ -106,8 +106,8 @@ module Pipelines =
                 pipelines.Pipelines
                 |> List.tryFind (fun x -> x.Name.Equals (arg, StringComparison.OrdinalIgnoreCase))
                 |> function
-                | Some pipeline -> PipelineFound pipeline
-                | None -> PipelineNotFound arg
+                    | Some pipeline -> PipelineFound pipeline
+                    | None -> PipelineNotFound arg
 
     /// <summary>
     /// Use a computation expression builder to define <see cref="T:Pipelines" />.

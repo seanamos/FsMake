@@ -70,7 +70,8 @@ module Step =
                 match result with
                 | Ok _ -> Ok runStat
                 | Error x -> Error (runStat, x)
-            with ex ->
+            with
+            | ex ->
                 stopwatch.Stop ()
 
                 ({

@@ -53,9 +53,7 @@ let tests =
             }
 
             test "bind continues to next on Ok" {
-                let part : StepPart<string> =
-                    StepPart.zero
-                    |> StepPart.bind (fun _ -> fun _ -> Ok "hello")
+                let part : StepPart<string> = StepPart.zero |> StepPart.bind (fun _ _ -> Ok "hello")
 
                 let result = part ctx
 
@@ -67,10 +65,9 @@ let tests =
 
                 let part : StepPart<string> =
                     fun _ -> [ Console.error "oh no" ] |> StepError |> Error
-                    |> StepPart.bind (fun _ ->
-                        fun _ ->
-                            run <- true
-                            Ok "hello"
+                    |> StepPart.bind (fun _ _ ->
+                        run <- true
+                        Ok "hello"
                     )
 
                 let result = part ctx

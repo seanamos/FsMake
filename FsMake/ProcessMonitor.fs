@@ -28,7 +28,8 @@ module ProcessMonitor =
             if not proc.HasExited then
                 try
                     proc.Kill ()
-                with ex ->
+                with
+                | ex ->
                     Console.warn "Failed to kill process "
                     |> Console.appendParts [ proc.Id.ToString () |> Console.Token
                                              $". Exception: {Environment.NewLine}" |> Console.Text
