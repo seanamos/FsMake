@@ -462,8 +462,10 @@ module IWriterExtensions =
         /// <summary>
         /// Writes a newline to the console.
         /// </summary>
-        /// <param name="level">The level of the newline. If the level is not high enough for the <see cref="T:Console.Verbosity" />,
-        /// the line will not be written.</param>
+        /// <param name="level">The level of the newline.</param>
+        /// <remarks>
+        /// If the <c>level</c> is not high enough for the <see cref="T:Console.Verbosity" />, the line will not be written.
+        /// </remarks>
         member this.WriteLine(level: Console.Level) : unit =
             level |> Console.message Environment.NewLine |> this.Write
 

@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core.fs" />
+    <Compile Include="ConsoleTests.fs" />
     <Compile Include="CliTests.fs" />
     <Compile Include="GlobTests.fs" />
     <Compile Include="StepPartTests.fs" />
