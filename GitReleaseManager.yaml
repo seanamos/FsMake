@@ -1,0 +1,4 @@
+issue-labels-include:
+    - bug
+    - feature
+    - improvement
