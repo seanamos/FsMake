@@ -199,6 +199,45 @@ module StepPart =
     let context : StepPart<StepContext> = Ok
 
     /// <summary>
+    /// Fails the current part with a message.
+    /// </summary>
+    /// <param name="message">The message to be printed as the failure reason.</param>
+    /// <typeparam name="'T">The <see cref="T:StepPart" /> type.</typeparam>
+    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let part =
+    ///     stepPart {
+    ///         do! StepPart.fail "Oh no!"
+    ///     }
+    /// </code>
+    /// </example>
+    let fail (message: string) : StepPart<'T> =
+        fun _ ->
+            let msg = Console.error message
+            StepError [ msg ] |> Error
+
+    /// <summary>
+    /// Fails the current part with a list of <see cref="T:Console.Message" /> to be printed.
+    /// This can be used to create detailed multi-line failures.
+    /// </summary>
+    /// <param name="messages">The messages to be printed.</param>
+    /// <typeparam name="'T">The <see cref="T:StepPart" /> type.</typeparam>
+    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let myStep =
+    ///     Step.create "myStep" {
+    ///         do!
+    ///             [ Console.error "Oh " |> Console.appendToken "no!" ]
+    ///             |> Step.failMessages
+    ///     }
+    /// </code>
+    /// </example>
+    let failMessages (messages: Console.Message list) : StepPart<'T> =
+        fun _ -> StepError messages |> Error
+
+    /// <summary>
     /// Base class for <see cref="T:StepPart" /> computation expression builders.
     /// </summary>
     [<AbstractClass>]
