@@ -2,9 +2,16 @@
 
 F# pipeline step/task runner.
 
-## Development :construction:
+[![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)](https://www.nuget.org/packages/FsMake)
+[![develop branch status](https://img.shields.io/github/workflow/status/seanamos/FsMake/Test%20incoming%20commits/develop?style=flat-square)](https://github.com/seanamos/FsMake/actions/workflows/test.yml?query=branch%3Adevelop+)
 
-> :warning: While this library is pre 1.0.0, there is the possibility of breaking changes in the API.
+## Development 🚧
+
+> ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the public API.
+
+## Demo
+
+[![FsMake Demo](https://user-images.githubusercontent.com/10598927/122659251-67a2ca00-d176-11eb-9ebd-42c8243a9ff8.png)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
 
 ## Usage
 
@@ -12,7 +19,7 @@ F# pipeline step/task runner.
 // build.fsx
 #r "nuget: FsMake"
 // or a specific version
-// #r "nuget: FsMake, 1.0.0"
+// #r "nuget: FsMake, 0.1.0"
 
 open FsMake
 open System.IO

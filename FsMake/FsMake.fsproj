@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -5,6 +6,22 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OtherFlags>$(OtherFlags)--warnon:3390</OtherFlags>
   </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>FsMake</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2021 Sean Amos</Copyright>
+    <Authors>seanamos</Authors>
+    <Description>F# pipeline step/task runner</Description>
+    <PackageTags>fsmake make build fsi f# fsharp pipeline step</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/seanamos/FsMake</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/seanamos/FsMake</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/seanamos/FsMake</PackageReleaseNotes>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties/AssemblyInfo.fs" />
     <Compile Include="Console.fs" />
@@ -12,9 +29,9 @@
     <Compile Include="Extensions.fs" />
     <Compile Include="Prefix.fs" />
     <Compile Include="Cli.fs" />
-    <Compile Include="EnvVar.fs" />
     <Compile Include="ProcessMonitor.fs" />
     <Compile Include="StepPart.fs" />
+    <Compile Include="EnvVar.fs" />
     <Compile Include="Step.fs" />
     <Compile Include="Cmd.fs" />
     <Compile Include="ParallelMaybe.fs" />
@@ -22,4 +39,5 @@
     <Compile Include="Pipeline.fs" />
     <Compile Include="Pipelines.fs" />
   </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

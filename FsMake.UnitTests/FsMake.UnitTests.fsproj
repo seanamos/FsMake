@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Core.fs" />
+    <Compile Include="ConsoleTests.fs" />
+    <Compile Include="CliTests.fs" />
+    <Compile Include="GlobTests.fs" />
+    <Compile Include="StepPartTests.fs" />
+    <Compile Include="StepTests.fs" />
+    <Compile Include="PipelineTests.fs" />
+    <Compile Include="PipelinesTests.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FsMake\FsMake.fsproj" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

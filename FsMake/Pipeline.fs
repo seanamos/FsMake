@@ -3,18 +3,26 @@ namespace FsMake
 open System
 open System.Threading
 
+/// <summary>
+/// Represents a pipeline and it's stages.
+/// </summary>
 type Pipeline = { Name: string; Stages: Stage list }
 
+/// <summary>
+/// Module for creating and working with a <see cref="T:Pipeline" />.
+/// </summary>
 module Pipeline =
     [<AutoOpen>]
     module internal Internal =
         type Context =
-            { Pipeline: Pipeline
-              Console: Console.IWriter
-              PrefixOption: Prefix.PrefixOption
-              ProcessMonitor: ProcessMonitor.Agent
-              LongestStepNameLength: int
-              ExtraArgs: string list }
+            {
+                Pipeline: Pipeline
+                Console: Console.IWriter
+                PrefixOption: Prefix.PrefixOption
+                ProcessMonitor: ProcessMonitor.Agent
+                LongestStepNameLength: int
+                ExtraArgs: string list
+            }
 
         type StepResult =
             | Success of step: Step * stat: Step.Internal.RunStat
@@ -82,20 +90,24 @@ module Pipeline =
         let createStepContext (ctx: Context) (isParallel: bool) (step: Step) : StepContext =
             let prefix = Prefix.Internal.createPrefix ctx.LongestStepNameLength step.Name
 
-            { PipelineName = ctx.Pipeline.Name
-              StepName = step.Name
-              IsParallel = isParallel
-              Console = ctx.Console
-              Prefix = prefix
-              PrefixOption = ctx.PrefixOption
-              ProcessMonitor = ctx.ProcessMonitor
-              ExtraArgs = ctx.ExtraArgs }
+            {
+                PipelineName = ctx.Pipeline.Name
+                StepName = step.Name
+                IsParallel = isParallel
+                Console = ctx.Console
+                Prefix = prefix
+                PrefixOption = ctx.PrefixOption
+                ProcessMonitor = ctx.ProcessMonitor
+                ExtraArgs = ctx.ExtraArgs
+            }
 
         type RunStepArgs =
-            { RunNextStage: StepResult list -> Stage list -> StepResult list
-              Context: Context
-              AccResults: StepResult list
-              RemainingStages: Stage list }
+            {
+                RunNextStage: StepResult list -> Stage list -> StepResult list
+                Context: Context
+                AccResults: StepResult list
+                RemainingStages: Stage list
+            }
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
             let ctx = createStepContext args.Context false step
@@ -109,9 +121,11 @@ module Pipeline =
                 err
                 |> StepError.toConsoleMessage
                 |> Prefix.Internal.addOptionalPrefixes
-                    { IsParallel = false
-                      PrefixOption = ctx.PrefixOption
-                      Prefix = ctx.Prefix }
+                    {
+                        IsParallel = false
+                        PrefixOption = ctx.PrefixOption
+                        Prefix = ctx.Prefix
+                    }
                 |> args.Context.Console.WriteLines
 
                 args.AccResults @ [ Failed (step, stat, err) ]
@@ -133,9 +147,11 @@ module Pipeline =
                         err
                         |> StepError.toConsoleMessage
                         |> Prefix.Internal.addOptionalPrefixes
-                            { IsParallel = true
-                              PrefixOption = ctx.PrefixOption
-                              Prefix = ctx.Prefix }
+                            {
+                                IsParallel = true
+                                PrefixOption = ctx.PrefixOption
+                                Prefix = ctx.Prefix
+                            }
                         |> args.Context.Console.WriteLines
 
                         Failed (step, stat, err))
@@ -144,29 +160,34 @@ module Pipeline =
             if results |> StepResult.anyFailed then
                 args.AccResults @ results
             else
-                args.RemainingStages |> args.RunNextStage (args.AccResults @ results)
+                args.RemainingStages
+                |> args.RunNextStage (args.AccResults @ results)
 
-        let runStages (writer: Console.IWriter) (context: Context) (stages: Stage list) : StepResult list =
+        let runStages (ctx: Context) (stages: Stage list) : StepResult list =
             let rec nextStage accResults remStages =
                 match remStages with
                 | [] -> accResults
                 | x :: xs ->
                     let stepArgs =
-                        { RunNextStage = nextStage
-                          Context = context
-                          AccResults = accResults
-                          RemainingStages = xs }
+                        {
+                            RunNextStage = nextStage
+                            Context = ctx
+                            AccResults = accResults
+                            RemainingStages = xs
+                        }
 
                     match x with
                     | SequentialStage step ->
-                        Console.info "Running " |> Console.appendToken step.Name |> writer.WriteLine
+                        Console.info "Running "
+                        |> Console.appendToken step.Name
+                        |> ctx.Console.WriteLine
 
                         step |> runStep stepArgs
                     | ParallelStage steps ->
                         Console.info "Running "
                         |> Console.appendToken (steps |> Step.Internal.concatNames)
                         |> Console.append " in parallel"
-                        |> writer.WriteLine
+                        |> ctx.Console.WriteLine
 
                         steps |> runParallelSteps stepArgs
                     | SequentialMaybeStage (step, cond) ->
@@ -174,14 +195,14 @@ module Pipeline =
                             Console.info "Running "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition passed"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             step |> runStep stepArgs
                         else
                             Console.warn "Skipping step "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             xs |> nextStage (accResults @ [ Skipped step ])
                     | ParallelMaybeStage (steps, cond) ->
@@ -191,14 +212,14 @@ module Pipeline =
                             Console.info "Running "
                             |> Console.appendToken (stepNames)
                             |> Console.append " in parallel"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             steps |> runParallelSteps stepArgs
                         else
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken stepNames
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                             let skipResults = steps |> StepResult.createSkippedList
 
@@ -210,14 +231,20 @@ module Pipeline =
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken (toSkip |> Step.Internal.concatNames)
                             |> Console.append ", condition not met"
-                            |> writer.WriteLine
+                            |> ctx.Console.WriteLine
 
                         let skipResults = toSkip |> StepResult.createSkippedList
 
-                        [ ParallelStage toRun ] @ xs |> nextStage (accResults @ skipResults)
+                        [ ParallelStage toRun ] @ xs
+                        |> nextStage (accResults @ skipResults)
 
             stages |> nextStage []
 
+    /// <summary>
+    /// A <see cref="T:Pipeline" /> computation expression builder.
+    /// </summary>
+    /// <param name="name">Name of the pipeline.</param>
+    /// <param name="from">A pipeline to as a base. A new pipeline will be created from this one and have stages appended.</param>
     [<Sealed>]
     type Builder(name: string, ?from: Pipeline) =
         let mutable pipeline =
@@ -237,7 +264,8 @@ module Pipeline =
         member _.Yield(pmaybes: ParallelMaybe list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybesStage pmaybes ] }
+                    Stages = pipeline.Stages @ [ ParallelMaybesStage pmaybes ]
+                }
 
         member _.Run(_: unit) =
             pipeline
@@ -249,39 +277,75 @@ module Pipeline =
         member _.RunStep(_: unit, step: Step) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ SequentialStage step ] }
+                    Stages = pipeline.Stages @ [ SequentialStage step ]
+                }
 
         [<CustomOperation("maybe_run")>]
         member _.MaybeRun(_: unit, step: Step, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ] }
+                    Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ]
+                }
 
         [<CustomOperation("run_parallel")>]
         member _.RunParallel(_: unit, steps: Step list) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelStage steps ] }
+                    Stages = pipeline.Stages @ [ ParallelStage steps ]
+                }
 
         [<CustomOperation("maybe_run_parallel")>]
         member _.MaybeRunParallel(_: unit, steps: Step list, cond: bool) : unit =
             pipeline <-
                 { pipeline with
-                      Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ] }
+                    Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ]
+                }
 
 
+    /// <summary>
+    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// </summary>
+    /// <param name="name">The name of the pipeline.</param>
+    /// <returns>A <see cref="T:Pipeline.Builder" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let emptyStep = Step.create "emptyStep" { () }
+    /// let pipeline =
+    ///     Pipeline.create "pipeline" {
+    ///         run emptyStep
+    ///     }
+    /// </code>
+    /// </example>
     let create (name: string) : Builder =
         Builder (name)
 
+    /// <summary>
+    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// The <c>pipeline</c> parameter is an exsting pipeline to use as a base.
+    /// This does not modify the existing <see cref="T:Pipeline" />, it returns a new <see cref="T:Pipeline" /> with additional stages.
+    /// </summary>
+    /// <param name="pipeline">A <see cref="T:Pipeline" /> to use as a base to build upon. A new <see cref="T:Pipeline" /> will be created from this one and have stages appended.</param>
+    /// <param name="name">The name of the new <see cref="T:Pipeline" />.</param>
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
+    /// <summary>
+    /// Required arguments for running a <see cref="T:Pipeline" />.
+    /// </summary>
     type RunArgs =
-        { Writer: Console.IWriter
-          ExtraArgs: string list
-          PrefixOption: Prefix.PrefixOption
-          CancellationToken: CancellationToken }
+        {
+            Writer: Console.IWriter
+            ExtraArgs: string list
+            PrefixOption: Prefix.PrefixOption
+            CancellationToken: CancellationToken
+        }
 
+    /// <summary>
+    /// Runs a pipeline.
+    /// </summary>
+    /// <param name="args">Required arguments.</param>
+    /// <param name="pipeline">The <see cref="T:Pipeline" /> to run.</param>
+    /// <returns><c>true</c> if the pipeline succeeded, <c>false</c> if there was any failure.</returns>
     let run (args: RunArgs) (pipeline: Pipeline) : bool =
         let longestNameLength = pipeline.Stages |> Stage.longestStepNameLength
         use procMonitor = ProcessMonitor.create (args.Writer)
@@ -289,18 +353,20 @@ module Pipeline =
         use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
         let context : Context =
-            { Pipeline = pipeline
-              Console = args.Writer
-              PrefixOption = args.PrefixOption
-              ProcessMonitor = procMonitor
-              LongestStepNameLength = longestNameLength
-              ExtraArgs = args.ExtraArgs }
+            {
+                Pipeline = pipeline
+                Console = args.Writer
+                PrefixOption = args.PrefixOption
+                ProcessMonitor = procMonitor
+                LongestStepNameLength = longestNameLength
+                ExtraArgs = args.ExtraArgs
+            }
 
         Console.info "Running pipeline "
         |> Console.appendToken pipeline.Name
         |> args.Writer.WriteLine
 
-        let results = pipeline.Stages |> runStages args.Writer context
+        let results = pipeline.Stages |> runStages context
 
         args.Writer.WriteLine (Console.Info)
         results |> StepResult.printResults args.Writer
