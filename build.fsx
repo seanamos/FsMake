@@ -98,12 +98,13 @@ let ``test:unit`` =
 
 let ``nupkg:create`` =
     Step.create "nupkg:create" {
-        let! semVer = getGitversion
+        let! gitversion = getGitversion
+        let semver = gitversion.SemVer
 
         do!
             Cmd.createWithArgs "dotnet" [ "pack"; "--no-build" ]
             |> Cmd.argsOption buildConfigArg
-            |> Cmd.args [ $"/p:Version={semVer}"; "-o"; "nupkgs"; "FsMake" ]
+            |> Cmd.args [ $"/p:Version=%s{semver}"; "-o"; "nupkgs"; "FsMake" ]
             |> Cmd.run
     }
 
@@ -113,7 +114,7 @@ let ``nupkg:push`` =
         let! ctx = Step.context
         let! gitversion = getGitversion
         let semver = gitversion.SemVer
-        let pkg = $"nupkgs/FsMake.{semver}.nupkg"
+        let pkg = $"nupkgs/FsMake.%s{semver}.nupkg"
 
         do!
             Cmd.createWithArgs "dotnet" [ "nuget"; "push"; pkg ]
@@ -124,7 +125,7 @@ let ``nupkg:push`` =
         // unlist the package
         if not nugetListPkg then
             Console.info "Unlisting "
-            |> Console.appendToken $"FsMake {semver}"
+            |> Console.appendToken $"FsMake %s{semver}"
             |> ctx.Console.WriteLine
 
             do!
