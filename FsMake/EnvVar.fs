@@ -59,7 +59,7 @@ module EnvVar =
     /// </summary>
     /// <param name="name">The name of the env var to get.</param>
     /// <typeparam name="'T">The type to convert the env var to.</typeparam>
-    /// <returns><c>Some</c> if env var exists and can be converted, <c>None</c> if it does not or cannot be converted.</returns>
+    /// <returns><c>Some</c> if the env var exists and can be converted, <c>None</c> if it does not or cannot be converted.</returns>
     let getOptionAs<'T when 'T: struct> (name: string) =
         try
             let var = getAs<'T> name
@@ -67,3 +67,69 @@ module EnvVar =
             Some var
         with
         | _ -> None
+
+    let internal someOrFail (envVar: string) (opt: 'T option) : StepPart<'T> =
+        stepPart {
+            match opt with
+            | Some x -> return x
+            | None ->
+                return!
+                    [
+                        Console.error "Could not get environment variable "
+                        |> Console.appendToken envVar
+                    ]
+                    |> StepPart.failMessages
+        }
+
+    /// <summary>
+    /// Gets an environment variable by name.
+    /// <para>
+    /// This is creates a <see cref="T:StepPart" /> that can be used in a step.
+    /// When unable to get the env var, the step will fail.
+    /// </para>
+    /// </summary>
+    /// <param name="name">The name of the env var to get.</param>
+    /// <returns>The env var if it exists, or an <c>Error</c> if it does not.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let getToken = EnvVar.getOrFail "GITHUB_TOKEN"
+    ///
+    /// let step = Step.create "release-notes" {
+    ///     let! token = getToken
+    ///     ...
+    /// }
+    /// </code>
+    /// </example>
+    let getOrFail (name: string) : StepPart<string> =
+        stepPart {
+            let opt = getOption name
+
+            return! opt |> someOrFail name |> StepPart.memo
+        }
+
+    /// <summary>
+    /// Gets an environment variable by name and converts it to the specified type.
+    /// <para>
+    /// This is creates a <see cref="T:StepPart" /> that can be used in a step.
+    /// When unable to get the env var, the step will fail.
+    /// </para>
+    /// </summary>
+    /// <param name="name">The name of the env var to get.</param>
+    /// <typeparam name="'T">The type to convert the env var to.</typeparam>
+    /// <returns>The env var if it exists and can be converted, an <c>Error</c> if it does not or cannot be converted.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let getMyBool = EnvVar.getAsOrFail&lt;bool&gt; "MY_BOOL"
+    ///
+    /// let step = Step.create "release-notes" {
+    ///     let! myBool = getMyBool
+    ///     ...
+    /// }
+    /// </code>
+    /// </example>
+    let getAsOrFail<'T when 'T: struct> (name: string) : StepPart<'T> =
+        stepPart {
+            let opt = getOptionAs<'T> name
+
+            return! opt |> someOrFail name |> StepPart.memo
+        }
