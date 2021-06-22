@@ -117,7 +117,7 @@ module Step =
     /// Fails the current step with a message.
     /// </summary>
     /// <param name="message">The message to be printed as the failure reason.</param>
-    /// <returns>An empty <see cref="T:StepPart" /></returns>
+    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -127,16 +127,14 @@ module Step =
     /// </code>
     /// </example>
     let fail (message: string) : StepPart<unit> =
-        fun _ ->
-            let msg = Console.error message
-            StepError [ msg ] |> Error
+        StepPart.fail message
 
     /// <summary>
     /// Fails the current step with a list of <see cref="T:Console.Message" /> to be printed.
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>
-    /// <returns>An empty <see cref="T:StepPart" /></returns>
+    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -148,4 +146,4 @@ module Step =
     /// </code>
     /// </example>
     let failMessages (messages: Console.Message list) : StepPart<unit> =
-        fun _ -> StepError messages |> Error
+        StepPart.failMessages messages

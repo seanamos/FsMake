@@ -7,8 +7,8 @@ on:
         description: "List nupkg on nuget.org (true/false)"
         required: true
         default: "false"
-      tag_release:
-        description: "Create a git tag during the release"
+      github_release:
+        description: "Create a Github release"
         required: true
         default: "true"
       username:
@@ -47,8 +47,8 @@ jobs:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./build.sh publish:nupkg -o ansi -- --clean
 
-  tag:
-    if: ${{ github.event.inputs.tag_release == 'true' }}
+  github-release:
+    if: ${{ github.event.inputs.github_release == 'true' }}
 
     runs-on: ubuntu-20.04
 
@@ -56,6 +56,8 @@ jobs:
 
     permissions:
       contents: write
+      issues: read
+      pull-requests: read
 
     steps:
     - name: Checkout
@@ -64,10 +66,7 @@ jobs:
         ref: ${{ github.head_ref }}
         fetch-depth: 0
 
-    - name: Git settings
-      run: |
-        git config --global user.name '${{ github.event.inputs.username }}'
-        git config --global user.email '${{ github.event.inputs.user_email }}'
-
-    - name: Git release tag
-      run: ./build.sh publish:tag -o ansi
+    - name: Github release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: ./build.sh publish:github -o ansi
