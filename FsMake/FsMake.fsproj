@@ -30,7 +30,7 @@
     <Compile Include="Prefix.fs" />
     <Compile Include="Cli.fs" />
     <Compile Include="ProcessMonitor.fs" />
-    <Compile Include="StepPart.fs" />
+    <Compile Include="Make.fs" />
     <Compile Include="EnvVar.fs" />
     <Compile Include="Step.fs" />
     <Compile Include="Cmd.fs" />

@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.2.0-beta.2"
+#r "nuget: FsMake, 0.2.0"
 
 open FsMake
 open System

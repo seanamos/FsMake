@@ -14,7 +14,7 @@ let tests =
 
     let procMon = ProcessMonitor.create consoleWriter
 
-    let ctx : StepContext =
+    let ctx : MakeContext =
         {
             PipelineName = "testPipeline"
             StepName = "testStep"
@@ -35,7 +35,7 @@ let tests =
                 teste <@ step.Name = "test" @>
             }
 
-            test "context should get StepContext" {
+            test "context should get MakeContext" {
                 let ctxResult = ctx |> Step.context
 
                 teste <@ ctxResult = Ok ctx @>
@@ -44,7 +44,7 @@ let tests =
             test "fail should create StepError" {
                 let failResult = ctx |> Step.fail "oh no!"
 
-                teste <@ failResult = (StepError [ Console.error "oh no!" ] |> Error) @>
+                teste <@ failResult = (MakeError [ Console.error "oh no!" ] |> Error) @>
             }
 
             test "failMessage should create StepError with messages" {
@@ -52,7 +52,7 @@ let tests =
 
                 let failResult = ctx |> Step.failMessages msgs
 
-                teste <@ failResult = (StepError msgs |> Error) @>
+                teste <@ failResult = (MakeError msgs |> Error) @>
             }
 
             test "run executes step" {
