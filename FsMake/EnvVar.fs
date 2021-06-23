@@ -68,8 +68,8 @@ module EnvVar =
         with
         | _ -> None
 
-    let internal someOrFail (envVar: string) (opt: 'T option) : StepPart<'T> =
-        stepPart {
+    let internal someOrFail (envVar: string) (opt: 'T option) : Make<'T> =
+        make {
             match opt with
             | Some x -> return x
             | None ->
@@ -78,13 +78,13 @@ module EnvVar =
                         Console.error "Could not get environment variable "
                         |> Console.appendToken envVar
                     ]
-                    |> StepPart.failMessages
+                    |> Make.failMessages
         }
 
     /// <summary>
     /// Gets an environment variable by name.
     /// <para>
-    /// This is creates a <see cref="T:StepPart" /> that can be used in a step.
+    /// This is creates a <see cref="T:Make" /> that can be used in a step.
     /// When unable to get the env var, the step will fail.
     /// </para>
     /// </summary>
@@ -100,17 +100,17 @@ module EnvVar =
     /// }
     /// </code>
     /// </example>
-    let getOrFail (name: string) : StepPart<string> =
-        stepPart {
+    let getOrFail (name: string) : Make<string> =
+        make {
             let opt = getOption name
 
-            return! opt |> someOrFail name |> StepPart.memo
+            return! opt |> someOrFail name |> Make.memo
         }
 
     /// <summary>
     /// Gets an environment variable by name and converts it to the specified type.
     /// <para>
-    /// This is creates a <see cref="T:StepPart" /> that can be used in a step.
+    /// This is creates a <see cref="T:Make" /> that can be used in a step.
     /// When unable to get the env var, the step will fail.
     /// </para>
     /// </summary>
@@ -127,9 +127,9 @@ module EnvVar =
     /// }
     /// </code>
     /// </example>
-    let getAsOrFail<'T when 'T: struct> (name: string) : StepPart<'T> =
-        stepPart {
+    let getAsOrFail<'T when 'T: struct> (name: string) : Make<'T> =
+        memo {
             let opt = getOptionAs<'T> name
 
-            return! opt |> someOrFail name |> StepPart.memo
+            return! opt |> someOrFail name |> Make.memo
         }

@@ -470,7 +470,7 @@ module Cmd =
     /// This method cannot be used if the output has not been redirected.
     /// </summary>
     /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
-    /// <param name="ctx">The <see cref="T:StepContext" /> of the current step.</param>
+    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
     /// <returns>The result.</returns>
     /// <example>
@@ -486,8 +486,8 @@ module Cmd =
     ///     }
     /// </code>
     /// </example>
-    let result (opts: CmdOptions<'a>) : StepPart<ProcessResult<'a>> =
-        fun (ctx: StepContext) ->
+    let result (opts: CmdOptions<'a>) : Make<ProcessResult<'a>> =
+        fun (ctx: MakeContext) ->
             let shouldPrefix =
                 match opts.Prefix with
                 | PrefixNever -> false
@@ -566,7 +566,7 @@ module Cmd =
                         |> Console.appendToken fullCommand
                         |> Console.append " failed to complete before timeout expired"
                     ]
-                    |> StepError
+                    |> MakeError
                     |> Error
                 else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
                     [
@@ -574,7 +574,7 @@ module Cmd =
                         |> Console.appendToken fullCommand
                         |> Console.append " was aborted"
                     ]
-                    |> StepAbort
+                    |> MakeAbort
                     |> Error
                 else
                     let exitCode = proc.ExitCode
@@ -582,7 +582,7 @@ module Cmd =
                     let exitCodeDecision = exitCode |> exitCodeDecision opts.ExitCodeCheck fullCommand
 
                     match exitCodeDecision with
-                    | UnexpectedExitCode x -> StepError [ x ] |> Error
+                    | UnexpectedExitCode x -> MakeError [ x ] |> Error
                     | ExpectedExitCode ->
                         OutputProcessorArgs (exitCode, stdBuilder.ToString (), stdErrBuilder.ToString ())
                         |> opts.OutputProcessor
@@ -594,7 +594,7 @@ module Cmd =
     /// Runs a command/process with the specified options.
     /// </summary>
     /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
-    /// <param name="ctx">The <see cref="T:StepContext" /> of the current step.</param>
+    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
     /// <returns>The result.</returns>
     /// <example>
@@ -605,8 +605,8 @@ module Cmd =
     ///     }
     /// </code>
     /// </example>
-    let run (opts: CmdOptions<'a>) : StepPart<unit> =
-        fun (ctx: StepContext) ->
+    let run (opts: CmdOptions<'a>) : Make<unit> =
+        fun (ctx: MakeContext) ->
             let procResult = result opts ctx
 
             match procResult with
