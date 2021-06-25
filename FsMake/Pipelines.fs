@@ -2,6 +2,7 @@ namespace FsMake
 
 open System
 open System.Threading
+open System.Runtime.InteropServices
 
 /// <summary>
 /// Represents a set of pipelines and settings.
@@ -168,6 +169,16 @@ module Pipelines =
                 match findResult with
                 | DefaultPipeline x
                 | PipelineFound x ->
+                    // 😥 temporary workaround for https://github.com/dotnet/fsharp/issues/11729
+                    if not <| RuntimeInformation.IsOSPlatform (OSPlatform.Windows) then
+                        let fixedPathEnv =
+                            Environment
+                                .GetEnvironmentVariable("PATH")
+                                .Replace(';', ':')
+                                .TrimEnd (':')
+
+                        Environment.SetEnvironmentVariable ("PATH", fixedPathEnv)
+
                     use cts = new CancellationTokenSource ()
 
                     let cancelHandler =

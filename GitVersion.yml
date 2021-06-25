@@ -3,3 +3,6 @@ continuous-delivery-fallback-tag: ''
 branches:
   develop:
     mode: ContinuousDelivery
+
+merge-message-formats:
+    gh-pr: '^Merge pull request #(?<PullRequestNumber>\d+) (from|in) ((?<Author>[^\/]*)\/)?(?:(?<SourceBranch>[^\s]*))(?: into (?<TargetBranch>[^\s]*))*'
