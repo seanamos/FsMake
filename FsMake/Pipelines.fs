@@ -170,7 +170,7 @@ module Pipelines =
                 | DefaultPipeline x
                 | PipelineFound x ->
                     // 😥 temporary workaround for https://github.com/dotnet/fsharp/issues/11729
-                    if not <| RuntimeInformation.IsOSPlatform(OSPlatform.Windows) then
+                    if not <| RuntimeInformation.IsOSPlatform (OSPlatform.Windows) then
                         let fixedPathEnv =
                             Environment
                                 .GetEnvironmentVariable("PATH")
