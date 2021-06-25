@@ -2,3 +2,6 @@ issue-labels-include:
     - bug
     - feature
     - improvement
+    -
+merge-message-formats:
+    gh-pr: '^Merge pull request #(?<PullRequestNumber>\d+) (from|in) ((?<Author>[^\/]*)\/)?(?:(?<SourceBranch>[^\s]*))(?: into (?<TargetBranch>[^\s]*))*'
