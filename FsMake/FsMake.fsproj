@@ -17,10 +17,12 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/seanamos/FsMake</RepositoryUrl>
     <PackageProjectUrl>https://github.com/seanamos/FsMake</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/seanamos/FsMake</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/seanamos/FsMake/releases</PackageReleaseNotes>
+    <PackageIcon>nuget-logo.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="../assets/nuget-logo.png" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties/AssemblyInfo.fs" />
