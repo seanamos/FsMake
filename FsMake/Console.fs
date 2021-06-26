@@ -12,10 +12,15 @@ module Console =
     /// The level of a console message.
     /// </summary>
     type Level =
+        /// <summary>Highest message level.</summary>
         | Error
+        /// <summary>Highest message level, shared with <c>Error</c>.</summary>
         | Important
+        /// <summary>Second highest message level.</summary>
         | Warn
+        /// <summary>Normal message level.</summary>
         | Info
+        /// <summary>Lowest message level.</summary>
         | Verbose
 
     /// <summary>
@@ -27,16 +32,15 @@ module Console =
         /// </summary>
         | Disabled
         /// <summary>
-        /// Only <see cref="T:Console.Level.Error" /> and <see cref="T:Console.Level.Important" /> messages will
-        /// be written to the console.
+        /// Only <c>Error</c> and <c>Important</c> messages will be written to the console.
         /// </summary>
         | Quiet
         /// <summary>
-        /// **Default**. All messages except <see cref="T:Console.Level.Verbose" /> will be written.
+        /// **Default**. All messages except <c>Verbose</c> will be written.
         /// </summary>
         | Normal
         /// <summary>
-        /// Messages of all <see cref="Console.Level" /> will be written.
+        /// Messages of all <see cref="T:FsMake.Console.Level" /> will be written.
         /// </summary>
         | All
 
@@ -132,7 +136,7 @@ module Console =
         /// <param name="text">The text.</param>
         | Text of text: string
         /// <summary>
-        /// A token that should be colorized with the <see cref="Console.Messages" />'s <c>TokenColor</c>.
+        /// A token that should be colorized with the <see cref="T:FsMake.Console.Message" />'s <c>TokenColor</c>.
         /// </summary>
         /// <param name="text">The token's text.</param>
         | Token of text: string
@@ -163,12 +167,12 @@ module Console =
         /// </summary>
         | Ansi
         /// <summary>
-        /// Output formatting using <see cref="T:Console" /> properties.
+        /// Output formatting using <see cref="T:System.Console" /> properties.
         /// </summary>
         | Standard
 
     /// <summary>
-    /// An abstraction for different types on console writers.
+    /// An abstraction for different types of console writers.
     /// </summary>
     type IWriter =
         /// <summary>
@@ -261,11 +265,11 @@ module Console =
         let defaultWriter = StandardWriter (Normal) :> IWriter
 
     /// <summary>
-    /// Creates a <see cref="Console.IWriter" />.
+    /// Creates a <see cref="T:FsMake.Console.IWriter" />.
     /// </summary>
-    /// <param name="outputType">The <see cref="Console.OutputType" /> of the console.</param>
-    /// <param name="verbosity">The <see cref="Console.Verbosity" /> of the console.</param>
-    /// <returns>The new <see cref="Console.IWriter" />.</returns>
+    /// <param name="outputType">The <see cref="T:Console.OutputType" /> of the console.</param>
+    /// <param name="verbosity">The <see cref="T:Console.Verbosity" /> of the console.</param>
+    /// <returns>The new <see cref="T:FsMake.Console.IWriter" />.</returns>
     let createWriter (outputType: OutputType) (verbosity: Verbosity) : IWriter =
         match outputType with
         | Ansi -> AnsiWriter (verbosity) :> IWriter
@@ -447,7 +451,7 @@ module Console =
         Info |> statusMessage successColor text
 
 /// <summary>
-/// <see cref="Console.IWriter" /> extension methods.
+/// <see cref="T:FsMake.Console.IWriter" /> extension methods.
 /// </summary>
 [<AutoOpen>]
 module IWriterExtensions =

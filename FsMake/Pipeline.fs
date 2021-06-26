@@ -4,7 +4,7 @@ open System
 open System.Threading
 
 /// <summary>
-/// Represents a pipeline and it's stages.
+/// Represents a pipeline and its stages.
 /// </summary>
 type Pipeline = { Name: string; Stages: Stage list }
 

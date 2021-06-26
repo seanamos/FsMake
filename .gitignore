@@ -396,3 +396,7 @@ ReleaseNotes.md
 
 # fakesharper
 inspectcode.xml
+
+# misc
+tmp/
+.fsdocs/

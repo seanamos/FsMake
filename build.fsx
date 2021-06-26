@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.2.0"
+#r "nuget: FsMake, 0.2.1"
 
 open FsMake
 open System
@@ -139,8 +139,8 @@ let ``nupkg:push`` =
 
     }
 
-let ``github-release-notes`` =
-    Step.create "github-release" {
+let ``github:release`` =
+    Step.create "github:release" {
         let! githubToken = getGithubToken
         let! gitversion = getGitversion
         let semver = gitversion.SemVer
@@ -172,7 +172,7 @@ Pipelines.create {
 
     do! Pipeline.createFrom nupkgCreate "publish:nupkg" { run ``nupkg:push`` }
 
-    do! Pipeline.create "publish:github" { run ``github-release-notes`` }
+    do! Pipeline.create "publish:github" { run ``github:release`` }
 
     default_pipeline build
 }

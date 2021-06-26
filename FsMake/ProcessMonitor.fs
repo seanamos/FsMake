@@ -4,12 +4,14 @@ open System
 open System.Diagnostics
 
 /// <summary>
-/// Module for working with the <see cref="T:ProcessMonitor.Agent" />
+/// Module for working with the <see cref="T:FsMake.ProcessMonitor.Agent" />.
+/// <para>
 /// This is used to track external processes launched by a pipeline.
+/// </para>
 /// </summary>
 module ProcessMonitor =
     [<AutoOpen>]
-    module Internal =
+    module internal Internal =
         type Message =
             | Add of proc: Process * reply: AsyncReplyChannel<unit>
             | Remove of proc: Process * reply: AsyncReplyChannel<unit>
@@ -41,10 +43,10 @@ module ProcessMonitor =
                 false
 
     /// <summary>
-    /// The ProcessMonitor agent (<see cref="Microsoft.FSharp.Control.FSharpMailboxProcessor" />) that tracks external processes
+    /// The ProcessMonitor agent (<see cref="T:Microsoft.FSharp.Control.FSharpMailboxProcessor`1" />) that tracks external processes
     /// launched by a pipeline.
     /// </summary>
-    /// <param name="console">The <see cref="Console.IWriter" /> to use.</param>
+    /// <param name="console">The <see cref="T:FsMake.Console.IWriter" /> to use.</param>
     type Agent(console: Console.IWriter) =
         let mailbox =
             MailboxProcessor.Start
@@ -136,10 +138,10 @@ module ProcessMonitor =
                 (mailbox :> IDisposable).Dispose ()
 
     /// <summary>
-    /// Creates a new <see cref="T:ProcessMonitor.Agent" />.
+    /// Creates a new <see cref="T:FsMake.ProcessMonitor.Agent" />.
     /// </summary>
-    /// <param name="console">The <see cref="T:Console.IWriter" /> to use.</param>
-    /// <returns>The new <see cref="T:ProcessMonitor.Agent" />.</returns>
+    /// <param name="console">The <see cref="T:FsMake.Console.IWriter" /> to use.</param>
+    /// <returns>The new <see cref="T:FsMake.ProcessMonitor.Agent" />.</returns>
     let create (console: Console.IWriter) : Agent =
         new Agent (console)
 
@@ -150,7 +152,7 @@ module ProcessMonitor =
     /// </para>
     /// </summary>
     /// <param name="proc">The process to track.</param>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     let add (proc: Process) (monitor: Agent) : unit =
         monitor.PostAndReply (fun x -> Add (proc, x))
 
@@ -162,7 +164,7 @@ module ProcessMonitor =
     /// </para>
     /// </summary>
     /// <param name="proc">The process to remove.</param>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     let remove (proc: Process) (monitor: Agent) : unit =
         monitor.PostAndReply (fun x -> Remove (proc, x))
 
@@ -173,7 +175,7 @@ module ProcessMonitor =
     /// </para>
     /// </summary>
     /// <param name="proc">The process to kill.</param>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     let kill (proc: Process) (monitor: Agent) : unit =
         monitor.PostAndReply (fun x -> Kill (proc, x))
 
@@ -184,28 +186,28 @@ module ProcessMonitor =
     /// </para>
     /// </summary>
     /// <param name="proc">The process to kill.</param>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     /// <returns><c>true</c> if killed, <c>false</c> if not.</returns>
     let isKilled (proc: Process) (monitor: Agent) : bool =
         monitor.PostAndReply (fun x -> IsKilled (proc, x))
 
     /// <summary>
-    /// Kills all processes tracked by the <see cref="T:ProcessMonitor.Agent" />.
+    /// Kills all processes tracked by the <see cref="T:FsMake.ProcessMonitor.Agent" />.
     /// <para>
     /// Blocks until the message has been processed by the agent.
     /// </para>
     /// </summary>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     let killAll (monitor: Agent) : unit =
         KillAll |> monitor.PostAndReply
 
     /// <summary>
-    /// Shuts down the <see cref="T:ProcessMonitor.Agent" />.
+    /// Shuts down the <see cref="T:FsMake.ProcessMonitor.Agent" />.
     /// It will no longer function after being shut down.
     /// <para>
     /// Blocks until the message has been processed by the agent.
     /// </para>
     /// </summary>
-    /// <param name="monitor">The <see cref="T:ProcessMonitor.Agent" />.</param>
+    /// <param name="monitor">The <see cref="T:FsMake.ProcessMonitor.Agent" />.</param>
     let shutdown (monitor: Agent) : unit =
         Shutdown |> monitor.PostAndReply

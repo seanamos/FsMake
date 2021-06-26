@@ -96,9 +96,9 @@ module Step =
 
 
     /// <summary>
-    /// Gets the current <see cref="T:Make" />.
+    /// Gets the current <see cref="T:MakeContext" />.
     /// </summary>
-    /// <returns>The <see cref="T:Make" />.</returns>
+    /// <returns>The <see cref="T:MakeContext" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -114,7 +114,7 @@ module Step =
     /// Fails the current step with a message.
     /// </summary>
     /// <param name="message">The message to be printed as the failure reason.</param>
-    /// <returns>An <c>Error</c> <see cref="T:Make" />.</returns>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -131,7 +131,7 @@ module Step =
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>
-    /// <returns>An <c>Error</c> <see cref="T:Make" />.</returns>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =

@@ -9,8 +9,11 @@ open System.Text
 /// </summary>
 /// <example>
 /// <code lang="fsharp">
-/// do! Cmd.createWithArgs "dotnet" [ "build" ] |> Cmd.run
-/// let! output = Cmd.createWithArgs "dotnet" [ "gitversion" ] |> Cmd.result
+/// let step = Step.create "mStep" {
+///     do! Cmd.createWithArgs "dotnet" [ "build" ] |> Cmd.run
+///     let! result = Cmd.createWithArgs "dotnet" [ "gitversion" ] |> Cmd.result
+///     printfn "%s" result.Output.Std
+/// }
 /// </code>
 /// </example>
 module Cmd =
@@ -20,13 +23,13 @@ module Cmd =
     /// </summary>
     type Arg =
         /// <summary>
-        /// Ordinary plain text argument
+        /// Ordinary plain text argument.
         /// </summary>
         /// <param name="arg">The argument.</param>
         | ArgText of arg: string
 
         /// <summary>
-        /// Secret argument that should always be masked in output
+        /// Secret argument that should always be masked in output.
         /// </summary>
         /// <param name="arg">The argument.</param>
         | ArgSecret of arg: string
@@ -63,12 +66,12 @@ module Cmd =
     type RedirectOption =
         /// <summary>
         /// Redirect the process output.
-        /// This allows you to capture the output with <see cref="M:Cmd.result" />, but does not print the output the console.
+        /// This allows you to capture the output with <see cref="M:FsMake.Cmd.result" />, but does not print the output the console.
         /// </summary>
         | Redirect
         /// <summary>
         /// Redirects the process output and prints to the console.
-        /// This allows you to capture the output with <see cref="M:Cmd.result" /> and prints the output to the console.
+        /// This allows you to capture the output with <see cref="M:FsMake.Cmd.result" /> and prints the output to the console.
         /// </summary>
         | RedirectToBoth
 
@@ -133,10 +136,10 @@ module Cmd =
         }
 
     /// <summary>
-    /// Creates a <see cref="T:Cmd.CmdOption" /> with a command to run.
+    /// Creates a <see cref="T:FsMake.Cmd.CmdOptions`1" /> with a command to run.
     /// </summary>
     /// <param name="cmd">The command to run.</param>
-    /// <returns>The new <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The new <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let create (cmd: string) : CmdOptions<unit> =
         {
             Command = cmd
@@ -151,7 +154,7 @@ module Cmd =
         }
 
     /// <summary>
-    /// Creates a <see cref="T:Cmd.CmdOption" /> with a command to run.
+    /// Creates a <see cref="T:FsMake.Cmd.CmdOptions`1" /> with a command to run.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
@@ -160,32 +163,32 @@ module Cmd =
     /// </example>
     /// <param name="cmd">The command to run.</param>
     /// <param name="args">A list of arguments to be passed to the command.</param>
-    /// <returns>The new <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The new <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let createWithArgs (cmd: string) (args: string list) : CmdOptions<unit> =
         { create cmd with
             Args = args |> List.map ArgText
         }
 
     /// <summary>
-    /// **Appends** the given arguments to the <see cref="T:Cmd.CmdOption" />.
+    /// **Appends** the given arguments to the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// </summary>
     /// <param name="args">The arguments to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let args (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
             Args = opts.Args @ (args |> List.map ArgText)
         }
 
     /// <summary>
-    /// **Appends** the given arguments to the <see cref="T:Cmd.CmdOption" /> if the condition is <c>true</c>.
+    /// **Appends** the given arguments to the <see cref="T:FsMake.Cmd.CmdOptions`1" /> if the condition is <c>true</c>.
     /// </summary>
     /// <param name="cond">The condition.</param>
     /// <param name="args">The arguments to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let argsMaybe (cond: bool) (args: string list) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         if cond then
             { opts with
@@ -195,58 +198,58 @@ module Cmd =
             opts
 
     /// <summary>
-    /// **Appends** the given argument to the <see cref="T:Cmd.CmdOption" /> if the condition is <c>true</c>.
+    /// **Appends** the given argument to the <see cref="T:FsMake.Cmd.CmdOptions`1" /> if the condition is <c>true</c>.
     /// </summary>
     /// <param name="cond">The condition.</param>
     /// <param name="arg">The argument to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let argMaybe (cond: bool) (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         opts |> argsMaybe cond [ arg ]
 
     /// <summary>
-    /// **Appends** the given arguments to the <see cref="T:Cmd.CmdOption" /> if the option <c>Some</c>.
+    /// **Appends** the given arguments to the <see cref="T:FsMake.Cmd.CmdOptions`1" /> if the option <c>Some</c>.
     /// </summary>
     /// <param name="args'">The arguments to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let argsOption (args': string list option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         match args' with
         | Some x -> opts |> args x
         | None -> opts
 
     /// <summary>
-    /// **Appends** the given argument to the <see cref="T:Cmd.CmdOption" /> if the option <c>Some</c>.
+    /// **Appends** the given argument to the <see cref="T:FsMake.Cmd.CmdOptions`1" /> if the option <c>Some</c>.
     /// </summary>
     /// <param name="arg">The argument to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let argOption (arg: string option) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         opts |> argsOption (arg |> Option.map (fun x -> [ x ]))
 
     /// <summary>
-    /// **Appends** the given *secret* argument to the <see cref="T:Cmd.CmdOption" />.
+    /// **Appends** the given *secret* argument to the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// Secret arguments are masked in console output.
     /// </summary>
     /// <param name="arg">The argument to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let argSecret (arg: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
             Args = opts.Args @ [ ArgSecret arg ]
         }
 
     /// <summary>
-    /// **Appends** the given environment variables to the <see cref="T:Cmd.CmdOption" />.
+    /// **Appends** the given environment variables to the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// </summary>
     /// <param name="envVars">A <c>key * value</c> tuple list of environment variables to append.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" /> to append to.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" /> to append to.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// Cmd.createWithArgs "docker-compose" [ "build" ]
@@ -259,37 +262,37 @@ module Cmd =
         }
 
     /// <summary>
-    /// Sets the working directory on the <see cref="T:Cmd.CmdOption" />.
+    /// Sets the working directory on the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// </summary>
     /// <param name="path">The path of the working directory.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let workingDir (path: string) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
             WorkingDirectory = Some path
         }
 
     /// <summary>
-    /// Sets the prefix option on the <see cref="T:Cmd.CmdOption" />.
+    /// Sets the prefix option on the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// This sets if the console output will be prefixed with the step name.
     /// </summary>
     /// <param name="prefix">The prefix option.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let prefix (prefix: PrefixOption) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with Prefix = prefix }
 
     /// <summary>
-    /// Sets the timeout option on the <see cref="T:Cmd.CmdOption" />.
+    /// Sets the timeout option on the <see cref="T:FsMake.Cmd.CmdOptions`1" />.
     /// This is the time in seconds before the command times out and is terminated.
     /// The timeout being reached causes a step failure.
     /// </summary>
     /// <param name="seconds">The timeout in seconds.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     let timeout (seconds: int) (opts: CmdOptions<'a>) : CmdOptions<'a> =
         { opts with
             Timeout = Some (TimeSpan.FromSeconds (seconds |> float))
@@ -301,9 +304,9 @@ module Cmd =
     /// Check the options in <see cref="T:Cmd.RedirectOption" /> for more information on each option.
     /// </summary>
     /// <param name="redirect">The redirect option.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let! output =
@@ -331,15 +334,15 @@ module Cmd =
         }
 
     /// <summary>
-    /// Sets the check exit code option on the <see cref="T:Cmd.CmdOptions" />.
+    /// Sets the check exit code option on the <see cref="T:FsMakeCmd.CmdOptions`1" />.
     /// This sets if the exit code returned by the process should be checked.
-    /// Check the options in <see cref="T:Cmd.ExitCodeCheckOption" /> for more information on each option.
-    /// The default is <see cref="T:Cmd.ExitCodeCheckOption.CheckCodeZero" />.
+    /// Check the options in <see cref="T:FsMake.Cmd.ExitCodeCheckOption" /> for more information on each option.
+    /// The default is <see cref="T:FsMake.Cmd.ExitCodeCheckOption.CheckCodeZero" />.
     /// </summary>
     /// <param name="check">The exit code check option.</param>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
-    /// <returns>The updated <see cref="T:Cmd.CmdOption" />.</returns>
+    /// <returns>The updated <see cref="T:FsMake.Cmd.CmdOptions`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let! output =
@@ -469,8 +472,8 @@ module Cmd =
     /// The <see cref="T:Cmd.ProcessResult" /> contains the exit code and optionally the redirected output if a redirect option was set.
     /// This method cannot be used if the output has not been redirected.
     /// </summary>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
-    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
+    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
     /// <returns>The result.</returns>
     /// <example>
@@ -593,8 +596,8 @@ module Cmd =
     /// <summary>
     /// Runs a command/process with the specified options.
     /// </summary>
-    /// <param name="opts">The <see cref="T:Cmd.CmdOption" />.</param>
-    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make" />.</param>
+    /// <param name="opts">The <see cref="T:FsMake.Cmd.CmdOptions`1" />.</param>
+    /// <param name="ctx">The <see cref="T:MakeContext" /> of the current <see cref="T:Make`1" />.</param>
     /// <typeparam name="'a">The command output type.</typeparam>
     /// <returns>The result.</returns>
     /// <example>
