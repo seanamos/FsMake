@@ -112,58 +112,16 @@ module Pipelines =
                     | Some pipeline -> PipelineFound pipeline
                     | None -> PipelineNotFound arg
 
-    /// <summary>
-    /// Use a computation expression builder to define <see cref="T:Pipelines" />.
-    /// </summary>
-    /// <returns>A <see cref="T:Pipelines.Builder" />.</returns>
-    /// <example>
-    /// <code lang="fsharp">
-    /// let clean = Step.create "clean" { () }
-    /// let build = Step.create "build" { () }
-    /// let testUnit = Step.create "test:unit" { () }
-    /// let testInt = Step.create "test:integration" { () }
-    ///
-    /// let pipelines =
-    ///     Pipelines.create {
-    ///         // adds the build pipeline to the <see cref="Pipelines" />
-    ///         let! build = Pipeline.create "build" {
-    ///             run clean
-    ///             run build
-    ///         }
-    ///
-    ///         // adds the test pipeline to the <see cref="Pipelines" />
-    ///         do! Pipeline.createFrom build "test" {
-    ///             run_parallel [ testUnit; testInt ]
-    ///         }
-    ///
-    ///         default_pipeline build
-    ///     }
-    /// </code>
-    /// </example>
-    let create = Builder ()
-
-    /// <summary>
-    /// Runs a <see cref="T:Pipeline" /> from the given <c>pipelines</c> based on the command line arguments given in <c>args</c>.
-    /// </summary>
-    /// <param name="args">Command line arguments to be parsed.</param>
-    /// <param name="pipelines"><see cref="T:Pipelines" /> definition.</param>
-    let runWithArgs (args: string []) (pipelines: Pipelines) : unit =
-        let parsedArgs = Cli.parseArgs args
-
-        match parsedArgs with
-        | Error (args, errors) ->
-            let writer = Console.Internal.defaultWriter
-
-            Cli.printUsage writer args errors
-        | Ok args ->
+        let runWithParsedArgs (args: Cli.Args) (pipelines: Pipelines) : int =
             let consoleOutput = args.ConsoleOutput |> Cli.ConsoleOutput.toConsoleOutputType
 
             let verbosity = args.Verbosity |> Cli.Verbosity.toConsoleVerbosity
             let writer = Console.createWriter consoleOutput verbosity
 
-            match args.PrintHelp with
-            | true -> Cli.printUsage writer args []
-            | false ->
+            if args.PrintHelp then
+                Cli.printUsage writer args []
+                0
+            else
                 let findResult = args.Pipeline |> findPipelineFromArg pipelines
 
                 match findResult with
@@ -201,20 +159,84 @@ module Pipelines =
 
                     Console.CancelKeyPress.RemoveHandler (cancelHandler)
 
-                    if success then exit 0 else exit 1
+                    if success then 0 else 1
                 | NoDefault ->
                     Console.error "No default pipeline was defined and no pipeline was specified"
                     |> writer.WriteLine
 
-                    exit 1
+                    1
                 | PipelineNotFound arg ->
-                    sprintf "Could not find a pipeline with the name "
-                    |> Console.error
+                    Console.error "Could not find a pipeline with the name "
                     |> Console.appendToken arg
                     |> writer.WriteLine
 
-                    exit 1
+                    1
 
+    /// <summary>
+    /// Use a computation expression builder to define <see cref="T:Pipelines" />.
+    /// </summary>
+    /// <returns>A <see cref="T:Pipelines.Builder" />.</returns>
+    /// <example>
+    /// <code lang="fsharp">
+    /// let clean = Step.create "clean" { () }
+    /// let build = Step.create "build" { () }
+    /// let testUnit = Step.create "test:unit" { () }
+    /// let testInt = Step.create "test:integration" { () }
+    ///
+    /// let pipelines =
+    ///     Pipelines.create {
+    ///         // adds the build pipeline to the `Pipelines`
+    ///         let! build = Pipeline.create "build" {
+    ///             run clean
+    ///             run build
+    ///         }
+    ///
+    ///         // adds the test pipeline to the <see cref="Pipelines" />
+    ///         do! Pipeline.createFrom build "test" {
+    ///             run_parallel [ testUnit; testInt ]
+    ///         }
+    ///
+    ///         default_pipeline build
+    ///     }
+    /// </code>
+    /// </example>
+    let create = Builder ()
+
+    /// <summary>
+    /// Runs a <see cref="T:Pipeline" /> from the given <c>pipelines</c> based on the command line arguments given in <c>args</c>.
+    /// <para>
+    /// Based on success or failure, returns a <c>0</c> or <c>1</c> exit code.
+    /// </para>
+    /// </summary>
+    /// <param name="args">Command line arguments to be parsed.</param>
+    /// <param name="pipelines"><see cref="T:Pipelines" /> definition.</param>
+    let runWithArgs (args: string []) (pipelines: Pipelines) : int =
+        let parsedArgs = Cli.parseArgs args
+
+        match parsedArgs with
+        | Error (args, errors) ->
+            let writer = Console.Internal.defaultWriter
+
+            Cli.printUsage writer args errors
+            1
+        | Ok args -> pipelines |> runWithParsedArgs args
+
+    /// <summary>
+    /// Runs a <see cref="T:Pipeline" /> from the given <c>pipelines</c> based on the command line arguments given in <c>args</c>.
+    /// <para>
+    /// Based on success or failure, exits the process with a <c>0</c> or <c>1</c> exit code.
+    /// </para>
+    /// </summary>
+    /// <param name="args">Command line arguments to be parsed.</param>
+    /// <param name="pipelines"><see cref="T:Pipelines" /> definition.</param>
+    let runWithArgsAndExit (args: string []) (pipelines: Pipelines) : unit =
+        pipelines |> runWithArgs args |> exit |> ignore
+
+
+/// <summary>
+/// Module containing extension methods for <see cref="T:Pipelines.Builder" />.
+/// </summary>
+/// <exclude />
 [<AutoOpen>]
 module PipelinesBuilderExtensions =
 
