@@ -400,3 +400,4 @@ inspectcode.xml
 # misc
 tmp/
 .fsdocs/
+docs-output/

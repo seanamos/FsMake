@@ -20,7 +20,7 @@ indent_size = 2
 [*.{fs,fsx}]
 max_line_length=140
 fsharp_multiline_block_brackets_on_same_column=true
-fsharp_max_infix_operator_expression=60
+fsharp_max_infix_operator_expression=80
 fsharp_max_value_binding_width=140
 fsharp_max_function_binding_width=0
 fsharp_max_if_then_else_short_width=60
