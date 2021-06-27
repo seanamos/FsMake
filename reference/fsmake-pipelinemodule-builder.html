@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Builder (FsMake)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="seanamos">
+
+    <link rel="stylesheet" id="theme_link" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.6.0/materia/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="https://github.com/seanamos/FsMake/content/navbar-fixed-left.css" />
+    <link type="text/css" rel="stylesheet" href="https://github.com/seanamos/FsMake/content/fsdocs-default.css" />
+    <link type="text/css" rel="stylesheet" href="https://github.com/seanamos/FsMake/content/fsdocs-custom.css" />
+    <script type="text/javascript" src="https://github.com/seanamos/FsMake/content/fsdocs-tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- BEGIN SEARCH BOX: this adds support for the search box -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/JavaScript-autoComplete/1.0.4/auto-complete.css" />
+    <!-- END SEARCH BOX: this adds support for the search box -->
+    
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bg-secondary navbar-nav-scroll fixed-left" id="fsdocs-nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <a href="/"><img id="fsdocs-logo" src="https://github.com/seanamos/FsMake/img/logo.png" /></a>
+            <!-- BEGIN SEARCH BOX: this adds support for the search box -->
+            <div id="header">
+                <div class="searchbox" id="fsdocs-searchbox">
+                    <label for="search-by">
+                        <i class="fas fa-search"></i>
+                    </label>
+                    <input data-search-input="" id="search-by" type="search" placeholder="Search..." />
+                    <span data-search-clear="">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- END SEARCH BOX: this adds support for the search box -->
+            <ul class="navbar-nav">
+                <li class="nav-header">Links</li>
+                <li class="nav-item" id="fsdocs-license-link"><a class="nav-link" href="https://github.com/seanamos/FsMake/blob/master/LICENSE.md">License</a></li>
+                <li class="nav-item" id="fsdocs-release-notes-link"><a class="nav-link" href="https://github.com/seanamos/FsMake/releases">Release Notes</a></li>
+                <li class="nav-item" id="fsdocs-repository-link"><a class="nav-link" href="https://github.com/seanamos/FsMake/">Source Repository</a></li>
+                
+                <li class="nav-header">
+  API Reference
+</li>             
+<li class="nav-item">
+  <a class="nav-link" href="https://github.com/seanamos/FsMake/reference/index.html">
+    All Namespaces
+  </a>
+</li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="masthead">
+            <h3 class="muted"><a href="https://github.com/seanamos/FsMake/">FsMake</a></h3>
+        </div>
+        <hr />
+        <div class="container" id="fsdocs-content">
+            <div>
+  <h2>
+    Builder Type
+  </h2>
+  <dl class="fsdocs-metadata">
+    <dt>
+      Namespace: 
+      <a href="https://github.com/seanamos/FsMake/reference/fsmake.html">
+        FsMake
+      </a>
+    </dt>
+    <dt>
+      Assembly: FsMake.dll
+    </dt>
+    <dt>
+      Parent Module: 
+      <a href="https://github.com/seanamos/FsMake/reference/fsmake-pipelinemodule.html">
+        Pipeline
+      </a>
+    </dt>
+    <dt>
+      Base Type: 
+      <code>obj</code>
+    </dt>
+  </dl>
+  <div class="fsdocs-xmldoc">
+    <div>
+      <p class="fsdocs-summary">
+        
+ A <a href="https://github.com/seanamos/FsMake/reference/fsmake-pipeline.html">Pipeline</a> computation expression builder.
+ 
+      </p>
+    </div>
+  </div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div>
+    <h3>
+      Constructors
+    </h3>
+    <table class="table outer-list fsdocs-member-list">
+      <thead>
+        <tr>
+          <td class="fsdocs-member-list-header">
+            Constructor
+          </td>
+          <td class="fsdocs-member-list-header">
+            Description
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '175', 175)" onmouseover="showTip(event, '175', 175)">
+                <p>
+                  <a id="( .ctor )">
+                    <a href="#( .ctor )">
+                      <code><span>Builder<span><span>(<span>name,&#32;?from</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="175">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>Builder<span><span>(<span>name,&#32;?from</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        name
+                      </b>
+                      :
+                      <code>string</code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        ?from
+                      </b>
+                      :
+                      <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipeline.html">Pipeline</a></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                  <span>
+                    Returns: 
+                    <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipelinemodule-builder.html">Builder</a></code>
+                  </span>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.#ctor`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.#ctor\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L249-249" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  name
+                </span>
+                :
+                <code>string</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  ?from
+                </span>
+                :
+                <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipeline.html">Pipeline</a></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+            <dl class="fsdocs-returns">
+              <dt>
+                <span class="fsdocs-return-name">
+                  Returns: 
+                </span>
+                <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipelinemodule-builder.html">Builder</a></code>
+              </dt>
+              <dd class="fsdocs-return-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <h3>
+      Instance members
+    </h3>
+    <table class="table outer-list fsdocs-member-list">
+      <thead>
+        <tr>
+          <td class="fsdocs-member-list-header">
+            Instance member
+          </td>
+          <td class="fsdocs-member-list-header">
+            Description
+          </td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '176', 176)" onmouseover="showTip(event, '176', 176)">
+                <p>
+                  <a id="Combine">
+                    <a href="#Combine">
+                      <code><span>this.Combine<span><span>(<span>arg1,&#32;arg2</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="176">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.Combine<span><span>(<span>arg1,&#32;arg2</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        arg0
+                      </b>
+                      :
+                      <code>'T</code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        arg1
+                      </b>
+                      :
+                      <code>'T</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('```cref:M:FsMake.PipelineModule.Builder.Combine``1```')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.Combine``1\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L273-273" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  arg0
+                </span>
+                :
+                <code>'T</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  arg1
+                </span>
+                :
+                <code>'T</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '177', 177)" onmouseover="showTip(event, '177', 177)">
+                <p>
+                  <a id="Delay">
+                    <a href="#Delay">
+                      <code><span>this.Delay<span><span>(<span>f</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="177">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.Delay<span><span>(<span>f</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        f
+                      </b>
+                      :
+                      <code><span>unit&#32;->&#32;'T</span></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                  <span>
+                    Returns: 
+                    <code>'T</code>
+                  </span>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('```cref:M:FsMake.PipelineModule.Builder.Delay``1```')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.Delay``1\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L255-255" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  f
+                </span>
+                :
+                <code><span>unit&#32;->&#32;'T</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+            <dl class="fsdocs-returns">
+              <dt>
+                <span class="fsdocs-return-name">
+                  Returns: 
+                </span>
+                <code>'T</code>
+              </dt>
+              <dd class="fsdocs-return-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '178', 178)" onmouseover="showTip(event, '178', 178)">
+                <p>
+                  <a id="For">
+                    <a href="#For">
+                      <code><span>this.For<span><span>(<span>(),&#32;x</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="178">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.For<span><span>(<span>(),&#32;x</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        ()
+                      </b>
+                      :
+                      <code>unit</code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        x
+                      </b>
+                      :
+                      <code><span>unit&#32;->&#32;unit</span></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.For`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.For\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L258-258" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  ()
+                </span>
+                :
+                <code>unit</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  x
+                </span>
+                :
+                <code><span>unit&#32;->&#32;unit</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '179', 179)" onmouseover="showTip(event, '179', 179)">
+                <p>
+                  <a id="MaybeRun">
+                    <a href="#MaybeRun">
+                      <code><span>maybe_run&#32;<span>step&#32;cond</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="179">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>maybe_run&#32;<span>step&#32;cond</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        step
+                      </b>
+                      :
+                      <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a></code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        cond
+                      </b>
+                      :
+                      <code>bool</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.MaybeRun`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.MaybeRun\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L284-284" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  step
+                </span>
+                :
+                <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  cond
+                </span>
+                :
+                <code>bool</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '180', 180)" onmouseover="showTip(event, '180', 180)">
+                <p>
+                  <a id="MaybeRunParallel">
+                    <a href="#MaybeRunParallel">
+                      <code><span>maybe_run_parallel&#32;<span>steps&#32;cond</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="180">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>maybe_run_parallel&#32;<span>steps&#32;cond</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        steps
+                      </b>
+                      :
+                      <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a>&#32;list</span></code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        cond
+                      </b>
+                      :
+                      <code>bool</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.MaybeRunParallel`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.MaybeRunParallel\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L298-298" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  steps
+                </span>
+                :
+                <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a>&#32;list</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  cond
+                </span>
+                :
+                <code>bool</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '181', 181)" onmouseover="showTip(event, '181', 181)">
+                <p>
+                  <a id="Run">
+                    <a href="#Run">
+                      <code><span>this.Run<span>()</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="181">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.Run<span>()</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        ()
+                      </b>
+                      :
+                      <code>unit</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                  <span>
+                    Returns: 
+                    <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipeline.html">Pipeline</a></code>
+                  </span>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.Run`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.Run\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L270-270" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  ()
+                </span>
+                :
+                <code>unit</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+            <dl class="fsdocs-returns">
+              <dt>
+                <span class="fsdocs-return-name">
+                  Returns: 
+                </span>
+                <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-pipeline.html">Pipeline</a></code>
+              </dt>
+              <dd class="fsdocs-return-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '182', 182)" onmouseover="showTip(event, '182', 182)">
+                <p>
+                  <a id="RunParallel">
+                    <a href="#RunParallel">
+                      <code><span>run_parallel&#32;<span>steps</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="182">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>run_parallel&#32;<span>steps</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        steps
+                      </b>
+                      :
+                      <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a>&#32;list</span></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.RunParallel`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.RunParallel\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L291-291" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  steps
+                </span>
+                :
+                <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a>&#32;list</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '183', 183)" onmouseover="showTip(event, '183', 183)">
+                <p>
+                  <a id="RunStep">
+                    <a href="#RunStep">
+                      <code><span>run&#32;<span>step</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="183">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>run&#32;<span>step</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        step
+                      </b>
+                      :
+                      <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.RunStep`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.RunStep\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L277-277" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  step
+                </span>
+                :
+                <code><a href="https://github.com/seanamos/FsMake/reference/fsmake-step.html">Step</a></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '184', 184)" onmouseover="showTip(event, '184', 184)">
+                <p>
+                  <a id="Yield">
+                    <a href="#Yield">
+                      <code><span>this.Yield<span><span>(<span>pmaybes</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="184">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.Yield<span><span>(<span>pmaybes</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        pmaybes
+                      </b>
+                      :
+                      <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.Yield`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.Yield\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L264-264" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  pmaybes
+                </span>
+                :
+                <code><span><a href="https://github.com/seanamos/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '185', 185)" onmouseover="showTip(event, '185', 185)">
+                <p>
+                  <a id="Yield">
+                    <a href="#Yield">
+                      <code><span>this.Yield<span>()</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="185">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>this.Yield<span>()</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        ()
+                      </b>
+                      :
+                      <code>unit</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.PipelineModule.Builder.Yield`')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.PipelineModule.Builder.Yield\'/>')">
+                <img src="https://github.com/seanamos/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Pipeline.fs#L261-261" class="fsdocs-source-link">
+                <img src="https://github.com/seanamos/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://github.com/seanamos/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  ()
+                </span>
+                :
+                <code>unit</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div></div>
+</div>
+            
+        </div>
+
+        <!-- BEGIN SEARCH BOX: this adds support for the search box -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/JavaScript-autoComplete/1.0.4/auto-complete.css" />
+        <script type="text/javascript">var fsdocs_search_baseurl = 'https://github.com/seanamos/FsMake/';</script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.8/lunr.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/JavaScript-autoComplete/1.0.4/auto-complete.min.js"></script>
+        <script type="text/javascript" src="https://github.com/seanamos/FsMake/content/fsdocs-search.js"></script>
+        <!-- END SEARCH BOX: this adds support for the search box -->
+    </div>
+</body>
+
+</html>
+
