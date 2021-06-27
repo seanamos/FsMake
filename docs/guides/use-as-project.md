@@ -18,8 +18,6 @@ Create a folder and a new console project in your solution directory.
 
     dotnet sln add MyProject.Build
 
-<br />
-
 Add a nuget reference to FsMake
 
     [lang=sh]
@@ -32,9 +30,10 @@ Add a nuget reference to FsMake
 Open `MyProject.Build/Program.fs` and replace its contents with:
 
     [hide]
-    #r "nuget: FsMake"
+    #I "../../FsMake/bin/Release/netcoreapp3.1"
+    #r "FsMake.dll"
 
-<!-- Seperate -->
+<!-- Sep -->
 
     open FsMake
 

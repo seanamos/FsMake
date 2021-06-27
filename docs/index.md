@@ -26,8 +26,6 @@ In your project root create a `build.cmd` file for Windows users:
     [lang=sh]
     dotnet fsi build.fsx %*
 
-<br />
-
 Create a `build.sh` for non Windows users:
 
     [lang=sh]
@@ -37,9 +35,13 @@ Create a `build.sh` for non Windows users:
 
 **Don't forget to `chmod +x build.sh`!**
 
-<br />
-
 Create a `build.fsx` file:
+
+    [hide]
+    #I "../FsMake/bin/Release/netcoreapp3.1"
+    #r "FsMake.dll"
+
+<!-- Sep -->
 
     [lang=fsharp]
     // Uses the latest stable version of FsMake
@@ -77,8 +79,6 @@ Create a `build.fsx` file:
         default_pipeline build
     }
     |> Pipelines.runWithArgsAndExit args
-
-<br />
 
 To run this pipeline:
 

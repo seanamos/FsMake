@@ -25,9 +25,10 @@ Add the following to your `build.cmd` & `build.sh`:
 Create a `build.fsx` file at the root of your solution:
 
     [hide]
-    #r "nuget: FsMake"
+    #I "../../FsMake/bin/Release/netcoreapp3.1"
+    #r "FsMake.dll"
 
-<!-- Seperate -->
+<!-- Sep -->
 
     #load ".paket/load/netcoreapp3.1/build/build.group.fsx"
 
