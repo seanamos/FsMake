@@ -16,9 +16,13 @@
     <PackageTags>fsmake make build fsi f# fsharp pipeline step</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/seanamos/FsMake</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/seanamos/FsMake</PackageProjectUrl>
+    <PackageProjectUrl>https://seanamos.github.io/FsMake/</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/seanamos/FsMake/releases</PackageReleaseNotes>
     <PackageIcon>nuget-logo.png</PackageIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FsDocsLogoLink>https://seanamos.github.io/FsMake</FsDocsLogoLink>
+    <FsDocsReleaseNotesLink>https://github.com/seanamos/FsMake/releases</FsDocsReleaseNotesLink>
   </PropertyGroup>
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />

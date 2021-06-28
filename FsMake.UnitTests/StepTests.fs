@@ -81,8 +81,7 @@ let tests =
 
                 let runResult = step |> Step.Internal.run ctx
 
-                runResult
-                |> Expect.isError "Step run result should be Error"
+                runResult |> Expect.isError "Step run result should be Error"
             }
 
             test "run returns Error result for Exception during step" {
@@ -90,8 +89,7 @@ let tests =
 
                 let runResult = step |> Step.Internal.run ctx
 
-                runResult
-                |> Expect.isError "Step run result should be Error"
+                runResult |> Expect.isError "Step run result should be Error"
             }
 
             test "concatNames [3] creates correct result" {

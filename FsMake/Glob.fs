@@ -64,10 +64,7 @@ module Glob =
                     | [ x ] -> FileOrDirectoryToken x :: parts
                     | x :: xs -> xs |> parseNext (DirectoryToken x :: parts)
 
-                splitPattern
-                |> parseNext initialParts
-                |> List.rev
-                |> ParsedPattern
+                splitPattern |> parseNext initialParts |> List.rev |> ParsedPattern
 
             let value (ParsedPattern value) : PatternToken list =
                 value
@@ -271,18 +268,14 @@ module Glob =
 
         let includePatterns = glob.Include |> List.map (ParsedPattern.create rootDir)
 
-        let excludePatternRegexes =
-            glob.Exclude
-            |> List.map (ParsedPattern.create rootDir >> ParsedPattern.toRegex)
+        let excludePatternRegexes = glob.Exclude |> List.map (ParsedPattern.create rootDir >> ParsedPattern.toRegex)
 
         seq {
             for pattern in includePatterns do
                 let paths = pattern |> ParsedPattern.toPaths
 
                 for path in paths do
-                    let excluded =
-                        excludePatternRegexes
-                        |> List.exists (fun x -> x.IsMatch (path))
+                    let excluded = excludePatternRegexes |> List.exists (fun x -> x.IsMatch (path))
 
                     if not excluded then yield path
         }

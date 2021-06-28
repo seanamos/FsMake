@@ -7,7 +7,7 @@ open System
 /// </summary>
 type Stage =
     /// <summary>
-    /// A sequential stage the run a single step.
+    /// A sequential stage that runs a single step.
     /// </summary>
     /// <param name="step">The step to run.</param>
     | SequentialStage of step: Step

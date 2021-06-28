@@ -4,7 +4,7 @@ open System
 open System.Threading
 
 /// <summary>
-/// Represents a pipeline and it's stages.
+/// Represents a pipeline and its stages.
 /// </summary>
 type Pipeline = { Name: string; Stages: Stage list }
 
@@ -160,8 +160,7 @@ module Pipeline =
             if results |> StepResult.anyFailed then
                 args.AccResults @ results
             else
-                args.RemainingStages
-                |> args.RunNextStage (args.AccResults @ results)
+                args.RemainingStages |> args.RunNextStage (args.AccResults @ results)
 
         let runStages (ctx: Context) (stages: Stage list) : StepResult list =
             let rec nextStage accResults remStages =
@@ -235,8 +234,7 @@ module Pipeline =
 
                         let skipResults = toSkip |> StepResult.createSkippedList
 
-                        [ ParallelStage toRun ] @ xs
-                        |> nextStage (accResults @ skipResults)
+                        [ ParallelStage toRun ] @ xs |> nextStage (accResults @ skipResults)
 
             stages |> nextStage []
 

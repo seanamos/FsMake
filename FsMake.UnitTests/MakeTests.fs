@@ -202,8 +202,7 @@ let tests =
                         Ok "hello"
                     |> Make.memoRace
 
-                [| make; make |]
-                |> Array.Parallel.iter (fun x -> x ctx |> ignore)
+                [| make; make |] |> Array.Parallel.iter (fun x -> x ctx |> ignore)
 
                 let result = make ctx
 

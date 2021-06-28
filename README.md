@@ -9,6 +9,10 @@ F# pipeline step/task runner.
 
 > ⚠ While this library is pre 1.0.0, there is the possibility of breaking changes in the public API.
 
+## Documentation
+
+Documentation with examples and API reference can be found [here](https://seanamos.github.io/FsMake/).
+
 ## Demo
 
 [![FsMake Demo](https://user-images.githubusercontent.com/10598927/122659251-67a2ca00-d176-11eb-9ebd-42c8243a9ff8.png)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
@@ -78,7 +82,7 @@ Pipelines.create {
 
     default_pipeline build
 }
-|> Pipelines.runWithArgs args
+|> Pipelines.runWithArgsAndExit args
 ```
 
 To run:

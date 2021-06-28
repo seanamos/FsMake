@@ -3,7 +3,7 @@ namespace FsMake
 open System
 
 /// <summary>
-/// The context passed to each <see cref="T:Make" />.
+/// The context passed to each <see cref="T:Make`1" />.
 /// </summary>
 type MakeContext =
     {
@@ -33,7 +33,7 @@ type MakeError =
     /// <param name="message">A list of message that should be printed to the console.</param>
     | MakeError of message: Console.Message list
     /// <summary>
-    /// An unhandled exception occurred while running the <see cref="T:Make" />.
+    /// An unhandled exception occurred while running the <see cref="T:Make`1" />.
     /// </summary>
     | MakeUnhandledEx of ex: exn
 
@@ -46,30 +46,35 @@ module internal MakeError =
         | MakeUnhandledEx ex -> ex |> Exception.toConsoleMessage
 
 /// <summary>
-/// A <see cref="T:Make" /> represents a function that takes a <see cref="T:MakeContext" /> and returns a <see cref="T:FSharp.Core.Result" />.
+/// A <see cref="T:Make`1" /> represents a function that takes a <see cref="T:MakeContext" /> and returns a <see cref="T:FSharp.Core.FSharpResult`2" />.
 /// <para>
 /// It allows various "pieces" that make up the execution of a step to be "glued" together and thread a <see cref="T:MakeContext" /> through.
 /// </para>
 /// </summary>
 type Make<'T> = MakeContext -> Result<'T, MakeError>
 
+
 /// <summary>
-/// Module for working with a <see cref="T:Make" />
+/// Module for working with a <see cref="T:Make`1" />
 /// </summary>
+///
+/// <namespacedoc>
+///   <summary>Contains core functionality.</summary>
+/// </namespacedoc>
 module Make =
 
     /// <summary>
-    /// Takes a mapping function to create a new <see cref="T:Make" /> from the result of an existing <see cref="T:Make" />.
+    /// Takes a mapping function to create a new <see cref="T:Make`1" /> from the result of an existing <see cref="T:Make`1" />.
     /// <para>
     /// This is typically used in computation expressions automatically, but can be used manually.
     /// </para>
     /// </summary>
     /// <param name="mapping">The mapping function.</param>
-    /// <param name="make">The existing <see cref="T:Make" />.</param>
+    /// <param name="make">The existing <see cref="T:Make`1" />.</param>
     /// <param name="ctx">The current <see cref="T:MakeContext" />.</param>
-    /// <typeparam name="'T">The type returned from the existing <see cref="T:Make" />.</typeparam>
+    /// <typeparam name="'T">The type returned from the existing <see cref="T:Make`1" />.</typeparam>
     /// <typeparam name="'U">The type returned from the mapping function.</typeparam>
-    /// <returns>A new <see cref="T:Make" />.</returns>
+    /// <returns>A new <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let boolMake : Make&lt;bool&gt; =
@@ -88,17 +93,17 @@ module Make =
             | Error x -> Error x
 
     /// <summary>
-    /// Takes a binder function to create a new <see cref="T:Make" /> from the result of an existing <see cref="T:Make" />.
+    /// Takes a binder function to create a new <see cref="T:Make`1" /> from the result of an existing <see cref="T:Make`1" />.
     /// <para>
     /// This is typically used in computation expressions automatically, but can be used manually.
     /// </para>
     /// </summary>
     /// <param name="binder">The binder function.</param>
-    /// <param name="make">The existing <see cref="T:Make" />.</param>
+    /// <param name="make">The existing <see cref="T:Make`1" />.</param>
     /// <param name="ctx">The current <see cref="T:MakeContext" />.</param>
-    /// <typeparam name="'T">The type returned from the existing <see cref="T:Make" />.</typeparam>
+    /// <typeparam name="'T">The type returned from the existing <see cref="T:Make`1" />.</typeparam>
     /// <typeparam name="'U">The type returned from the binder function.</typeparam>
-    /// <returns>A new <see cref="T:Make" />.</returns>
+    /// <returns>A new <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let newMake : Make&lt;unit&gt; =
@@ -120,7 +125,7 @@ module Make =
 
 
     /// <summary>
-    /// Takes two <see cref="T:Make" /> and creates a tuple <see cref="T:Make" /> of their results.
+    /// Takes two <see cref="T:Make`1" /> and creates a tuple <see cref="T:Make`1" /> of their results.
     /// <para>
     /// This is typically used in computation expressions automatically, but can be used manually.
     /// </para>
@@ -128,8 +133,8 @@ module Make =
     /// <param name="make1">The first make.</param>
     /// <param name="make2">The second make.</param>
     /// <param name="ctx">The current <see cref="T:MakeContext" />.</param>
-    /// <typeparam name="'T">The type returned from the first <see cref="T:Make" />.</typeparam>
-    /// <typeparam name="'T1">The type returned from the second <see cref="T:Make" />.</typeparam>
+    /// <typeparam name="'T">The type returned from the first <see cref="T:Make`1" />.</typeparam>
+    /// <typeparam name="'T1">The type returned from the second <see cref="T:Make`1" />.</typeparam>
     /// <returns>The tupled result.</returns>
     /// <example>
     /// <code lang="fsharp">
@@ -147,12 +152,12 @@ module Make =
             | _, Error e -> Error e
 
     /// <summary>
-    /// Creates an empty <see cref="T:Make" />.
+    /// Creates an empty <see cref="T:Make`1" />.
     /// <para>
     /// This is typically used in computation expressions automatically, but can be used manually.
     /// </para>
     /// </summary>
-    /// <returns>An empty <see cref="T:Make" />.</returns>
+    /// <returns>An empty <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code>
     /// let emptyMake : Make&lt;unit&gt; = Make.zero
@@ -161,7 +166,7 @@ module Make =
     let zero : Make<unit> = fun _ -> Ok ()
 
     /// <summary>
-    /// Wraps a value in a <see cref="T:Make" />.
+    /// Wraps a value in a <see cref="T:Make`1" />.
     /// <para>
     /// This is typically used in computation expressions automatically, but can be used manually.
     /// </para>
@@ -178,12 +183,12 @@ module Make =
         fun _ -> Ok value
 
     /// <summary>
-    /// Gets a <see cref="T:Make" /> that can be used to retrieve the current <see cref="T:MakeContext" />.
+    /// Gets a <see cref="T:Make`1" /> that can be used to retrieve the current <see cref="T:MakeContext" />.
     /// <para>
     /// This is typically used in computation expressions.
     /// </para>
     /// </summary>
-    /// <returns>The <see cref="T:Make" />.</returns>
+    /// <returns>The <see cref="T:Make`1" /> contains a <see cref="T:MakeContext" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let ctxMake =
@@ -196,11 +201,11 @@ module Make =
     let context : Make<MakeContext> = Ok
 
     /// <summary>
-    /// Fails the current <see cref="T:Make" /> with a message.
+    /// Fails the current <see cref="T:Make`1" /> with a message.
     /// </summary>
     /// <param name="message">The message to be printed as the failure reason.</param>
-    /// <typeparam name="'T">The <see cref="T:Make" /> type.</typeparam>
-    /// <returns>An <c>Error</c> <see cref="T:Make" /></returns>
+    /// <typeparam name="'T">The <see cref="T:Make`1" /> type.</typeparam>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" /></returns>
     /// <example>
     /// <code lang="fsharp">
     /// let errMake =
@@ -215,12 +220,12 @@ module Make =
             MakeError [ msg ] |> Error
 
     /// <summary>
-    /// Fails the current <see cref="T:Make" /> with a list of <see cref="T:Console.Message" /> to be printed.
+    /// Fails the current <see cref="T:Make`1" /> with a list of <see cref="T:Console.Message" /> to be printed.
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>
-    /// <typeparam name="'T">The <see cref="T:Make" /> type.</typeparam>
-    /// <returns>An <c>Error</c> <see cref="T:Make" /></returns>
+    /// <typeparam name="'T">The <see cref="T:Make`1" /> type.</typeparam>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" /></returns>
     /// <example>
     /// <code lang="fsharp">
     /// let failMake =
@@ -235,7 +240,7 @@ module Make =
         fun _ -> MakeError messages |> Error
 
     /// <summary>
-    /// Base class for <see cref="T:Make" /> computation expression builders.
+    /// Base class for <see cref="T:Make`1" /> computation expression builders.
     /// </summary>
     [<AbstractClass>]
     type BaseBuilder() =
@@ -288,7 +293,10 @@ module Make =
             zip source1 source2
 
     /// <summary>
-    /// A <see cref="T:Make" /> computation expression builder.
+    /// A <see cref="T:Make`1" /> computation expression builder.
+    /// <para>
+    /// This is used with <see cref="P:FsMake.MakeBuilders.make" />.
+    /// </para>
     /// </summary>
     [<Sealed>]
     type Builder() =
@@ -300,13 +308,13 @@ module Make =
                 make ctx
 
     /// <summary>
-    /// Creates a new <see cref="T:Make" /> from an existing one, that adds retry behaviour.
+    /// Creates a new <see cref="T:Make`1" /> from an existing one, that adds retry behaviour.
     /// This will "catch" all errors except for <see cref="T:MakeError.MakeAbort" />.
     /// </summary>
     /// <param name="attempts">The amount of attempts in total to try.</param>
-    /// <param name="make">The <see cref="T:Make" /> to add retries to.</param>
+    /// <param name="make">The <see cref="T:Make`1" /> to add retries to.</param>
     /// <typeparam name="'T">The return type.</typeparam>
-    /// <returns>The new <see cref="T:Make" />.</returns>
+    /// <returns>The new <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let cmdWithRetry =
@@ -362,7 +370,10 @@ module Make =
         fun ctx -> ctx |> nextRetry 1
 
     /// <summary>
-    /// A computation expression builder for creating a retryable <see cref="T:Make" />.
+    /// A computation expression builder for creating a retryable <see cref="T:Make`1" />.
+    /// <para>
+    /// This is used with <see cref="P:FsMake.MakeBuilders.retry" />.
+    /// </para>
     /// </summary>
     [<Sealed>]
     type RetryBuilder(attempts: int) =
@@ -378,14 +389,14 @@ module Make =
 
 
     /// <summary>
-    /// Memoizes a <see cref="T:Make" /> so it is only executed once. Subsequent executions return the result immediately.
+    /// Memoizes a <see cref="T:Make`1" /> so it is only executed once. Subsequent executions return the result immediately.
     /// <para>
-    /// This only allows single access to the <see cref="T:Make" />, so if it is run in parallel, only one will run and the rest will block until a result is available.
+    /// This only allows single access to the <see cref="T:Make`1" />, so if it is run in parallel, only one will run and the rest will block until a result is available.
     /// </para>
     /// </summary>
-    /// <param name="make">The <see cref="T:Make" /> to memoize.</param>
-    /// <typeparam name="'T">The return type of the <see cref="T:Make" />.</typeparam>
-    /// <returns>A new memoized <see cref="T:Make" />.</returns>
+    /// <param name="make">The <see cref="T:Make`1" /> to memoize.</param>
+    /// <typeparam name="'T">The return type of the <see cref="T:Make`1" />.</typeparam>
+    /// <returns>A new memoized <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let versionMake =
@@ -409,7 +420,10 @@ module Make =
                     result
 
     /// <summary>
-    /// A computation expression builder for creating a memoized <see cref="T:Make" />.
+    /// A computation expression builder for creating a memoized <see cref="T:Make`1" />.
+    /// <para>
+    /// This is used with <see cref="P:FsMake.MakeBuilders.memo" />.
+    /// </para>
     /// </summary>
     [<Sealed>]
     type MemoBuilder() =
@@ -420,16 +434,16 @@ module Make =
             memo make
 
     /// <summary>
-    /// Memoizes a <see cref="T:Make" /> so it is only executed once. Subsequent executions return the result immediately.
+    /// Memoizes a <see cref="T:Make`1" /> so it is only executed once. Subsequent executions return the result immediately.
     /// Unlike <see cref="M:Make.memo" />, this allows parallel executions to occur.
     /// <para>
     /// If it is run in parallel, it will be run multiple times until a result has been stored. Once a result has been stored, subsequent
     /// runs will immediately return the result.
     /// </para>
     /// </summary>
-    /// <param name="make">The <see cref="T:Make" /> to memoize.</param>
-    /// <typeparam name="'T">The return type of the <see cref="T:Make" />.</typeparam>
-    /// <returns>A new memoized <see cref="T:Make" />.</returns>
+    /// <param name="make">The <see cref="T:Make`1" /> to memoize.</param>
+    /// <typeparam name="'T">The return type of the <see cref="T:Make`1" />.</typeparam>
+    /// <returns>A new memoized <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let versionMake =
@@ -450,7 +464,10 @@ module Make =
                 result
 
     /// <summary>
-    /// A computation expression builder for creating a memoized <see cref="T:Make" /> with parallel access.
+    /// A computation expression builder for creating a memoized <see cref="T:Make`1" /> with parallel access.
+    /// <para>
+    /// This is used with <see cref="P:FsMake.MakeBuilders.memoRace" />.
+    /// </para>
     /// </summary>
     [<Sealed>]
     type MemoRaceBuilder() =
@@ -460,23 +477,27 @@ module Make =
             let make = fun ctx -> ctx |> generator ()
             memoRace make
 
+/// <summary>
+/// Auto-opened module containing functions for using <see cref="T:Make`1" /> computation expressions.
+/// </summary>
 [<AutoOpen>]
 module MakeBuilders =
     /// <summary>
-    /// Creates a <see cref="T:Make" /> using a <see cref="T:Make.Builder" /> computation expression.
+    /// Creates a <see cref="T:Make`1" /> using a <see cref="T:Make.Builder" /> computation expression.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
-    /// let newMake = make {
-    ///     let ctx = Make.context
-    ///     printfn "%s" ctx.StepName
-    /// }
+    /// let newMake =
+    ///     make {
+    ///         let ctx = Make.context
+    ///         printfn "%s" ctx.StepName
+    ///     }
     /// </code>
     /// </example>
     let make = Make.Builder ()
 
     /// <summary>
-    /// Creates a retry <see cref="T:Make" /> using a <see cref="T:Make.RetryBuilder" /> computation expression.
+    /// Creates a retry <see cref="T:Make`1" /> using a <see cref="T:Make.RetryBuilder" /> computation expression.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
@@ -492,7 +513,10 @@ module MakeBuilders =
         Make.RetryBuilder (attempts)
 
     /// <summary>
-    /// Creates a single access memo <see cref="T:Make" /> using a <see cref="T:Make.MemoBuilder" /> computation expression.
+    /// Creates a single access memo <see cref="T:Make`1" /> using a <see cref="T:Make.MemoBuilder" /> computation expression.
+    /// <para>
+    /// Once a memo has run, it will return the same value without running again.
+    /// </para>
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
@@ -505,7 +529,10 @@ module MakeBuilders =
     let memo = Make.MemoBuilder ()
 
     /// <summary>
-    /// Creates a parallel access memo <see cref="T:Make" /> using a <see cref="T:Make.MemoRaceBuilder" /> computation expression.
+    /// Creates a parallel access memo <see cref="T:Make`1" /> using a <see cref="T:Make.MemoRaceBuilder" /> computation expression.
+    /// <para>
+    /// Once a memoRace has run, it will return the same value without running again.
+    /// </para>
     /// </summary>
     /// <example>
     /// <code lang="fsharp">

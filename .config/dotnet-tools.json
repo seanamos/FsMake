@@ -31,6 +31,12 @@
       "commands": [
         "dotnet-gitreleasemanager"
       ]
+    },
+    "fsharp.formatting.commandtool": {
+      "version": "11.2.0",
+      "commands": [
+        "fsdocs"
+      ]
     }
   }
 }
