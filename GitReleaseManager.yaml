@@ -2,3 +2,5 @@ issue-labels-include:
     - bug
     - feature
     - improvement
+    - breaking change
+    - documentation
