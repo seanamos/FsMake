@@ -7,18 +7,14 @@ on:
         description: "List nupkg on nuget.org (true/false)"
         required: true
         default: "false"
+      github_pages:
+        description: "Update Github pages documentation"
+        required: true
+        default: "true"
       github_release:
         description: "Create a Github release"
         required: true
         default: "true"
-      username:
-        description: "Name of the user doing the release"
-        required: true
-        default: Sean Amos
-      user_email:
-        description: "Email address of the user doing the release"
-        required: true
-        default: 10598927+seanamos@users.noreply.github.com
 
 env:
   RELEASING: "true"
@@ -46,6 +42,36 @@ jobs:
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./build.sh publish:nupkg -o ansi -- --clean
+
+  github-pages:
+    if: ${{ github.event.inputs.github_pages == 'true' }}
+
+    runs-on: ubuntu-20.04
+
+    needs: package
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.3.4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1.8.0
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Git settings
+      run: |
+        git config --global user.name '${{ github.actor }}'
+        git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+
+    - name: Github Pages
+      run: ./build.sh github:pages -o ansi -- --clean
 
   github-release:
     if: ${{ github.event.inputs.github_release == 'true' }}

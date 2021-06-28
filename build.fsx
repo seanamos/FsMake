@@ -35,7 +35,10 @@ let clean =
 
         // only clean if --clean is specified
         if ctx.ExtraArgs |> List.contains "--clean" then
-            Glob.create "nupkgs/*" |> Glob.toPaths |> Seq.iter (File.Delete)
+            Glob.create "nupkgs/*"
+            |> Glob.add ".fsdocs/*"
+            |> Glob.toPaths
+            |> Seq.iter (File.Delete)
 
             Glob.create "**/bin"
             |> Glob.add "**/obj"
