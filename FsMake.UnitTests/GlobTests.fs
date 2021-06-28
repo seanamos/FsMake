@@ -39,10 +39,7 @@ let globTests =
             }
 
             test "exclude multiple appends multiple excludes" {
-                let glob =
-                    Glob.create "test"
-                    |> Glob.exclude "ex1"
-                    |> Glob.exclude "ex2"
+                let glob = Glob.create "test" |> Glob.exclude "ex1" |> Glob.exclude "ex2"
 
                 teste <@ glob.Exclude = [ "ex2"; "ex1" ] @>
             }
@@ -68,9 +65,7 @@ let parseTests =
             }
 
             test "Directory/file parsed" {
-                let parsed =
-                    ParsedPattern.create "/test" "dir/file"
-                    |> ParsedPattern.value
+                let parsed = ParsedPattern.create "/test" "dir/file" |> ParsedPattern.value
 
                 teste
                     <@ parsed = [
@@ -81,9 +76,7 @@ let parseTests =
             }
 
             test "Directory/file wildcard token parsed" {
-                let parsed =
-                    ParsedPattern.create "/test" "dir/*file"
-                    |> ParsedPattern.value
+                let parsed = ParsedPattern.create "/test" "dir/*file" |> ParsedPattern.value
 
                 teste
                     <@ parsed = [
@@ -105,9 +98,7 @@ let parseTests =
             }
 
             test "Complex test" {
-                let parsed =
-                    ParsedPattern.create "/test" "dir/*/**/dir2/*.ext"
-                    |> ParsedPattern.value
+                let parsed = ParsedPattern.create "/test" "dir/*/**/dir2/*.ext" |> ParsedPattern.value
 
                 teste
                     <@ parsed = [

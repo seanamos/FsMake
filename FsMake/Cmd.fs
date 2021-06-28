@@ -548,10 +548,7 @@ module Cmd =
                 match redirectDecision with
                 | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
                 | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
-                | ToBoth ->
-                    proc
-                    |> (addOutputConsoleWriters >> addOutputBuilderWriters)
-                    |> beginDataRead
+                | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputBuilderWriters) |> beginDataRead
                 | NoRedirect -> ()
 
                 let processCompleted =
