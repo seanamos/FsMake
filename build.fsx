@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.2.1"
+#r "nuget: FsMake, 0.3.0-beta.1"
 
 open FsMake
 open System
@@ -20,14 +20,14 @@ let getGitversion =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
     |> Cmd.redirectOutput Cmd.RedirectToBoth
     |> Cmd.result
-    |> StepPart.map (fun x ->
+    |> Make.map (fun x ->
         x.Output.Std
         |> JsonSerializer.Deserialize<{| MajorMinorPatch: string
                                          SemVer: string
                                          BranchName: string
                                          PreReleaseNumber: Nullable<int> |}>
     )
-    |> StepPart.memo
+    |> Make.memo
 
 let clean =
     Step.create "clean" {
@@ -166,7 +166,7 @@ let ``github:pages`` =
             Cmd.createWithArgs "git" [ "status"; "-s" ]
             |> Cmd.redirectOutput Cmd.RedirectToBoth
             |> Cmd.result
-            |> StepPart.map (fun x -> x.Output.Std)
+            |> Make.map (fun x -> x.Output.Std)
 
         if not <| String.IsNullOrEmpty (gitStatus) then
             do!
