@@ -133,6 +133,7 @@ let ``github:pages`` =
     Step.create "github:pages" {
         let! gitversion = getGitversion
 
+        do! Cmd.createWithArgs "git" [ "stash"; "-u" ] |> Cmd.run
         do! Cmd.createWithArgs "git" [ "fetch" ] |> Cmd.run
         do! Cmd.createWithArgs "git" [ "checkout"; "gh-pages" ] |> Cmd.run
         do! Cmd.createWithArgs "git" [ "rm"; "--ignore-unmatch"; "*" ] |> Cmd.run
