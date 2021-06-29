@@ -2,7 +2,7 @@ storage: none
 framework: netcoreapp3.1
 source https://api.nuget.org/v3/index.json
 
-nuget FSharp.Core ~> 5
+nuget FSharp.Core = 5
 
 group test
     storage: none

@@ -6,11 +6,7 @@ open System.Diagnostics
 /// <summary>
 /// Represents a pipeline step.
 /// </summary>
-type Step =
-    {
-        Name: string
-        StepPart: StepPart<unit>
-    }
+type Step = { Name: string; Make: Make<unit> }
 
 /// <summary>
 /// Module for creating and working with steps.
@@ -23,15 +19,15 @@ module Step =
     /// <param name="name">Name of the step to build.</param>
     [<Sealed>]
     type Builder(name: string) =
-        inherit StepPart.BaseBuilder()
+        inherit Make.BaseBuilder()
 
-        member _.Run(generator: unit -> StepPart<unit>) : Step =
-            let part =
+        member _.Run(generator: unit -> Make<unit>) : Step =
+            let make =
                 fun ctx ->
-                    let part = generator ()
-                    part ctx
+                    let innerMake = generator ()
+                    innerMake ctx
 
-            { Name = name; StepPart = part }
+            { Name = name; Make = make }
 
     [<AutoOpen>]
     module internal Internal =
@@ -41,7 +37,7 @@ module Step =
                 ExecutionTime: TimeSpan
             }
 
-        type RunResult = Result<RunStat, RunStat * StepError>
+        type RunResult = Result<RunStat, RunStat * MakeError>
 
         let concatNames (steps: Step list) : string =
             steps
@@ -53,12 +49,12 @@ module Step =
                 )
                 ""
 
-        let run (context: StepContext) (step: Step) : RunResult =
+        let run (context: MakeContext) (step: Step) : RunResult =
             let stopwatch = Stopwatch ()
 
             try
                 stopwatch.Start ()
-                let result = step.StepPart context
+                let result = step.Make context
                 stopwatch.Stop ()
 
                 let runStat =
@@ -74,12 +70,13 @@ module Step =
             | ex ->
                 stopwatch.Stop ()
 
-                ({
-                     StepName = step.Name
-                     ExecutionTime = stopwatch.Elapsed
-                 },
-                 StepUnhandledEx ex)
-                |> Error
+                let runStat =
+                    {
+                        StepName = step.Name
+                        ExecutionTime = stopwatch.Elapsed
+                    }
+
+                (runStat, MakeUnhandledEx ex) |> Error
 
     /// <summary>
     /// Creates a step using a <see cref="T:Step.Builder" /> computation expression.
@@ -99,9 +96,9 @@ module Step =
 
 
     /// <summary>
-    /// Gets the current <see cref="T:StepContext" />.
+    /// Gets the current <see cref="T:MakeContext" />.
     /// </summary>
-    /// <returns>The <see cref="T:StepContext" />.</returns>
+    /// <returns>The <see cref="T:MakeContext" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -111,13 +108,13 @@ module Step =
     ///     }
     /// </code>
     /// </example>
-    let context = StepPart.context
+    let context = Make.context
 
     /// <summary>
     /// Fails the current step with a message.
     /// </summary>
     /// <param name="message">The message to be printed as the failure reason.</param>
-    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -126,15 +123,15 @@ module Step =
     ///     }
     /// </code>
     /// </example>
-    let fail (message: string) : StepPart<unit> =
-        StepPart.fail message
+    let fail (message: string) : Make<unit> =
+        Make.fail message
 
     /// <summary>
     /// Fails the current step with a list of <see cref="T:Console.Message" /> to be printed.
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>
-    /// <returns>An <c>Error</c> <see cref="T:StepPart" /></returns>
+    /// <returns>An <c>Error</c> <see cref="T:Make`1" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let myStep =
@@ -145,5 +142,5 @@ module Step =
     ///     }
     /// </code>
     /// </example>
-    let failMessages (messages: Console.Message list) : StepPart<unit> =
-        StepPart.failMessages messages
+    let failMessages (messages: Console.Message list) : Make<unit> =
+        Make.failMessages messages

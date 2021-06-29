@@ -16,11 +16,17 @@
     <PackageTags>fsmake make build fsi f# fsharp pipeline step</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/seanamos/FsMake</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/seanamos/FsMake</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/seanamos/FsMake</PackageReleaseNotes>
+    <PackageProjectUrl>https://seanamos.github.io/FsMake/</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/seanamos/FsMake/releases</PackageReleaseNotes>
+    <PackageIcon>nuget-logo.png</PackageIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FsDocsLogoLink>https://seanamos.github.io/FsMake</FsDocsLogoLink>
+    <FsDocsReleaseNotesLink>https://github.com/seanamos/FsMake/releases</FsDocsReleaseNotesLink>
   </PropertyGroup>
   <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
+    <None Include="../assets/nuget-logo.png" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties/AssemblyInfo.fs" />
@@ -30,7 +36,7 @@
     <Compile Include="Prefix.fs" />
     <Compile Include="Cli.fs" />
     <Compile Include="ProcessMonitor.fs" />
-    <Compile Include="StepPart.fs" />
+    <Compile Include="Make.fs" />
     <Compile Include="EnvVar.fs" />
     <Compile Include="Step.fs" />
     <Compile Include="Cmd.fs" />

@@ -58,9 +58,7 @@ let tests =
             }
 
             test "messageColor creates a messages with color part" {
-                let message =
-                    Console.Info
-                    |> Console.messageColor Console.Magenta "Hello world!"
+                let message = Console.Info |> Console.messageColor Console.Magenta "Hello world!"
 
                 let expected : Console.Message =
                     {
@@ -88,9 +86,7 @@ let tests =
             }
 
             test "statusMessage creates a message with token and text" {
-                let message =
-                    Console.Info
-                    |> Console.statusMessage Console.Red "Hello world!"
+                let message = Console.Info |> Console.statusMessage Console.Red "Hello world!"
 
                 let expected : Console.Message =
                     {
@@ -156,10 +152,7 @@ let tests =
             }
 
             test "appendToken adds token part to message" {
-                let message =
-                    Console.Info
-                    |> Console.message "Hello"
-                    |> Console.appendToken " world!"
+                let message = Console.Info |> Console.message "Hello" |> Console.appendToken " world!"
 
                 let expected : Console.Message =
                     {
@@ -173,10 +166,7 @@ let tests =
             }
 
             test "append adds text part to message" {
-                let message =
-                    Console.Info
-                    |> Console.message "Hello"
-                    |> Console.append " world!"
+                let message = Console.Info |> Console.message "Hello" |> Console.append " world!"
 
                 let expected : Console.Message =
                     {

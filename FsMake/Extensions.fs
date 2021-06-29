@@ -8,9 +8,7 @@ module internal Exception =
 
         Console.error $"Exception:"
         :: [
-            for exLine in split ->
-                Console.Error
-                |> Console.messageColor Console.errorColor exLine
+            for exLine in split -> Console.Error |> Console.messageColor Console.errorColor exLine
         ]
 
 module internal List =

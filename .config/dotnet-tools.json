@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "paket": {
-      "version": "6.0.0-rc002",
+      "version": "6.0.0-rc003",
       "commands": [
         "paket"
       ]
@@ -30,6 +30,12 @@
       "version": "0.11.0",
       "commands": [
         "dotnet-gitreleasemanager"
+      ]
+    },
+    "fsharp.formatting.commandtool": {
+      "version": "11.2.0",
+      "commands": [
+        "fsdocs"
       ]
     }
   }

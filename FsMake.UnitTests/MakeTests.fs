@@ -1,4 +1,4 @@
-module FsMake.UnitTests.StepPartTests
+module FsMake.UnitTests.MakeTests
 
 open Expecto
 open FsMake
@@ -13,7 +13,7 @@ let tests =
 
     let procMon = ProcessMonitor.create consoleWriter
 
-    let ctx : StepContext =
+    let ctx : MakeContext =
         {
             PipelineName = "testPipeline"
             StepName = "testStep"
@@ -26,36 +26,36 @@ let tests =
         }
 
     testList
-        "StepPart tests"
+        "Make tests"
         [
-            test "zero creates empty part" {
-                let part = StepPart.zero
+            test "zero creates empty make" {
+                let make = Make.zero
 
-                let result = part ctx
+                let result = make ctx
 
                 teste <@ result = Ok () @>
             }
 
             test "return wraps value" {
-                let part = StepPart.return' "hello"
+                let make = Make.return' "hello"
 
-                let result = part ctx
+                let result = make ctx
 
                 teste <@ result = Ok "hello" @>
             }
 
             test "map maps result" {
-                let part = StepPart.zero |> StepPart.map (fun _ -> "hello")
+                let make = Make.zero |> Make.map (fun _ -> "hello")
 
-                let result = part ctx
+                let result = make ctx
 
                 teste <@ result = Ok "hello" @>
             }
 
             test "bind continues to next on Ok" {
-                let part : StepPart<string> = StepPart.zero |> StepPart.bind (fun _ _ -> Ok "hello")
+                let make : Make<string> = Make.zero |> Make.bind (fun _ _ -> Ok "hello")
 
-                let result = part ctx
+                let result = make ctx
 
                 teste <@ result = Ok "hello" @>
             }
@@ -63,25 +63,25 @@ let tests =
             test "bind short circuits on Error" {
                 let mutable run = false
 
-                let part : StepPart<string> =
-                    fun _ -> [ Console.error "oh no" ] |> StepError |> Error
-                    |> StepPart.bind (fun _ _ ->
+                let make : Make<string> =
+                    fun _ -> [ Console.error "oh no" ] |> MakeError |> Error
+                    |> Make.bind (fun _ _ ->
                         run <- true
                         Ok "hello"
                     )
 
-                let result = part ctx
+                let result = make ctx
 
                 let run = run
-                teste <@ result = ([ Console.error "oh no" ] |> StepError |> Error) @>
+                teste <@ result = ([ Console.error "oh no" ] |> MakeError |> Error) @>
                 teste <@ not run @>
             }
 
             test "zip tuples results" {
-                let part1 : StepPart<string> = fun _ -> Ok "test1"
-                let part2 : StepPart<string> = fun _ -> Ok "test2"
+                let make1 : Make<string> = fun _ -> Ok "test1"
+                let make2 : Make<string> = fun _ -> Ok "test2"
 
-                let zipped = StepPart.zip part1 part2
+                let zipped = Make.zip make1 make2
 
                 let result = zipped ctx
 
@@ -89,24 +89,24 @@ let tests =
             }
 
             test "context gets context" {
-                let part = StepPart.context
+                let make = Make.context
 
-                let result = part ctx
+                let result = make ctx
 
                 teste <@ result = Ok ctx @>
             }
 
-            test "zip returns Error result on part Error" {
-                let part1 : StepPart<string> = fun _ -> [ Console.error "oh no" ] |> StepError |> Error
-                let part2 : StepPart<string> = fun _ -> Ok "test2"
+            test "zip returns Error result on make Error" {
+                let make1 : Make<string> = fun _ -> [ Console.error "oh no" ] |> MakeError |> Error
+                let make2 : Make<string> = fun _ -> Ok "test2"
 
-                let zipped1 = StepPart.zip part1 part2
-                let zipped2 = StepPart.zip part2 part1
+                let zipped1 = Make.zip make1 make2
+                let zipped2 = Make.zip make2 make1
 
                 let result1 = zipped1 ctx
                 let result2 = zipped2 ctx
 
-                let expected = [ Console.error "oh no" ] |> StepError |> Error
+                let expected = [ Console.error "oh no" ] |> MakeError |> Error
                 teste <@ result1 = expected @>
                 teste <@ result2 = expected @>
             }
@@ -114,28 +114,28 @@ let tests =
             test "retry retries X attempts on exception" {
                 let mutable attempt = 0
 
-                let part : StepPart<unit> =
+                let make : Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
                         failwith "oh no"
-                    |> StepPart.retry 5
+                    |> Make.retry 5
 
-                part ctx |> ignore
+                make ctx |> ignore
                 let attempt = attempt
 
                 teste <@ attempt = 5 @>
             }
 
-            test "retry retries X attempts on StepError" {
+            test "retry retries X attempts on MakeError" {
                 let mutable attempt = 0
 
-                let part : StepPart<unit> =
+                let make : Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
-                        [ Console.error "oh no" ] |> StepError |> Error
-                    |> StepPart.retry 5
+                        [ Console.error "oh no" ] |> MakeError |> Error
+                    |> Make.retry 5
 
-                part ctx |> ignore
+                make ctx |> ignore
                 let attempt = attempt
 
                 teste <@ attempt = 5 @>
@@ -144,13 +144,13 @@ let tests =
             test "retry does not retry on StepAbort" {
                 let mutable attempt = 0
 
-                let part : StepPart<unit> =
+                let make : Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
-                        [ Console.error "oh no" ] |> StepAbort |> Error
-                    |> StepPart.retry 5
+                        [ Console.error "oh no" ] |> MakeAbort |> Error
+                    |> Make.retry 5
 
-                part ctx |> ignore
+                make ctx |> ignore
                 let attempt = attempt
 
                 teste <@ attempt = 1 @>
@@ -159,15 +159,15 @@ let tests =
             test "memo executes only once" {
                 let mutable run = 0
 
-                let part : StepPart<string> =
+                let make : Make<string> =
                     fun _ ->
                         run <- run + 1
                         Ok "hello"
-                    |> StepPart.memo
+                    |> Make.memo
 
-                part ctx |> ignore
-                part ctx |> ignore
-                let result = part ctx
+                make ctx |> ignore
+                make ctx |> ignore
+                let result = make ctx
 
                 let run = run
                 teste <@ run = 1 @>
@@ -177,15 +177,15 @@ let tests =
             test "memoRace executes only once" {
                 let mutable run = 0
 
-                let part : StepPart<string> =
+                let make : Make<string> =
                     fun _ ->
                         run <- run + 1
                         Ok "hello"
-                    |> StepPart.memoRace
+                    |> Make.memoRace
 
-                part ctx |> ignore
-                part ctx |> ignore
-                let result = part ctx
+                make ctx |> ignore
+                make ctx |> ignore
+                let result = make ctx
 
                 let run = run
                 teste <@ run = 1 @>
@@ -195,17 +195,16 @@ let tests =
             test "memoRace can execute more than once" {
                 let mutable run = 0
 
-                let part : StepPart<string> =
+                let make : Make<string> =
                     fun _ ->
                         System.Threading.Thread.Sleep 100
                         System.Threading.Interlocked.Increment &run |> ignore
                         Ok "hello"
-                    |> StepPart.memoRace
+                    |> Make.memoRace
 
-                [| part; part |]
-                |> Array.Parallel.iter (fun x -> x ctx |> ignore)
+                [| make; make |] |> Array.Parallel.iter (fun x -> x ctx |> ignore)
 
-                let result = part ctx
+                let result = make ctx
 
                 let run = run
                 teste <@ run = 2 @>

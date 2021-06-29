@@ -4,7 +4,7 @@ open System
 open System.Threading
 
 /// <summary>
-/// Represents a pipeline and it's stages.
+/// Represents a pipeline and its stages.
 /// </summary>
 type Pipeline = { Name: string; Stages: Stage list }
 
@@ -26,7 +26,7 @@ module Pipeline =
 
         type StepResult =
             | Success of step: Step * stat: Step.Internal.RunStat
-            | Failed of step: Step * stat: Step.Internal.RunStat * err: StepError
+            | Failed of step: Step * stat: Step.Internal.RunStat * err: MakeError
             | Skipped of step: Step
 
         module StepResult =
@@ -87,7 +87,7 @@ module Pipeline =
                 |> Console.message (sprintf "%-35s: %s" "Total" (totalTime |> formatTime))
                 |> writer.WriteLine
 
-        let createStepContext (ctx: Context) (isParallel: bool) (step: Step) : StepContext =
+        let createMakeContext (ctx: Context) (isParallel: bool) (step: Step) : MakeContext =
             let prefix = Prefix.Internal.createPrefix ctx.LongestStepNameLength step.Name
 
             {
@@ -110,7 +110,7 @@ module Pipeline =
             }
 
         let runStep (args: RunStepArgs) (step: Step) : StepResult list =
-            let ctx = createStepContext args.Context false step
+            let ctx = createMakeContext args.Context false step
             let stepResult = step |> Step.Internal.run ctx
 
             match stepResult with
@@ -119,7 +119,7 @@ module Pipeline =
                 |> args.RunNextStage (args.AccResults @ [ Success (step, stat) ])
             | Error (stat, err) ->
                 err
-                |> StepError.toConsoleMessage
+                |> MakeError.toConsoleMessage
                 |> Prefix.Internal.addOptionalPrefixes
                     {
                         IsParallel = false
@@ -135,17 +135,17 @@ module Pipeline =
                 steps
                 |> Array.ofList
                 |> Array.Parallel.map (fun step ->
-                    let stepContext = createStepContext args.Context true step
-                    let stepResult = step |> Step.Internal.run stepContext
+                    let makeContext = createMakeContext args.Context true step
+                    let stepResult = step |> Step.Internal.run makeContext
 
-                    (step, stepContext, stepResult)
+                    (step, makeContext, stepResult)
                 )
                 |> Array.map
                     (function
                     | (step, _, Ok stat) -> Success (step, stat)
                     | (step, ctx, Error (stat, err)) ->
                         err
-                        |> StepError.toConsoleMessage
+                        |> MakeError.toConsoleMessage
                         |> Prefix.Internal.addOptionalPrefixes
                             {
                                 IsParallel = true
@@ -160,8 +160,7 @@ module Pipeline =
             if results |> StepResult.anyFailed then
                 args.AccResults @ results
             else
-                args.RemainingStages
-                |> args.RunNextStage (args.AccResults @ results)
+                args.RemainingStages |> args.RunNextStage (args.AccResults @ results)
 
         let runStages (ctx: Context) (stages: Stage list) : StepResult list =
             let rec nextStage accResults remStages =
@@ -235,8 +234,7 @@ module Pipeline =
 
                         let skipResults = toSkip |> StepResult.createSkippedList
 
-                        [ ParallelStage toRun ] @ xs
-                        |> nextStage (accResults @ skipResults)
+                        [ ParallelStage toRun ] @ xs |> nextStage (accResults @ skipResults)
 
             stages |> nextStage []
 

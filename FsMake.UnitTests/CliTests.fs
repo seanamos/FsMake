@@ -24,9 +24,7 @@ module Gen =
 
     let config =
         { FsCheckConfig.defaultConfig with
-            arbitrary =
-                typeof<HelpArgs>.DeclaringType
-                :: FsCheckConfig.defaultConfig.arbitrary
+            arbitrary = typeof<HelpArgs>.DeclaringType :: FsCheckConfig.defaultConfig.arbitrary
         }
 
 [<Tests>]

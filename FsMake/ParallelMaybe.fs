@@ -16,6 +16,9 @@ type ParallelMaybe =
     /// <param name="condition">The condition that must be <c>true</c> for the step to run.</param>
     | PMaybe of step: Step * condition: bool
 
+/// <summary>
+/// Module for <see cref="T:ParallelMaybe" /> functions.
+/// </summary>
 module ParallelMaybe =
     [<AutoOpen>]
     module internal Internal =
@@ -41,6 +44,9 @@ module ParallelMaybe =
 
     /// <summary>
     /// A <see cref="T:ParallelMaybe" /> <c>list</c> computation expression builder.
+    /// <para>
+    /// Used with <see cref="P:FsMake.ParallelMaybeBuilders.run_parallel_maybes" />
+    /// </para>
     /// </summary>
     [<Sealed>]
     type Builder() =
@@ -55,6 +61,9 @@ module ParallelMaybe =
         member _.Maybe(maybes: ParallelMaybe list, step: Step, cond: bool) : ParallelMaybe list =
             maybes @ [ PMaybe (step, cond) ]
 
+/// <summary>
+/// Auto-opened module containing functions for using <see cref="T:ParallelMaybe`1" /> computation expressions.
+/// </summary>
 [<AutoOpen>]
 module ParallelMaybeBuilders =
     // fsharplint:disable
