@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="PipelinesTests.fs" />
     <Compile Include="CmdTests.fs" />
+    <Compile Include="EnvVarTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
