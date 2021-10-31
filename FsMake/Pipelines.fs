@@ -147,7 +147,7 @@ module Pipelines =
 
                     Console.CancelKeyPress.AddHandler (cancelHandler)
 
-                    let args : Pipeline.RunArgs =
+                    let args: Pipeline.RunArgs =
                         {
                             Writer = writer
                             ExtraArgs = args.ExtraArgs

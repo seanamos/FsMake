@@ -14,7 +14,7 @@ let tests =
 
     let procMon = ProcessMonitor.create consoleWriter
 
-    let ctx : MakeContext =
+    let ctx: MakeContext =
         {
             PipelineName = "testPipeline"
             StepName = "testStep"

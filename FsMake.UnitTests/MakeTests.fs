@@ -13,7 +13,7 @@ let tests =
 
     let procMon = ProcessMonitor.create consoleWriter
 
-    let ctx : MakeContext =
+    let ctx: MakeContext =
         {
             PipelineName = "testPipeline"
             StepName = "testStep"
@@ -53,7 +53,7 @@ let tests =
             }
 
             test "bind continues to next on Ok" {
-                let make : Make<string> = Make.zero |> Make.bind (fun _ _ -> Ok "hello")
+                let make: Make<string> = Make.zero |> Make.bind (fun _ _ -> Ok "hello")
 
                 let result = make ctx
 
@@ -63,7 +63,7 @@ let tests =
             test "bind short circuits on Error" {
                 let mutable run = false
 
-                let make : Make<string> =
+                let make: Make<string> =
                     fun _ -> [ Console.error "oh no" ] |> MakeError |> Error
                     |> Make.bind (fun _ _ ->
                         run <- true
@@ -78,8 +78,8 @@ let tests =
             }
 
             test "zip tuples results" {
-                let make1 : Make<string> = fun _ -> Ok "test1"
-                let make2 : Make<string> = fun _ -> Ok "test2"
+                let make1: Make<string> = fun _ -> Ok "test1"
+                let make2: Make<string> = fun _ -> Ok "test2"
 
                 let zipped = Make.zip make1 make2
 
@@ -97,8 +97,8 @@ let tests =
             }
 
             test "zip returns Error result on make Error" {
-                let make1 : Make<string> = fun _ -> [ Console.error "oh no" ] |> MakeError |> Error
-                let make2 : Make<string> = fun _ -> Ok "test2"
+                let make1: Make<string> = fun _ -> [ Console.error "oh no" ] |> MakeError |> Error
+                let make2: Make<string> = fun _ -> Ok "test2"
 
                 let zipped1 = Make.zip make1 make2
                 let zipped2 = Make.zip make2 make1
@@ -114,7 +114,7 @@ let tests =
             test "retry retries X attempts on exception" {
                 let mutable attempt = 0
 
-                let make : Make<unit> =
+                let make: Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
                         failwith "oh no"
@@ -129,7 +129,7 @@ let tests =
             test "retry retries X attempts on MakeError" {
                 let mutable attempt = 0
 
-                let make : Make<unit> =
+                let make: Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
                         [ Console.error "oh no" ] |> MakeError |> Error
@@ -144,7 +144,7 @@ let tests =
             test "retry does not retry on StepAbort" {
                 let mutable attempt = 0
 
-                let make : Make<unit> =
+                let make: Make<unit> =
                     fun _ ->
                         attempt <- attempt + 1
                         [ Console.error "oh no" ] |> MakeAbort |> Error
@@ -159,7 +159,7 @@ let tests =
             test "memo executes only once" {
                 let mutable run = 0
 
-                let make : Make<string> =
+                let make: Make<string> =
                     fun _ ->
                         run <- run + 1
                         Ok "hello"
@@ -177,7 +177,7 @@ let tests =
             test "memoRace executes only once" {
                 let mutable run = 0
 
-                let make : Make<string> =
+                let make: Make<string> =
                     fun _ ->
                         run <- run + 1
                         Ok "hello"
@@ -195,7 +195,7 @@ let tests =
             test "memoRace can execute more than once" {
                 let mutable run = 0
 
-                let make : Make<string> =
+                let make: Make<string> =
                     fun _ ->
                         System.Threading.Thread.Sleep 100
                         System.Threading.Interlocked.Increment &run |> ignore

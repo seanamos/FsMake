@@ -35,10 +35,11 @@ module Pipeline =
 
             let anyFailed (pipelineResults: StepResult list) : bool =
                 pipelineResults
-                |> List.tryFind
-                    (function
+                |> List.tryFind (
+                    function
                     | Failed _ -> true
-                    | _ -> false)
+                    | _ -> false
+                )
                 |> Option.isSome
 
             let totalTime (pipelineResults: StepResult list) : TimeSpan =
@@ -140,8 +141,8 @@ module Pipeline =
 
                     (step, makeContext, stepResult)
                 )
-                |> Array.map
-                    (function
+                |> Array.map (
+                    function
                     | (step, _, Ok stat) -> Success (step, stat)
                     | (step, ctx, Error (stat, err)) ->
                         err
@@ -154,7 +155,8 @@ module Pipeline =
                             }
                         |> args.Context.Console.WriteLines
 
-                        Failed (step, stat, err))
+                        Failed (step, stat, err)
+                )
                 |> List.ofArray
 
             if results |> StepResult.anyFailed then
@@ -350,7 +352,7 @@ module Pipeline =
 
         use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
-        let context : Context =
+        let context: Context =
             {
                 Pipeline = pipeline
                 Console = args.Writer
