@@ -31,9 +31,9 @@ let tests =
         "EnvVar Integration Tests"
         [
             test "get returns env var" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let value = EnvVar.get envVarName
 
@@ -41,17 +41,15 @@ let tests =
             }
 
             test "get throws when no env var set" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Expect.throwsT<EnvVar.NotFoundException>
-                    "Expect exception when env var not set"
-                    (fun () -> EnvVar.get envVarName |> ignore)
+                Expect.throwsT<EnvVar.NotFoundException> "Expect exception when env var not set" (fun () -> EnvVar.get envVarName |> ignore)
             }
 
             test "getAs returns typed env var" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let value = EnvVar.getAs<int> envVarName
 
@@ -59,19 +57,17 @@ let tests =
             }
 
             test "getAs throws when env cannot be converted" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "asdsa")
+                Environment.SetEnvironmentVariable (envVarName, "asdsa")
 
-                Expect.throws
-                    "Expect exception when env var cannot be converted"
-                    (fun () -> EnvVar.getAs<int> envVarName |> ignore)
+                Expect.throws "Expect exception when env var cannot be converted" (fun () -> EnvVar.getAs<int> envVarName |> ignore)
             }
 
             test "getOption returns Some" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let value = EnvVar.getOption envVarName
 
@@ -79,7 +75,7 @@ let tests =
             }
 
             test "getOption returns None when env var not set" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
                 let value = EnvVar.getOption envVarName
 
@@ -87,9 +83,9 @@ let tests =
             }
 
             test "getOptionAs returns Some typed" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let value = EnvVar.getOptionAs<int> envVarName
 
@@ -97,7 +93,7 @@ let tests =
             }
 
             test "getOptionAs returns None when env var cannot be converted" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
                 let value = EnvVar.getOptionAs<int> envVarName
 
@@ -105,9 +101,9 @@ let tests =
             }
 
             test "getOrFail returns Ok" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let makeEnv = EnvVar.getOrFail envVarName
 
@@ -117,7 +113,7 @@ let tests =
             }
 
             test "getOrFail returns Error when env var not set" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
                 let makeEnv = EnvVar.getOrFail envVarName
 
@@ -127,9 +123,9 @@ let tests =
             }
 
             test "getAsOrFail returns Ok typed" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "1")
+                Environment.SetEnvironmentVariable (envVarName, "1")
 
                 let makeEnv = EnvVar.getAsOrFail<int> envVarName
 
@@ -139,9 +135,9 @@ let tests =
             }
 
             test "getAsOrFail returns Error when env var cannot be converted" {
-                let envVarName = Guid.NewGuid().ToString()
+                let envVarName = Guid.NewGuid().ToString ()
 
-                Environment.SetEnvironmentVariable(envVarName, "asd")
+                Environment.SetEnvironmentVariable (envVarName, "asd")
 
                 let makeEnv = EnvVar.getAsOrFail<int> envVarName
 
