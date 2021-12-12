@@ -67,7 +67,7 @@ let ``test:format`` = Step.create "test:format" { do! Cmd.createWithArgs "dotnet
 let ``test:lint`` = Step.create "test:lint" { do! Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ] |> Cmd.run }
 
 let ``test:tests`` =
-    Step.create "test:unit" {
+    Step.create "test:tests" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
             |> Cmd.argsOption buildConfigArg
