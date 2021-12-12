@@ -58,31 +58,55 @@ module Pipelines =
 
             (pipelines, vars)
 
+        /// <summary>
+        /// Adds a <see cref="T:Pipeline" /> to the <see cref="T:Pipelines" />.
+        /// </summary>
+        /// <param name="state">The current state of the computation expression.</param>
+        /// <param name="pipeline">The <see cref="T:Pipeline" /> to be added.</param>
+        /// <typeparam name="'a">The types of the variables in the computation expression's state.</typeparam>
+        /// <returns>Updated computation expression state.</returns>
         [<CustomOperation("add", MaintainsVariableSpace = true)>]
-        member _.Add((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>] f: 'a -> Pipeline) : Pipelines * 'a =
-            let pipeline = f vars
+        member _.Add(state: (Pipelines * 'a), [<ProjectionParameter>] pipeline: 'a -> Pipeline) : Pipelines * 'a =
+            let pipelines, vars = state
+            let newPipeline = pipeline vars
 
             let pipelines =
                 { pipelines with
-                    Pipelines = pipelines.Pipelines @ [ pipeline ]
+                    Pipelines = pipelines.Pipelines @ [ newPipeline ]
                 }
 
             (pipelines, vars)
 
+        /// <summary>
+        /// Sets the default <see cref="T:Pipeline" /> to be run when one is not specified.
+        /// </summary>
+        /// <param name="state">The current state of the computation expression.</param>
+        /// <param name="pipeline">The <see cref="T:Pipeline" /> to be used as the default.</param>
+        /// <typeparam name="'a">The types of the variables in the computation expression's state.</typeparam>
+        /// <returns>Updated computation expression state.</returns>
         [<CustomOperation("default_pipeline", MaintainsVariableSpace = true)>]
-        member _.DefaultPipeline((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>] f: 'a -> Pipeline) : Pipelines * 'a =
-            let pipeline = f vars
+        member _.DefaultPipeline(state: (Pipelines * 'a), [<ProjectionParameter>] pipeline: 'a -> Pipeline) : Pipelines * 'a =
+            let pipelines, vars = state
+            let defaultPipeline = pipeline vars
 
             let pipelines =
                 { pipelines with
-                    Default = Some pipeline
+                    Default = Some defaultPipeline
                 }
 
             (pipelines, vars)
 
+        /// <summary>
+        /// Sets the when to prefix a <see cref="T:Step" />'s console output.
+        /// </summary>
+        /// <param name="state">The current state of the computation expression.</param>
+        /// <param name="prefixOption">The <see cref="T:Prefix.PrefixOption" />.</param>
+        /// <typeparam name="'a">The types of the variables in the computation expression's state.</typeparam>
+        /// <returns>Updated computation expression state.</returns>
         [<CustomOperation("step_prefix", MaintainsVariableSpace = true)>]
-        member _.StepPrefix((pipelines: Pipelines, vars: 'a), [<ProjectionParameter>] f: 'a -> Prefix.PrefixOption) : Pipelines * 'a =
-            let option = f vars
+        member _.StepPrefix(state: (Pipelines * 'a), [<ProjectionParameter>] prefixOption: 'a -> Prefix.PrefixOption) : Pipelines * 'a =
+            let pipelines, vars = state
+            let option = prefixOption vars
 
             let pipelines = { pipelines with StepPrefix = option }
 
