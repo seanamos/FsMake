@@ -6,7 +6,18 @@ open System.Diagnostics
 /// <summary>
 /// Represents a pipeline step.
 /// </summary>
-type Step = { Name: string; Make: Make<unit> }
+type Step =
+    {
+        /// <summary>
+        /// Gets the name of the <see cref="T:Step" />.
+        /// </summary>
+        Name: string
+
+        /// <summary>
+        /// Gets the <see cref="T:Make`1" /> that will be executed when running the <see cref="T:Step" />.
+        /// </summary>
+        Make: Make<unit>
+    }
 
 /// <summary>
 /// Module for creating and working with steps.

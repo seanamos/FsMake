@@ -45,7 +45,7 @@ module internal Cli =
                 |> Console.appendToken option
             | InvalidArgument arg -> Console.error "Invalid argument " |> Console.appendToken arg
 
-    type Args =
+    type ParsedArgs =
         {
             PrintHelp: bool
             ScriptFile: string option
@@ -55,7 +55,7 @@ module internal Cli =
             ExtraArgs: string list
         }
 
-    let printUsage (writer: Console.IWriter) (args: Args) (errors: ParseError list) : unit =
+    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) : unit =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
@@ -86,7 +86,7 @@ Options:
         | NormalArgs
         | ExtraArgs
 
-    let parseArgs (args: string array) : Result<Args, Args * ParseError list> =
+    let parseArgs (args: string array) : Result<ParsedArgs, ParsedArgs * ParseError list> =
         let args = args |> List.ofArray
 
         let rec parseNextArg remArgs errors idx state options =

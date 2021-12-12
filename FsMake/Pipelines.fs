@@ -9,8 +9,19 @@ open System.Runtime.InteropServices
 /// </summary>
 type Pipelines =
     {
+        /// <summary>
+        /// Gets the <see cref="T:Pipeline" /> that will be executed by default.
+        /// </summary>
         Default: Pipeline option
+
+        /// <summary>
+        /// Gets the <see cref="T:Pipeline" />s.
+        /// </summary>
         Pipelines: Pipeline list
+
+        /// <summary>
+        /// Gets the <see cref="T:Prefix.PrefixOption" /> for the <see cref="T:Step" />s that will run.
+        /// </summary>
         StepPrefix: Prefix.PrefixOption
     }
 
@@ -136,7 +147,7 @@ module Pipelines =
                     | Some pipeline -> PipelineFound pipeline
                     | None -> PipelineNotFound arg
 
-        let runWithParsedArgs (args: Cli.Args) (pipelines: Pipelines) : int =
+        let runWithParsedArgs (args: Cli.ParsedArgs) (pipelines: Pipelines) : int =
             let consoleOutput = args.ConsoleOutput |> Cli.ConsoleOutput.toConsoleOutputType
 
             let verbosity = args.Verbosity |> Cli.Verbosity.toConsoleVerbosity
