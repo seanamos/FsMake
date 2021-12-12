@@ -1,10 +1,10 @@
-module FsMake.UnitTests.ConsoleTests
+module FsMake.Tests.Unit.Console
 
 open Expecto
 open Expecto.Flip
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let tests =
     testList
         "Console tests"

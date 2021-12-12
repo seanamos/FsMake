@@ -179,7 +179,7 @@ module Console =
         /// Writes a list of messages to the console.
         /// </summary>
         /// <param name="messages">The messages to write.</param>
-        abstract member Write : messages: Message list -> unit
+        abstract member Write: messages: Message list -> unit
 
     [<AutoOpen>]
     module internal Internal =

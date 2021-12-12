@@ -6,11 +6,11 @@ nuget FSharp.Core = 5
 
 group test
     storage: none
-    framework: net5.0
+    framework: net6.0
     source https://api.nuget.org/v3/index.json
 
     nuget Expecto ~> 9
     nuget Expecto.FsCheck ~> 9
-    nuget Microsoft.NET.Test.Sdk ~> 16
+    nuget Microsoft.NET.Test.Sdk ~> 17
     nuget Unquote ~> 6
     nuget YoloDev.Expecto.TestSdk ~> 0

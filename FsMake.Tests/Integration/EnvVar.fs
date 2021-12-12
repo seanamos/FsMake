@@ -1,11 +1,10 @@
-module FsMake.IntegrationTests.EnvVarTests
+module FsMake.Tests.Integration.EnvVar
 
 open Expecto
 open Expecto.Flip
 open FsMake
 open System
 
-[<Tests>]
 let tests =
     let consoleWriter =
         { new Console.IWriter with
@@ -28,7 +27,7 @@ let tests =
         }
 
     testList
-        "EnvVar Integration Tests"
+        "EnvVar Tests"
         [
             test "get returns env var" {
                 let envVarName = Guid.NewGuid().ToString ()

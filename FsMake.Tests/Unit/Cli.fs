@@ -1,9 +1,10 @@
-module FsMake.UnitTests.CliTests
+module FsMake.Tests.Unit.Cli
 
 open Expecto
 open Expecto.Flip
 open FsCheck
 open FsMake
+open FsMake.Tests
 
 module Gen =
     type HelpArgs = HelpArgs of string array
@@ -27,7 +28,6 @@ module Gen =
             arbitrary = typeof<HelpArgs>.DeclaringType :: FsCheckConfig.defaultConfig.arbitrary
         }
 
-[<Tests>]
 let tests =
     testList
         "Cli tests"

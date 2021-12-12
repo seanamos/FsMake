@@ -1,13 +1,12 @@
-module FsMake.IntegrationTests.PipelinesTests
+module FsMake.Tests.Integration.Pipelines
 
 open Expecto
 open Expecto.Flip
 open FsMake
 
-[<Tests>]
 let tests =
     testList
-        "Pipelines integration tests"
+        "Pipelines tests"
         [
             test "default pipeline is used" {
                 let mutable run = false

@@ -1,13 +1,12 @@
-module FsMake.IntegrationTests.CmdTests
+module FsMake.Tests.Integration.Cmd
 
 open Expecto
 open Expecto.Flip
 open FsMake
 
-[<Tests>]
 let tests =
     testList
-        "Cmd Integration Tests"
+        "Cmd Tests"
         [
             test "zero exit code is success" {
                 let step1 =

@@ -1,9 +1,9 @@
-module FsMake.UnitTests.MakeTests
+module FsMake.Tests.Unit.Make
 
 open Expecto
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let tests =
     let consoleWriter =
         { new Console.IWriter with

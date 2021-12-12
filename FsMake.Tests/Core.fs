@@ -1,4 +1,4 @@
-namespace FsMake.UnitTests
+namespace FsMake.Tests
 
 open Swensen.Unquote
 

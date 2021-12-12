@@ -54,8 +54,6 @@ let clean =
 
 let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
 
-let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
-
 let build =
     Step.create "build" {
         do!
@@ -68,21 +66,12 @@ let build =
 let ``test:format`` = Step.create "test:format" { do! Cmd.createWithArgs "dotnet" [ "fantomas"; "-r"; "."; "--check" ] |> Cmd.run }
 let ``test:lint`` = Step.create "test:lint" { do! Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ] |> Cmd.run }
 
-let ``test:unit`` =
+let ``test:tests`` =
     Step.create "test:unit" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
             |> Cmd.argsOption buildConfigArg
-            |> Cmd.workingDir "FsMake.UnitTests"
-            |> Cmd.run
-    }
-
-let ``test:integration`` =
-    Step.create "test:integration" {
-        do!
-            Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
-            |> Cmd.argsOption buildConfigArg
-            |> Cmd.workingDir "FsMake.IntegrationTests"
+            |> Cmd.workingDir "FsMake.Tests"
             |> Cmd.run
     }
 
@@ -214,18 +203,11 @@ Pipelines.create {
     let! build =
         Pipeline.create "build" {
             run clean
-            run restore
             maybe_run assemblyinfo isRelease
             run build
         }
 
-    do!
-        Pipeline.createFrom build "test" {
-            run_parallel [ ``test:format``
-                           ``test:lint``
-                           ``test:unit``
-                           ``test:integration`` ]
-        }
+    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:tests`` ] }
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run ``nupkg:create`` }
 
