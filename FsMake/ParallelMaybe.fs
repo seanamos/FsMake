@@ -77,13 +77,13 @@ module ParallelMaybe =
             state @ [ PMaybe (step, cond) ]
 
 /// <summary>
-/// Auto-opened module containing functions for using <see cref="T:ParallelMaybe`1" /> computation expressions.
+/// Auto-opened module containing functions for using <see cref="T:ParallelMaybe" /> computation expressions.
 /// </summary>
 [<AutoOpen>]
 module ParallelMaybeBuilders =
     // fsharplint:disable
     /// <summary>
-    /// Creates a <see cref="T:ParallelMaybe" /> <c>list</c> using a <see cref="T:ParallelMaybe.Builder" /> computation expression.
+    /// Creates a <see cref="T:ParallelMaybe" /> <c>list</c> using a <see cref="T:FsMake.ParallelMaybeModule.Builder" /> computation expression.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">

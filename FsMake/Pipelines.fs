@@ -97,7 +97,7 @@ module Pipelines =
             (pipelines, vars)
 
         /// <summary>
-        /// Sets the when to prefix a <see cref="T:Step" />'s console output.
+        /// Sets when to prefix a <see cref="T:Step" />'s console output.
         /// </summary>
         /// <param name="state">The current state of the computation expression.</param>
         /// <param name="prefixOption">The <see cref="T:Prefix.PrefixOption" />.</param>
