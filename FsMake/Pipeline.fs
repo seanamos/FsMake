@@ -35,10 +35,11 @@ module Pipeline =
 
             let anyFailed (pipelineResults: StepResult list) : bool =
                 pipelineResults
-                |> List.tryFind
-                    (function
+                |> List.tryFind (
+                    function
                     | Failed _ -> true
-                    | _ -> false)
+                    | _ -> false
+                )
                 |> Option.isSome
 
             let totalTime (pipelineResults: StepResult list) : TimeSpan =
@@ -140,8 +141,8 @@ module Pipeline =
 
                     (step, makeContext, stepResult)
                 )
-                |> Array.map
-                    (function
+                |> Array.map (
+                    function
                     | (step, _, Ok stat) -> Success (step, stat)
                     | (step, ctx, Error (stat, err)) ->
                         err
@@ -154,7 +155,8 @@ module Pipeline =
                             }
                         |> args.Context.Console.WriteLines
 
-                        Failed (step, stat, err))
+                        Failed (step, stat, err)
+                )
                 |> List.ofArray
 
             if results |> StepResult.anyFailed then
@@ -242,7 +244,7 @@ module Pipeline =
     /// A <see cref="T:Pipeline" /> computation expression builder.
     /// </summary>
     /// <param name="name">Name of the pipeline.</param>
-    /// <param name="from">A pipeline to as a base. A new pipeline will be created from this one and have stages appended.</param>
+    /// <param name="from">A <see cref="T:Pipeline" /> to use as a base. A new pipeline will be created from this one and have stages appended.</param>
     [<Sealed>]
     type Builder(name: string, ?from: Pipeline) =
         let mutable pipeline =
@@ -301,10 +303,10 @@ module Pipeline =
 
 
     /// <summary>
-    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// Creates a pipeline using a <see cref="T:FsMake.PipelineModule.Builder" /> computation expression.
     /// </summary>
     /// <param name="name">The name of the pipeline.</param>
-    /// <returns>A <see cref="T:Pipeline.Builder" />.</returns>
+    /// <returns>A <see cref="T:FsMake.PipelineModule.Builder" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let emptyStep = Step.create "emptyStep" { () }
@@ -318,12 +320,13 @@ module Pipeline =
         Builder (name)
 
     /// <summary>
-    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// Creates a pipeline using a <see cref="T:FsMake.PipelineModule.Builder" /> computation expression.
     /// The <c>pipeline</c> parameter is an exsting pipeline to use as a base.
     /// This does not modify the existing <see cref="T:Pipeline" />, it returns a new <see cref="T:Pipeline" /> with additional stages.
     /// </summary>
     /// <param name="pipeline">A <see cref="T:Pipeline" /> to use as a base to build upon. A new <see cref="T:Pipeline" /> will be created from this one and have stages appended.</param>
     /// <param name="name">The name of the new <see cref="T:Pipeline" />.</param>
+    /// <returns>A <see cref="T:FsMake.PipelineModule.Builder" />.</returns>
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
@@ -350,7 +353,7 @@ module Pipeline =
 
         use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
-        let context : Context =
+        let context: Context =
             {
                 Pipeline = pipeline
                 Console = args.Writer

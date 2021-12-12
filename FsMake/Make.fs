@@ -163,7 +163,7 @@ module Make =
     /// let emptyMake : Make&lt;unit&gt; = Make.zero
     /// </code>
     /// </example>
-    let zero : Make<unit> = fun _ -> Ok ()
+    let zero: Make<unit> = fun _ -> Ok ()
 
     /// <summary>
     /// Wraps a value in a <see cref="T:Make`1" />.
@@ -198,7 +198,7 @@ module Make =
     ///     }
     /// </code>
     /// </example>
-    let context : Make<MakeContext> = Ok
+    let context: Make<MakeContext> = Ok
 
     /// <summary>
     /// Fails the current <see cref="T:Make`1" /> with a message.
@@ -325,7 +325,7 @@ module Make =
     /// </example>
     let retry (attempts: int) (make: Make<'T>) : Make<'T> =
         let rec nextRetry attempted ctx =
-            let prefixArgs : Prefix.Internal.OptionalPrefixArgs =
+            let prefixArgs: Prefix.Internal.OptionalPrefixArgs =
                 {
                     IsParallel = ctx.IsParallel
                     PrefixOption = ctx.PrefixOption

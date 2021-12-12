@@ -24,18 +24,20 @@ module ParallelMaybe =
     module internal Internal =
         let partition (pmaybes: ParallelMaybe list) : (ParallelMaybe list * ParallelMaybe list) =
             pmaybes
-            |> List.partition
-                (function
+            |> List.partition (
+                function
                 | PMaybe (_, true) -> true
                 | PMaybe _ -> false
-                | PStep _ -> true)
+                | PStep _ -> true
+            )
 
         let toSteps (pmaybes: ParallelMaybe list) : Step list =
             pmaybes
-            |> List.map
-                (function
+            |> List.map (
+                function
                 | PMaybe (x, _) -> x
-                | PStep x -> x)
+                | PStep x -> x
+            )
 
         let partionedSteps (pmaybes: ParallelMaybe list) : (Step list * Step list) =
             let (run, skip) = pmaybes |> partition

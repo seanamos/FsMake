@@ -37,17 +37,19 @@ module Cmd =
     module internal Arg =
         let toUnsafeStrList (args: Arg list) : string list =
             args
-            |> List.map
-                (function
+            |> List.map (
+                function
                 | ArgText x -> x
-                | ArgSecret x -> x)
+                | ArgSecret x -> x
+            )
 
         let toSafeStrList (args: Arg list) : string list =
             args
-            |> List.map
-                (function
+            |> List.map (
+                function
                 | ArgText x -> x
-                | ArgSecret _ -> "**masked**")
+                | ArgSecret _ -> "**masked**"
+            )
 
     /// <summary>
     /// Prefix options, sets when to prefix the output with the step name.

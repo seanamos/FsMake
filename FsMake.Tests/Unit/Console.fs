@@ -1,10 +1,10 @@
-module FsMake.UnitTests.ConsoleTests
+module FsMake.Tests.Unit.Console
 
 open Expecto
 open Expecto.Flip
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let tests =
     testList
         "Console tests"
@@ -30,7 +30,7 @@ let tests =
             test "messageEmpty create empty message" {
                 let message = Console.Error |> Console.messageEmpty Console.Red
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Error
                         Prefix = None
@@ -46,7 +46,7 @@ let tests =
                     Console.Info
                     |> Console.messageParts Console.DarkBlue [ Console.Colorized ("Hello", Console.Magenta); Console.Text " world!" ]
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -60,7 +60,7 @@ let tests =
             test "messageColor creates a messages with color part" {
                 let message = Console.Info |> Console.messageColor Console.Magenta "Hello world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -74,7 +74,7 @@ let tests =
             test "message creates a message with text part" {
                 let message = Console.Info |> Console.message "Hello world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -88,7 +88,7 @@ let tests =
             test "statusMessage creates a message with token and text" {
                 let message = Console.Info |> Console.statusMessage Console.Red "Hello world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -106,7 +106,7 @@ let tests =
                     |> Console.appendParts [ Console.Text "Hello" ]
                     |> Console.appendParts [ Console.Text " world!" ]
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -123,7 +123,7 @@ let tests =
                     |> Console.message "Hello"
                     |> Console.appendPart (Console.Text " world!")
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -140,7 +140,7 @@ let tests =
                     |> Console.message "Hello"
                     |> Console.appendColor Console.DarkCyan " world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -154,7 +154,7 @@ let tests =
             test "appendToken adds token part to message" {
                 let message = Console.Info |> Console.message "Hello" |> Console.appendToken " world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -168,7 +168,7 @@ let tests =
             test "append adds text part to message" {
                 let message = Console.Info |> Console.message "Hello" |> Console.append " world!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -185,7 +185,7 @@ let tests =
                     |> Console.messageEmpty Console.Red
                     |> Console.prefix (Console.Text "Prefix")
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = Some (Console.Text "Prefix")
@@ -199,7 +199,7 @@ let tests =
             test "error creates error status message" {
                 let message = Console.error "oh no!"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Error
                         Prefix = None
@@ -213,7 +213,7 @@ let tests =
             test "warn creates warn status message" {
                 let message = Console.warn "warning"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Warn
                         Prefix = None
@@ -227,7 +227,7 @@ let tests =
             test "info creates info status message" {
                 let message = Console.info "info"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None
@@ -241,7 +241,7 @@ let tests =
             test "success creates success status message" {
                 let message = Console.success "success"
 
-                let expected : Console.Message =
+                let expected: Console.Message =
                     {
                         Level = Console.Info
                         Prefix = None

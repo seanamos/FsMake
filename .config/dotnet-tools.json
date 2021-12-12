@@ -3,21 +3,21 @@
   "isRoot": true,
   "tools": {
     "paket": {
-      "version": "6.0.0-rc003",
+      "version": "6.2.1",
       "commands": [
         "paket"
       ]
     },
-    "fantomas-tool": {
-      "version": "4.5.0-beta-001",
-      "commands": [
-        "fantomas"
-      ]
-    },
     "dotnet-fsharplint": {
-      "version": "0.18.1",
+      "version": "0.21.0",
       "commands": [
         "dotnet-fsharplint"
+      ]
+    },
+    "fantomas-tool": {
+      "version": "4.6.0-alpha-010",
+      "commands": [
+        "fantomas"
       ]
     },
     "gitversion.tool": {
@@ -27,7 +27,7 @@
       ]
     },
     "gitreleasemanager.tool": {
-      "version": "0.11.0",
+      "version": "0.12.1",
       "commands": [
         "dotnet-gitreleasemanager"
       ]

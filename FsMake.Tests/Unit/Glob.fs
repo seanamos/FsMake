@@ -1,9 +1,9 @@
-module FsMake.UnitTests.GlobTests
+module FsMake.Tests.Unit.Glob
 
 open Expecto
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let globTests =
     testList
         "Glob tests"
@@ -47,7 +47,6 @@ let globTests =
 
 open FsMake.Glob.Internal
 
-[<Tests>]
 let parseTests =
     testList
         "Glob parse tests"
@@ -112,7 +111,6 @@ let parseTests =
             }
         ]
 
-[<Tests>]
 let regexTests =
     testList
         "Glob regex tests"

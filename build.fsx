@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.3.0-beta.1"
+#r "nuget: FsMake, 0.3.0"
 
 open FsMake
 open System
@@ -16,7 +16,7 @@ let nugetListPkg = EnvVar.getOptionAs<bool> "NUGET_LIST_PKG" |> Option.contains 
 let getNugetApiKey = EnvVar.getOrFail "NUGET_API_KEY"
 let getGithubToken = EnvVar.getOrFail "GITHUB_TOKEN"
 
-let getGitversion =
+let makeGitversion =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
     |> Cmd.redirectOutput Cmd.RedirectToBoth
     |> Cmd.result
@@ -54,8 +54,6 @@ let clean =
 
 let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
 
-let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
-
 let build =
     Step.create "build" {
         do!
@@ -68,18 +66,18 @@ let build =
 let ``test:format`` = Step.create "test:format" { do! Cmd.createWithArgs "dotnet" [ "fantomas"; "-r"; "."; "--check" ] |> Cmd.run }
 let ``test:lint`` = Step.create "test:lint" { do! Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ] |> Cmd.run }
 
-let ``test:unit`` =
-    Step.create "test:unit" {
+let ``test:tests`` =
+    Step.create "test:tests" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
             |> Cmd.argsOption buildConfigArg
-            |> Cmd.workingDir "FsMake.UnitTests"
+            |> Cmd.workingDir "FsMake.Tests"
             |> Cmd.run
     }
 
 let ``nupkg:create`` =
     Step.create "nupkg:create" {
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
 
         do!
@@ -93,7 +91,7 @@ let ``nupkg:push`` =
     Step.create "nupkg:push" {
         let! nugetApiKey = getNugetApiKey
         let! ctx = Step.context
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
         let pkg = $"nupkgs/FsMake.%s{semver}.nupkg"
 
@@ -131,7 +129,7 @@ let docs =
 
 let ``github:pages`` =
     Step.create "github:pages" {
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
 
         do! Cmd.createWithArgs "git" [ "stash"; "-u" ] |> Cmd.run
         do! Cmd.createWithArgs "git" [ "fetch" ] |> Cmd.run
@@ -148,8 +146,8 @@ let ``github:pages`` =
 
         Glob.create "docs-output/**"
         |> Glob.toPathTypes
-        |> Seq.iter
-            (function
+        |> Seq.iter (
+            function
             | Glob.File x ->
                 let newPath = Path.GetRelativePath (rootDir, x)
                 let newDir = Path.GetDirectoryName (newPath)
@@ -158,7 +156,8 @@ let ``github:pages`` =
                     Directory.CreateDirectory (newDir) |> ignore
 
                 File.Move (x, newPath)
-            | _ -> ())
+            | _ -> ()
+        )
 
         do! Cmd.createWithArgs "git" [ "add"; "." ] |> Cmd.run
 
@@ -185,7 +184,7 @@ let ``github:pages`` =
 let ``github:release`` =
     Step.create "github:release" {
         let! githubToken = getGithubToken
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
         let isPre = gitversion.PreReleaseNumber.HasValue
         let milestone = gitversion.MajorMinorPatch
@@ -204,12 +203,11 @@ Pipelines.create {
     let! build =
         Pipeline.create "build" {
             run clean
-            run restore
             maybe_run assemblyinfo isRelease
             run build
         }
 
-    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:unit`` ] }
+    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:tests`` ] }
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run ``nupkg:create`` }
 
@@ -225,4 +223,4 @@ Pipelines.create {
 
     default_pipeline build
 }
-|> Pipelines.runWithArgs args
+|> Pipelines.runWithArgsAndExit args
