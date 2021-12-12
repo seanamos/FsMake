@@ -252,6 +252,9 @@ module Pipeline =
             | Some x -> { x with Name = name }
             | None -> { Name = name; Stages = [] }
 
+        member _.Zero() : unit =
+            ()
+
         member _.Delay(f: unit -> 'T) : 'T =
             f ()
 
@@ -273,29 +276,57 @@ module Pipeline =
         member _.Combine(_: 'T, _: 'T) : unit =
             ()
 
+        /// <summary>
+        /// Adds a <see cref="T:Step" /> that will always be run.
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="step">The <see cref="T:Step" /> to add.</param>
+        /// <returns>Unit.</returns>
         [<CustomOperation("run")>]
-        member _.RunStep(_: unit, step: Step) : unit =
+        member _.RunStep(state: unit, step: Step) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ SequentialStage step ]
                 }
 
-        [<CustomOperation("maybe_run")>]
-        member _.MaybeRun(_: unit, step: Step, cond: bool) : unit =
+        /// <summary>
+        /// Adds a <see cref="T:Step" /> that will be run conditionally.
+        /// <para>The <see cref="T:Step" /> will only run if <paramref name="cond" /> is true.</para>
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="step">The <see cref="T:Step" /> to conditionally run.</param>
+        /// <param name="cond">The condition that must be true for the step to run.</param>
+        /// <returns>Unit.</returns>
+        [<CustomOperation("run_maybe")>]
+        member _.RunMaybe(state: unit, step: Step, cond: bool) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ]
                 }
 
+        /// <summary>
+        ///  Adds a list of <see cref="T:Step" />s to be run in parralel.
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="steps">The list of <see cref="T:Step" />s that will be run in parallel.</param>
+        /// <returns></returns>
         [<CustomOperation("run_parallel")>]
-        member _.RunParallel(_: unit, steps: Step list) : unit =
+        member _.RunParallel(state: unit, steps: Step list) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ ParallelStage steps ]
                 }
 
-        [<CustomOperation("maybe_run_parallel")>]
-        member _.MaybeRunParallel(_: unit, steps: Step list, cond: bool) : unit =
+        /// <summary>
+        /// Adds steps that will be run in parallel.
+        /// <para>The steps will only run if <paramref name="cond" /> is true.</para>
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="steps">The steps to conditionally run in parallel.</param>
+        /// <param name="cond">The condition that must be true for the steps to run.</param>
+        /// <returns>Unit.</returns>
+        [<CustomOperation("run_parallel_maybe")>]
+        member _.RunParallelMaybe(state: unit, steps: Step list, cond: bool) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ]
