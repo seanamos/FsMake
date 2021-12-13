@@ -3,16 +3,20 @@ name: Release new version
 on:
   workflow_dispatch:
     inputs:
+      publish_to_nuget:
+        description: "Publish nuget package (true/false)"
+        required: true
+        default: "false"
       list_pkg:
         description: "List nupkg on nuget.org (true/false)"
         required: true
         default: "false"
       github_pages:
-        description: "Update Github pages documentation"
+        description: "Update Github pages documentation (true/false)"
         required: true
         default: "true"
       github_release:
-        description: "Create a Github release"
+        description: "Create a Github release (true/false)"
         required: true
         default: "true"
 
@@ -24,6 +28,8 @@ env:
 
 jobs:
   package:
+    if: ${{ github.event.inputs.publish_to_nuget == 'true' }}
+
     runs-on: ubuntu-20.04
 
     steps:
