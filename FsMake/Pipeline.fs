@@ -6,7 +6,19 @@ open System.Threading
 /// <summary>
 /// Represents a pipeline and its stages.
 /// </summary>
-type Pipeline = { Name: string; Stages: Stage list }
+type Pipeline =
+    {
+        /// <summary>
+        /// Gets the name of the <see cref="T:Pipeline" />.
+        /// </summary>
+        Name: string
+
+        /// <summary>
+        /// Gets the <see cref="T:Stage" />s.
+        /// </summary>
+        /// <returns></returns>
+        Stages: Stage list
+    }
 
 /// <summary>
 /// Module for creating and working with a <see cref="T:Pipeline" />.

@@ -9,8 +9,19 @@ open System.Text.RegularExpressions
 /// </summary>
 type Glob =
     {
+        /// <summary>
+        /// Gets the root directory of the <see cref="T:Glob" />.
+        /// </summary>
         RootDirectory: string
+
+        /// <summary>
+        /// Gets the include patterns.
+        /// </summary>
         Include: string list
+
+        /// <summary>
+        /// Gets the exclude patterns.
+        /// </summary>
         Exclude: string list
     }
 
