@@ -26,8 +26,15 @@ type Glob =
     }
 
 /// <summary>
-/// Module for creating and working a <see cref="T:Glob" />.
+/// Module for creating and working with a <see cref="T:Glob" />.
+/// <para>A <see cref="T:Glob" /> represents a set of patterns to include/exclude files.</para>
 /// </summary>
+/// <example>
+/// <code lang="fsharp">
+/// // search recursively for all files with a .dll file extension
+/// let dlls = Glob.create "**/*.dll" |> Glob.toPaths
+/// </code>
+/// </example>
 module Glob =
     [<AutoOpen>]
     module internal Internal =
