@@ -116,3 +116,11 @@ div.fsdocs-source-link {
 .fsdocs-xmldoc, .fsdocs-entity-xmldoc, .fsdocs-member-xmldoc {
 	color: #c6c6c6;
 }
+
+div.fsdocs-tip {
+    background: #47455f;
+    color: #f0f3f6;
+    border-color: #f0f3f6;
+    border-width: 1px;
+    border-style: solid;
+}

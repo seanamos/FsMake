@@ -154,7 +154,7 @@ module Pipelines =
             let writer = Console.createWriter consoleOutput verbosity
 
             if args.PrintHelp then
-                Cli.printUsage writer args []
+                Cli.printUsage writer args [] pipelines.Pipelines
                 0
             else
                 let findResult = args.Pipeline |> findPipelineFromArg pipelines
@@ -252,7 +252,7 @@ module Pipelines =
         | Error (args, errors) ->
             let writer = Console.Internal.defaultWriter
 
-            Cli.printUsage writer args errors
+            Cli.printUsage writer args errors pipelines.Pipelines
             1
         | Ok args -> pipelines |> runWithParsedArgs args
 
