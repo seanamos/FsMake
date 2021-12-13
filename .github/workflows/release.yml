@@ -25,11 +25,10 @@ env:
   ANSI: "true"
   BUILD_CONFIG: Release
   NUGET_LIST_PKG: ${{ github.event.inputs.list_pkg }}
+  PUBLISH_TO_NUGET: ${{ github.event.inputs.publish_to_nuget }}
 
 jobs:
   package:
-    if: ${{ github.event.inputs.publish_to_nuget == 'true' }}
-
     runs-on: ubuntu-20.04
 
     steps:
@@ -47,7 +46,9 @@ jobs:
     - name: Publish Release
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: ./build.sh publish:nupkg -o ansi -- --clean
+      run: |
+        [ "${PUBLISH_TO_NUGET}" != "true" ] && exit 0
+        ./build.sh publish:nupkg -o ansi -- --clean
 
   github-pages:
     if: ${{ github.event.inputs.github_pages == 'true' }}
