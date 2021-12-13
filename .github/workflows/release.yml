@@ -6,7 +6,7 @@ on:
       publish_to_nuget:
         description: "Publish nuget package (true/false)"
         required: true
-        default: "false"
+        default: "true"
       list_pkg:
         description: "List nupkg on nuget.org (true/false)"
         required: true
