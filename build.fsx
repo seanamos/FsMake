@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.3.0"
+#r "nuget: FsMake, 0.4.0"
 
 open FsMake
 open System
@@ -206,7 +206,7 @@ Pipelines.create {
         Pipeline.create "build" {
             run clean
             run restore
-            maybe_run assemblyinfo isRelease
+            run_maybe assemblyinfo isRelease
             run build
         }
 
