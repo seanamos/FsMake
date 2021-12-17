@@ -29,7 +29,7 @@ open FsMake
 open System.IO
 
 let args = fsi.CommandLineArgs
-let useAnsi = EnvVar.getOption<int> "ANSI" |> Option.contains 1
+let useAnsi = EnvVar.getOptionAs<int> "ANSI" |> Option.contains 1
 let buildConfig = EnvVar.getOption "BUILD_CONFIG" |> Option.defaultValue "Debug"
 
 let clean =
