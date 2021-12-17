@@ -186,7 +186,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L52-52" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L54-54" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -229,9 +229,9 @@
             <div>
               <code onmouseout="hideTip(event, '172', 172)" onmouseover="showTip(event, '172', 172)">
                 <p>
-                  <a id="Maybe">
-                    <a href="#Maybe">
-                      <code><span>maybe_run&#32;<span>step&#32;cond</span></span></code>
+                  <a id="RunMaybe">
+                    <a href="#RunMaybe">
+                      <code><span>run_maybe&#32;<span>step&#32;cond</span></span></code>
                     </a>
                   </a>
                 </p>
@@ -239,7 +239,7 @@
               <div class="fsdocs-tip" id="172">
                 <div class="member-tooltip">
                   Full Usage: 
-                  <code><span>maybe_run&#32;<span>step&#32;cond</span></span></code>
+                  <code><span>run_maybe&#32;<span>step&#32;cond</span></span></code>
                   <br/>
                   <br/>
                   Parameters: 
@@ -250,6 +250,8 @@
                       </b>
                       :
                       <code><a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a></code>
+                       - 
+                      The <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> to add.
                     </span>
                     <br/>
                     <span>
@@ -258,6 +260,8 @@
                       </b>
                       :
                       <code>bool</code>
+                       - 
+                      The condition that must be true for the <span class="fsdocs-param-name">step</span> to run.
                     </span>
                     <br/>
                   </ul>
@@ -266,6 +270,7 @@
                     Returns: 
                     <code><span><a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
                   </span>
+                  Updated state of the computation expression.
                   <br/>
                 </div>
               </div>
@@ -273,20 +278,22 @@
           </td>
           <td class="fsdocs-member-xmldoc">
             <div class="fsdocs-summary">
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.ParallelMaybeModule.Builder.Maybe`')">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.ParallelMaybeModule.Builder.RunMaybe`')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
               </div>
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.ParallelMaybeModule.Builder.Maybe\'/>')">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.ParallelMaybeModule.Builder.RunMaybe\'/>')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L61-61" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L76-76" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
+ Adds a <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> that will be run when <span class="fsdocs-param-name">cond</span> is true.
+ 
               </p>
             </div>
             <dl class="fsdocs-params">
@@ -297,7 +304,11 @@
                 :
                 <code><a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a></code>
               </dt>
-              <dd class="fsdocs-param-docs"></dd>
+              <dd class="fsdocs-param-docs">
+                <p>
+                  The <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> to add.
+                </p>
+              </dd>
               <dt class="fsdocs-param">
                 <span class="fsdocs-param-name">
                   cond
@@ -305,7 +316,11 @@
                 :
                 <code>bool</code>
               </dt>
-              <dd class="fsdocs-param-docs"></dd>
+              <dd class="fsdocs-param-docs">
+                <p>
+                  The condition that must be true for the <span class="fsdocs-param-name">step</span> to run.
+                </p>
+              </dd>
             </dl>
             <dl class="fsdocs-returns">
               <dt>
@@ -314,7 +329,11 @@
                 </span>
                 <code><span><a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
               </dt>
-              <dd class="fsdocs-return-docs"></dd>
+              <dd class="fsdocs-return-docs">
+                <p>
+                  Updated state of the computation expression.
+                </p>
+              </dd>
             </dl>
           </td>
         </tr>
@@ -344,6 +363,8 @@
                       </b>
                       :
                       <code><a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a></code>
+                       - 
+                      The <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> to add.
                     </span>
                     <br/>
                   </ul>
@@ -352,6 +373,7 @@
                     Returns: 
                     <code><span><a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
                   </span>
+                  Updated state of the computation expression.
                   <br/>
                 </div>
               </div>
@@ -367,12 +389,14 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L57-57" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L65-65" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
+ Adds a <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> that will always be run.
+ 
               </p>
             </div>
             <dl class="fsdocs-params">
@@ -383,7 +407,11 @@
                 :
                 <code><a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a></code>
               </dt>
-              <dd class="fsdocs-param-docs"></dd>
+              <dd class="fsdocs-param-docs">
+                <p>
+                  The <a href="https://seanamos.github.io/FsMake/reference/fsmake-step.html">Step</a> to add.
+                </p>
+              </dd>
             </dl>
             <dl class="fsdocs-returns">
               <dt>
@@ -392,7 +420,11 @@
                 </span>
                 <code><span><a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a>&#32;list</span></code>
               </dt>
-              <dd class="fsdocs-return-docs"></dd>
+              <dd class="fsdocs-return-docs">
+                <p>
+                  Updated state of the computation expression.
+                </p>
+              </dd>
             </dl>
           </td>
         </tr>
@@ -445,7 +477,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L53-53" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L55-55" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>

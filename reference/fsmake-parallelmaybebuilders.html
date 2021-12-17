@@ -111,7 +111,7 @@
     <div>
       <p class="fsdocs-summary">
         
- Auto-opened module containing functions for using <a href="https://docs.microsoft.com/dotnet/api/parallelmaybe-1">ParallelMaybe</a> computation expressions.
+ Auto-opened module containing functions for using <a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a> computation expressions.
  
       </p>
     </div>
@@ -169,13 +169,13 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L91-91" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/ParallelMaybe.fs#L106-106" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- Creates a <a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a><code>list</code> using a <a href="https://docs.microsoft.com/dotnet/api/parallelmaybe.builder">Builder</a> computation expression.
+ Creates a <a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybe.html">ParallelMaybe</a><code>list</code> using a <a href="https://seanamos.github.io/FsMake/reference/fsmake-parallelmaybemodule-builder.html">Builder</a> computation expression.
  
               </p>
             </div>
@@ -203,7 +203,7 @@
      Pipeline.create "example" {
          run_parallel_maybes {
              run emptyStep1
-             maybe_run emptyStep2 condition
+             run_maybe emptyStep2 condition
              run emptyStep3
          }
      }</pre>
