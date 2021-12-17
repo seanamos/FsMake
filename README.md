@@ -29,9 +29,8 @@ open FsMake
 open System.IO
 
 let args = fsi.CommandLineArgs
-let useAnsi = EnvVar.getOption "ANSI" |> Option.isSome
-let buildConfig = EnvVar.getOption "BUILD_CONFIG"
-let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
+let useAnsi = EnvVar.getOption<int> "ANSI" |> Option.contains 1
+let buildConfig = EnvVar.getOption "BUILD_CONFIG" |> Option.defaultValue "Debug"
 
 let clean =
     Step.create "clean" {
@@ -46,8 +45,8 @@ let build =
     Step.create "build" {
         do!
             Cmd.createWithArgs "dotnet" [ "build"; "--no-restore" ]
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.argMaybe useAnsi "/consoleloggerparameters:ForceConsoleColor"
-            |> Cmd.argsOption buildConfigArg
             |> Cmd.run
     }
 
