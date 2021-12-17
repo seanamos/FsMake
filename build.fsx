@@ -52,12 +52,7 @@ let clean =
             |> ctx.Console.WriteLine
     }
 
-let restore =
-    Step.create "restore" {
-        do!
-            Cmd.createWithArgs "dotnet" [ "restore" ]
-            |> Cmd.run
-    }
+let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
 
 let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
 
