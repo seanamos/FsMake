@@ -6,7 +6,19 @@ open System.Threading
 /// <summary>
 /// Represents a pipeline and its stages.
 /// </summary>
-type Pipeline = { Name: string; Stages: Stage list }
+type Pipeline =
+    {
+        /// <summary>
+        /// Gets the name of the <see cref="T:Pipeline" />.
+        /// </summary>
+        Name: string
+
+        /// <summary>
+        /// Gets the <see cref="T:Stage" />s.
+        /// </summary>
+        /// <returns></returns>
+        Stages: Stage list
+    }
 
 /// <summary>
 /// Module for creating and working with a <see cref="T:Pipeline" />.
@@ -35,10 +47,11 @@ module Pipeline =
 
             let anyFailed (pipelineResults: StepResult list) : bool =
                 pipelineResults
-                |> List.tryFind
-                    (function
+                |> List.tryFind (
+                    function
                     | Failed _ -> true
-                    | _ -> false)
+                    | _ -> false
+                )
                 |> Option.isSome
 
             let totalTime (pipelineResults: StepResult list) : TimeSpan =
@@ -140,8 +153,8 @@ module Pipeline =
 
                     (step, makeContext, stepResult)
                 )
-                |> Array.map
-                    (function
+                |> Array.map (
+                    function
                     | (step, _, Ok stat) -> Success (step, stat)
                     | (step, ctx, Error (stat, err)) ->
                         err
@@ -154,7 +167,8 @@ module Pipeline =
                             }
                         |> args.Context.Console.WriteLines
 
-                        Failed (step, stat, err))
+                        Failed (step, stat, err)
+                )
                 |> List.ofArray
 
             if results |> StepResult.anyFailed then
@@ -242,13 +256,16 @@ module Pipeline =
     /// A <see cref="T:Pipeline" /> computation expression builder.
     /// </summary>
     /// <param name="name">Name of the pipeline.</param>
-    /// <param name="from">A pipeline to as a base. A new pipeline will be created from this one and have stages appended.</param>
+    /// <param name="from">A <see cref="T:Pipeline" /> to use as a base. A new pipeline will be created from this one and have stages appended.</param>
     [<Sealed>]
     type Builder(name: string, ?from: Pipeline) =
         let mutable pipeline =
             match from with
             | Some x -> { x with Name = name }
             | None -> { Name = name; Stages = [] }
+
+        member _.Zero() : unit =
+            ()
 
         member _.Delay(f: unit -> 'T) : 'T =
             f ()
@@ -271,29 +288,57 @@ module Pipeline =
         member _.Combine(_: 'T, _: 'T) : unit =
             ()
 
+        /// <summary>
+        /// Adds a <see cref="T:Step" /> that will always be run.
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="step">The <see cref="T:Step" /> to add.</param>
+        /// <returns>Unit.</returns>
         [<CustomOperation("run")>]
-        member _.RunStep(_: unit, step: Step) : unit =
+        member _.RunStep(state: unit, step: Step) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ SequentialStage step ]
                 }
 
-        [<CustomOperation("maybe_run")>]
-        member _.MaybeRun(_: unit, step: Step, cond: bool) : unit =
+        /// <summary>
+        /// Adds a <see cref="T:Step" /> that will be run conditionally.
+        /// <para>The <see cref="T:Step" /> will only run if <paramref name="cond" /> is true.</para>
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="step">The <see cref="T:Step" /> to conditionally run.</param>
+        /// <param name="cond">The condition that must be true for the step to run.</param>
+        /// <returns>Unit.</returns>
+        [<CustomOperation("run_maybe")>]
+        member _.RunMaybe(state: unit, step: Step, cond: bool) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ SequentialMaybeStage (step, cond) ]
                 }
 
+        /// <summary>
+        ///  Adds a list of <see cref="T:Step" />s to be run in parralel.
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="steps">The list of <see cref="T:Step" />s that will be run in parallel.</param>
+        /// <returns></returns>
         [<CustomOperation("run_parallel")>]
-        member _.RunParallel(_: unit, steps: Step list) : unit =
+        member _.RunParallel(state: unit, steps: Step list) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ ParallelStage steps ]
                 }
 
-        [<CustomOperation("maybe_run_parallel")>]
-        member _.MaybeRunParallel(_: unit, steps: Step list, cond: bool) : unit =
+        /// <summary>
+        /// Adds steps that will be run in parallel.
+        /// <para>The steps will only run if <paramref name="cond" /> is true.</para>
+        /// </summary>
+        /// <param name="state">Unused.</param>
+        /// <param name="steps">The steps to conditionally run in parallel.</param>
+        /// <param name="cond">The condition that must be true for the steps to run.</param>
+        /// <returns>Unit.</returns>
+        [<CustomOperation("run_parallel_maybe")>]
+        member _.RunParallelMaybe(state: unit, steps: Step list, cond: bool) : unit =
             pipeline <-
                 { pipeline with
                     Stages = pipeline.Stages @ [ ParallelMaybeStage (steps, cond) ]
@@ -301,10 +346,10 @@ module Pipeline =
 
 
     /// <summary>
-    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// Creates a pipeline using a <see cref="T:FsMake.PipelineModule.Builder" /> computation expression.
     /// </summary>
     /// <param name="name">The name of the pipeline.</param>
-    /// <returns>A <see cref="T:Pipeline.Builder" />.</returns>
+    /// <returns>A <see cref="T:FsMake.PipelineModule.Builder" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let emptyStep = Step.create "emptyStep" { () }
@@ -318,12 +363,13 @@ module Pipeline =
         Builder (name)
 
     /// <summary>
-    /// Creates a pipeline using a <see cref="T:Pipeline.Builder" /> computation expression.
+    /// Creates a pipeline using a <see cref="T:FsMake.PipelineModule.Builder" /> computation expression.
     /// The <c>pipeline</c> parameter is an exsting pipeline to use as a base.
     /// This does not modify the existing <see cref="T:Pipeline" />, it returns a new <see cref="T:Pipeline" /> with additional stages.
     /// </summary>
     /// <param name="pipeline">A <see cref="T:Pipeline" /> to use as a base to build upon. A new <see cref="T:Pipeline" /> will be created from this one and have stages appended.</param>
     /// <param name="name">The name of the new <see cref="T:Pipeline" />.</param>
+    /// <returns>A <see cref="T:FsMake.PipelineModule.Builder" />.</returns>
     let createFrom (pipeline: Pipeline) (name: string) : Builder =
         Builder (name, pipeline)
 
@@ -350,7 +396,7 @@ module Pipeline =
 
         use __ = args.CancellationToken.Register (fun () -> procMonitor |> ProcessMonitor.killAll)
 
-        let context : Context =
+        let context: Context =
             {
                 Pipeline = pipeline
                 Console = args.Writer

@@ -1,4 +1,4 @@
-#r "nuget: FsMake, 0.3.0-beta.1"
+#r "nuget: FsMake, 0.3.0"
 
 open FsMake
 open System
@@ -6,17 +6,17 @@ open System.IO
 open System.Text.Json
 
 let args = fsi.CommandLineArgs
-let isRelease = EnvVar.getOptionAs<bool> "RELEASING" |> Option.contains true
-let useAnsi = EnvVar.getOptionAs<bool> "ANSI" |> Option.contains true
-let buildConfig = EnvVar.getOption "BUILD_CONFIG"
-let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
+let shouldClean = EnvVar.getOptionAs<int> "CLEAN" |> Option.contains 1
+let isRelease = EnvVar.getOptionAs<int> "RELEASING" |> Option.contains 1
+let useAnsi = EnvVar.getOptionAs<int> "ANSI" |> Option.contains 1
+let buildConfig = EnvVar.getOption "BUILD_CONFIG" |> Option.defaultValue "Debug"
 
 let nugetListPkg = EnvVar.getOptionAs<bool> "NUGET_LIST_PKG" |> Option.contains true
 
 let getNugetApiKey = EnvVar.getOrFail "NUGET_API_KEY"
 let getGithubToken = EnvVar.getOrFail "GITHUB_TOKEN"
 
-let getGitversion =
+let makeGitversion =
     Cmd.createWithArgs "dotnet" [ "gitversion" ]
     |> Cmd.redirectOutput Cmd.RedirectToBoth
     |> Cmd.result
@@ -33,8 +33,8 @@ let clean =
     Step.create "clean" {
         let! ctx = Step.context
 
-        // only clean if --clean is specified
-        if ctx.ExtraArgs |> List.contains "--clean" then
+        // only clean if CLEAN=1 is specified
+        if shouldClean then
             Glob.create "nupkgs/*"
             |> Glob.add ".fsdocs/*"
             |> Glob.toPaths
@@ -48,19 +48,19 @@ let clean =
             do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
         else
             Console.warn "Skipping clean, "
-            |> Console.appendParts [ Console.Token "--clean"; Console.Text " not specified" ]
+            |> Console.appendParts [ Console.Token "CLEAN=1"; Console.Text " env var not set" ]
             |> ctx.Console.WriteLine
     }
 
-let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
-
 let restore = Step.create "restore" { do! Cmd.createWithArgs "dotnet" [ "restore" ] |> Cmd.run }
+
+let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
 
 let build =
     Step.create "build" {
         do!
             Cmd.createWithArgs "dotnet" [ "build"; "--warnaserror" ]
-            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.argMaybe useAnsi "/consoleloggerparameters:ForceConsoleColor"
             |> Cmd.run
     }
@@ -68,23 +68,23 @@ let build =
 let ``test:format`` = Step.create "test:format" { do! Cmd.createWithArgs "dotnet" [ "fantomas"; "-r"; "."; "--check" ] |> Cmd.run }
 let ``test:lint`` = Step.create "test:lint" { do! Cmd.createWithArgs "dotnet" [ "fsharplint"; "lint"; "FsMake.sln" ] |> Cmd.run }
 
-let ``test:unit`` =
-    Step.create "test:unit" {
+let ``test:tests`` =
+    Step.create "test:tests" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
-            |> Cmd.argsOption buildConfigArg
-            |> Cmd.workingDir "FsMake.UnitTests"
+            |> Cmd.args [ "-c"; buildConfig ]
+            |> Cmd.workingDir "FsMake.Tests"
             |> Cmd.run
     }
 
 let ``nupkg:create`` =
     Step.create "nupkg:create" {
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
 
         do!
             Cmd.createWithArgs "dotnet" [ "pack"; "--no-build" ]
-            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.args [ $"/p:Version=%s{semver}"; "-o"; "nupkgs"; "FsMake" ]
             |> Cmd.run
     }
@@ -93,7 +93,7 @@ let ``nupkg:push`` =
     Step.create "nupkg:push" {
         let! nugetApiKey = getNugetApiKey
         let! ctx = Step.context
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
         let pkg = $"nupkgs/FsMake.%s{semver}.nupkg"
 
@@ -125,13 +125,13 @@ let docs =
         do!
             Cmd.createWithArgs "dotnet" [ "fsdocs"; "build" ]
             |> Cmd.args [ "--output"; "docs-output" ]
-            |> Cmd.argsOption (buildConfig |> Option.map (fun x -> [ "--properties"; $"Configuration={x}" ]))
+            |> Cmd.args [ "--properties"; $"Configuration={buildConfig}" ]
             |> Cmd.run
     }
 
 let ``github:pages`` =
     Step.create "github:pages" {
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
 
         do! Cmd.createWithArgs "git" [ "stash"; "-u" ] |> Cmd.run
         do! Cmd.createWithArgs "git" [ "fetch" ] |> Cmd.run
@@ -148,8 +148,8 @@ let ``github:pages`` =
 
         Glob.create "docs-output/**"
         |> Glob.toPathTypes
-        |> Seq.iter
-            (function
+        |> Seq.iter (
+            function
             | Glob.File x ->
                 let newPath = Path.GetRelativePath (rootDir, x)
                 let newDir = Path.GetDirectoryName (newPath)
@@ -158,7 +158,8 @@ let ``github:pages`` =
                     Directory.CreateDirectory (newDir) |> ignore
 
                 File.Move (x, newPath)
-            | _ -> ())
+            | _ -> ()
+        )
 
         do! Cmd.createWithArgs "git" [ "add"; "." ] |> Cmd.run
 
@@ -185,7 +186,7 @@ let ``github:pages`` =
 let ``github:release`` =
     Step.create "github:release" {
         let! githubToken = getGithubToken
-        let! gitversion = getGitversion
+        let! gitversion = makeGitversion
         let semver = gitversion.SemVer
         let isPre = gitversion.PreReleaseNumber.HasValue
         let milestone = gitversion.MajorMinorPatch
@@ -209,7 +210,7 @@ Pipelines.create {
             run build
         }
 
-    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:unit`` ] }
+    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:tests`` ] }
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run ``nupkg:create`` }
 
@@ -225,4 +226,4 @@ Pipelines.create {
 
     default_pipeline build
 }
-|> Pipelines.runWithArgs args
+|> Pipelines.runWithArgsAndExit args

@@ -7,13 +7,46 @@ open System
 /// </summary>
 type MakeContext =
     {
+
+        /// <summary>
+        /// Gets the name of the currently executing <see cref="T:Pipeline" />.
+        /// </summary>
         PipelineName: string
+
+        /// <summary>
+        /// Gets the name of the currently execting <see cref="T:Step" />.
+        /// </summary>
         StepName: string
+
+        /// <summary>
+        /// Gets a <c>bool</c> indicating if the <see cref="T:Step" /> is running in parallel.
+        /// </summary>
         IsParallel: bool
+
+        /// <summary>
+        /// Gets the current <see cref="T:Console.IWriter" /> that can be used to write to the console.
+        /// </summary>
         Console: Console.IWriter
+
+        /// <summary>
+        /// Gets the console prefix for the current <see cref="T:Step" />.
+        /// </summary>
         Prefix: Console.TextPart
+
+        /// <summary>
+        /// Gets the globally configured <see cref="T:Prefix.PrefixOption" />.
+        /// </summary>
         PrefixOption: Prefix.PrefixOption
+
+        /// <summary>
+        /// Gets the <see cref="T:ProcessMonitor.Agent" /> for the currently running <see cref="T:Pipeline" />.
+        /// </summary>
         ProcessMonitor: ProcessMonitor.Agent
+
+        /// <summary>
+        /// Gets the extra arguments passed to the runner.
+        /// <para>These are arguments that were passed after "--". eg. <c>dotnet fsi build.fsx build -- --clean</c></para>
+        /// </summary>
         ExtraArgs: string list
     }
 
@@ -163,7 +196,7 @@ module Make =
     /// let emptyMake : Make&lt;unit&gt; = Make.zero
     /// </code>
     /// </example>
-    let zero : Make<unit> = fun _ -> Ok ()
+    let zero: Make<unit> = fun _ -> Ok ()
 
     /// <summary>
     /// Wraps a value in a <see cref="T:Make`1" />.
@@ -198,7 +231,7 @@ module Make =
     ///     }
     /// </code>
     /// </example>
-    let context : Make<MakeContext> = Ok
+    let context: Make<MakeContext> = Ok
 
     /// <summary>
     /// Fails the current <see cref="T:Make`1" /> with a message.
@@ -325,7 +358,7 @@ module Make =
     /// </example>
     let retry (attempts: int) (make: Make<'T>) : Make<'T> =
         let rec nextRetry attempted ctx =
-            let prefixArgs : Prefix.Internal.OptionalPrefixArgs =
+            let prefixArgs: Prefix.Internal.OptionalPrefixArgs =
                 {
                     IsParallel = ctx.IsParallel
                     PrefixOption = ctx.PrefixOption

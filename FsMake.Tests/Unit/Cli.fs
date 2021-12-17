@@ -1,9 +1,10 @@
-module FsMake.UnitTests.CliTests
+module FsMake.Tests.Unit.Cli
 
 open Expecto
 open Expecto.Flip
 open FsCheck
 open FsMake
+open FsMake.Tests
 
 module Gen =
     type HelpArgs = HelpArgs of string array
@@ -27,23 +28,29 @@ module Gen =
             arbitrary = typeof<HelpArgs>.DeclaringType :: FsCheckConfig.defaultConfig.arbitrary
         }
 
-[<Tests>]
 let tests =
     testList
         "Cli tests"
         [
-            test "parseArgs should parse script file" {
+            test "parseArgs should parse .fsx file" {
                 let parsed = [| "test.fsx" |] |> Cli.parseArgs
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
-                teste <@ args.ScriptFile = Some "test.fsx" @>
+                teste <@ args.Executable = Some (Cli.ExecutableType.Fsx "test.fsx") @>
+            }
+
+            test "parseArgs should parse .dll file" {
+                let parsed = [| "test.dll" |] |> Cli.parseArgs
+
+                let args = parsed |> Expect.wantOk "parsed should be Ok"
+                teste <@ args.Executable = Some (Cli.ExecutableType.Dll "test.dll") @>
             }
 
             test "parseArgs should not match non script file arg" {
                 let parsed = [| "test" |] |> Cli.parseArgs
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
-                teste <@ args.ScriptFile = None @>
+                teste <@ args.Executable = None @>
             }
 
             test "parseArgs should parse second arg as pipeline when script file arg" {

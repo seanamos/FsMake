@@ -9,14 +9,32 @@ open System.Text.RegularExpressions
 /// </summary>
 type Glob =
     {
+        /// <summary>
+        /// Gets the root directory of the <see cref="T:Glob" />.
+        /// </summary>
         RootDirectory: string
+
+        /// <summary>
+        /// Gets the include patterns.
+        /// </summary>
         Include: string list
+
+        /// <summary>
+        /// Gets the exclude patterns.
+        /// </summary>
         Exclude: string list
     }
 
 /// <summary>
-/// Module for creating and working a <see cref="T:Glob" />.
+/// Module for creating and working with a <see cref="T:Glob" />.
+/// <para>A <see cref="T:Glob" /> represents a set of patterns to include/exclude files.</para>
 /// </summary>
+/// <example>
+/// <code lang="fsharp">
+/// // search recursively for all files with a .dll file extension
+/// let dlls = Glob.create "**/*.dll" |> Glob.toPaths
+/// </code>
+/// </example>
 module Glob =
     [<AutoOpen>]
     module internal Internal =

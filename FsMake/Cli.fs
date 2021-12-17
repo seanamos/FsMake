@@ -1,5 +1,7 @@
 namespace FsMake
 
+open System
+open System.IO
 open System.Reflection
 
 module internal Cli =
@@ -45,30 +47,56 @@ module internal Cli =
                 |> Console.appendToken option
             | InvalidArgument arg -> Console.error "Invalid argument " |> Console.appendToken arg
 
-    type Args =
+    [<RequireQualifiedAccess>]
+    type ExecutableType =
+        | Fsx of string
+        | Dll of string
+
+    type ParsedArgs =
         {
             PrintHelp: bool
-            ScriptFile: string option
+            Executable: ExecutableType option
             Pipeline: string option
             ConsoleOutput: ConsoleOutput
             Verbosity: Verbosity
             ExtraArgs: string list
         }
 
-    let printUsage (writer: Console.IWriter) (args: Args) (errors: ParseError list) : unit =
+    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) (pipelines: Pipeline list) : unit =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
 
-        let scriptFile = args.ScriptFile |> Option.defaultValue "<script>.fsx"
+        let usageText =
+            match args.Executable with
+            | Some x ->
+                match x with
+                | ExecutableType.Fsx file -> $"dotnet fsi {file}"
+                | ExecutableType.Dll file ->
+                    let file = file |> Path.GetFileName |> Path.GetFileNameWithoutExtension
+                    $"dotnet run {file}"
+            | _ -> "dotnet fsi <script>.fsx"
 
-        let usage =
+        let pipelineText =
+            if pipelines.Length > 0 then
+                pipelines
+                |> List.rev
+                |> List.map (fun x -> $"  {x.Name}")
+                |> String.concat Environment.NewLine
+            else
+                "  No pipelines"
+
+        let helpText =
             @$"
-Usage: dotnet fsi {scriptFile} [pipeline] [options] [-- extra args]
+Usage: {usageText} [pipeline] [options] [-- extra args]
+
 Options:
   --help                                       Shows help and usage information
   -v, --verbosity <disabled|quiet|normal|all>  The verbosity level of FsMake's output [default: normal]
-  -o, --console-output <standard|ansi>         The type of console output produced by FsMake"
+  -o, --console-output <standard|ansi>         The type of console output produced by FsMake
+
+Pipelines:
+{pipelineText}"
 
         Console.Important
         |> Console.message "FsMake "
@@ -80,13 +108,13 @@ Options:
 
             errors |> List.iter (ParseError.toConsoleMessage >> writer.WriteLine)
 
-        Console.Important |> Console.message usage |> writer.WriteLine
+        Console.Important |> Console.message helpText |> writer.WriteLine
 
     type ParserState =
         | NormalArgs
         | ExtraArgs
 
-    let parseArgs (args: string array) : Result<Args, Args * ParseError list> =
+    let parseArgs (args: string array) : Result<ParsedArgs, ParsedArgs * ParseError list> =
         let args = args |> List.ofArray
 
         let rec parseNextArg remArgs errors idx state options =
@@ -123,8 +151,17 @@ Options:
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
             | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
-                match (idx, options.ScriptFile) with
-                | (0, _) when x.EndsWith (".fsx") -> { options with ScriptFile = Some x } |> parseNextArg xs errors (idx + 1) state
+                match (idx, options.Executable) with
+                | (0, _) when x.EndsWith (".fsx") ->
+                    { options with
+                        Executable = Some (ExecutableType.Fsx x)
+                    }
+                    |> parseNextArg xs errors (idx + 1) state
+                | (0, _) when x.EndsWith (".dll") ->
+                    { options with
+                        Executable = Some (ExecutableType.Dll x)
+                    }
+                    |> parseNextArg xs errors (idx + 1) state
                 | (0, _)
                 | (1, Some _) -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
                 | _ -> options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
@@ -137,7 +174,7 @@ Options:
         let (args, errors) =
             {
                 PrintHelp = false
-                ScriptFile = None
+                Executable = None
                 Pipeline = None
                 ConsoleOutput = Standard
                 Verbosity = Normal

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Core.fs" />
+    <Compile Include="Integration\Cmd.fs" />
+    <Compile Include="Integration\EnvVar.fs" />
+    <Compile Include="Integration\Pipelines.fs" />
+    <Compile Include="Unit\Console.fs" />
+    <Compile Include="Unit\Cli.fs" />
+    <Compile Include="Unit\Glob.fs" />
+    <Compile Include="Unit\Make.fs" />
+    <Compile Include="Unit\Step.fs" />
+    <Compile Include="Unit\Pipeline.fs" />
+    <Compile Include="Unit\Pipelines.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FsMake\FsMake.fsproj" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

@@ -1,10 +1,10 @@
-module FsMake.UnitTests.StepTests
+module FsMake.Tests.Unit.Step
 
 open Expecto
 open Expecto.Flip
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let tests =
     let consoleWriter =
         { new Console.IWriter with
@@ -14,7 +14,7 @@ let tests =
 
     let procMon = ProcessMonitor.create consoleWriter
 
-    let ctx : MakeContext =
+    let ctx: MakeContext =
         {
             PipelineName = "testPipeline"
             StepName = "testStep"

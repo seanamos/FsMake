@@ -37,17 +37,19 @@ module Cmd =
     module internal Arg =
         let toUnsafeStrList (args: Arg list) : string list =
             args
-            |> List.map
-                (function
+            |> List.map (
+                function
                 | ArgText x -> x
-                | ArgSecret x -> x)
+                | ArgSecret x -> x
+            )
 
         let toSafeStrList (args: Arg list) : string list =
             args
-            |> List.map
-                (function
+            |> List.map (
+                function
                 | ArgText x -> x
-                | ArgSecret _ -> "**masked**")
+                | ArgSecret _ -> "**masked**"
+            )
 
     /// <summary>
     /// Prefix options, sets when to prefix the output with the step name.
@@ -83,12 +85,37 @@ module Cmd =
     /// <summary>
     /// Contains the redirected std and stderr output of a process.
     /// </summary>
-    type RedirectedOutput = { Std: string; StdErr: string }
+    type RedirectedOutput =
+        {
+
+            /// <summary>
+            /// Gets the redirected std output.
+            /// </summary>
+            Std: string
+
+
+            /// <summary>
+            /// Gets the redirected stderr output.
+            /// </summary>
+            StdErr: string
+        }
 
     /// <summary>
     /// Contains the exit code and output of a process (if redirected).
     /// </summary>
-    type ProcessResult<'a> = { ExitCode: int; Output: 'a }
+    type ProcessResult<'a> =
+        {
+            /// <summary>
+            /// Gets the exit code returned by the process.
+            /// </summary>
+            ExitCode: int
+
+
+            /// <summary>
+            ///  Gets the process' output (if redirected).
+            /// </summary>
+            Output: 'a
+        }
 
     /// <summary>
     /// Process exit code check options.

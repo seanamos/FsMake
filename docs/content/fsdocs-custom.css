@@ -1,3 +1,126 @@
+body {
+    background-color: #0a0c10;
+    color: #f0f3f6;
+}
+
+hr {
+	border-top: 1px solid rgb(255, 255, 255, 0.2);
+}
+
+.bg-secondary {
+    background-color: #0a0c10 !important;
+}
+
+.masthead .muted a {
+    color: #fff;
+}
+
+#fsdocs-nav a {
+	color: #58a6ff;
+}
+
+#fsdocs-nav li.nav-header {
+	color: #fff;
+}
+
+#fsdocs-content p {
+	color: #f0f3f6;
+}
+
+#fsdocs-content h1 a,
+#fsdocs-content h1 a:hover,
+#fsdocs-content h1 a:focus,
+#fsdocs-content h2 a,
+#fsdocs-content h2 a:hover,
+#fsdocs-content h2 a:focus,
+#fsdocs-content h3 a,
+#fsdocs-content h3 a:hover,
+#fsdocs-content h3 a:focus,
+#fsdocs-content h4 a,
+#fsdocs-content h4 a:hover,
+#fsdocs-content h4 a:focus,
+#fsdocs-content h5 a,
+#fsdocs-content h5 a:hover,
+#fsdocs-content h5 a:focus,
+#fsdocs-content h6 a,
+#fsdocs-content h6 a:hover,
+#fsdocs-content h6 a:focus {
+	color: #fff;
+}
+
 #fsdocs-content table.pre {
     margin: 0 0 1em;
+}
+
+#fsdocs-content table.pre, #fsdocs-content pre.fssnip, #fsdocs-content pre {
+	background-color: #161b22;
+	border-radius: 5px;
+	color: #c6c6c6;
+}
+
+.table {
+	color: #c6c6c6;
+}
+
+#fsdocs-content a {
+	color: #58a6ff;
+}
+
+/* Code formatting */
+
+#fsdocs-content span.s {
+	color: #f1fa8c;
+}
+
+.pp {
+	color: #f1fa8c;
+}
+
+#fsdocs-content span.k {
+	color: #ff79c6;
+}
+
+#fsdocs-content span.id {
+	color: #50fa7b;
+}
+
+#fsdocs-content span.m {
+	color: #f0f3f6;
+}
+
+#fsdocs-content span.pn {
+	color: #ff79c6;
+}
+
+#fsdocs-content span.o {
+	color: #ff79c6;
+}
+
+#fsdocs-content span.fn {
+	color: #50fa7b;
+}
+
+#fsdocs-content span.rt {
+	color: #8be9fd;
+}
+
+/* API ref */
+div.fsdocs-source-link {
+	display: none;
+}
+
+.fsdocs-example-header {
+	color: #fff;
+}
+
+.fsdocs-xmldoc, .fsdocs-entity-xmldoc, .fsdocs-member-xmldoc {
+	color: #c6c6c6;
+}
+
+div.fsdocs-tip {
+    background: #47455f;
+    color: #f0f3f6;
+    border-color: #f0f3f6;
+    border-width: 1px;
+    border-style: solid;
 }

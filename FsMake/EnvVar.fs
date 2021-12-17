@@ -101,11 +101,9 @@ module EnvVar =
     /// </code>
     /// </example>
     let getOrFail (name: string) : Make<string> =
-        make {
-            let opt = getOption name
+        let opt = getOption name
 
-            return! opt |> someOrFail name |> Make.memo
-        }
+        opt |> someOrFail name
 
     /// <summary>
     /// Gets an environment variable by name and converts it to the specified type.
@@ -128,8 +126,6 @@ module EnvVar =
     /// </code>
     /// </example>
     let getAsOrFail<'T when 'T: struct> (name: string) : Make<'T> =
-        memo {
-            let opt = getOptionAs<'T> name
+        let opt = getOptionAs<'T> name
 
-            return! opt |> someOrFail name |> Make.memo
-        }
+        opt |> someOrFail name

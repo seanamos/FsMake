@@ -1,9 +1,9 @@
-module FsMake.UnitTests.PipelinesTests
+module FsMake.Tests.Unit.Pipelines
 
 open Expecto
 open FsMake
+open FsMake.Tests
 
-[<Tests>]
 let tests =
     testList
         "Pipelines tests"
