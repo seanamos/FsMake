@@ -6,10 +6,10 @@ open System.IO
 open System.Text.Json
 
 let args = fsi.CommandLineArgs
-let isRelease = EnvVar.getOptionAs<bool> "RELEASING" |> Option.contains true
-let useAnsi = EnvVar.getOptionAs<bool> "ANSI" |> Option.contains true
-let buildConfig = EnvVar.getOption "BUILD_CONFIG"
-let buildConfigArg = buildConfig |> Option.map (fun x -> [ "-c"; x ])
+let shouldClean = EnvVar.getOptionAs<int> "CLEAN" |> Option.contains 1
+let isRelease = EnvVar.getOptionAs<int> "RELEASING" |> Option.contains 1
+let useAnsi = EnvVar.getOptionAs<int> "ANSI" |> Option.contains 1
+let buildConfig = EnvVar.getOption "BUILD_CONFIG" |> Option.defaultValue "Debug"
 
 let nugetListPkg = EnvVar.getOptionAs<bool> "NUGET_LIST_PKG" |> Option.contains true
 
@@ -33,8 +33,8 @@ let clean =
     Step.create "clean" {
         let! ctx = Step.context
 
-        // only clean if --clean is specified
-        if ctx.ExtraArgs |> List.contains "--clean" then
+        // only clean if CLEAN=1 is specified
+        if shouldClean then
             Glob.create "nupkgs/*"
             |> Glob.add ".fsdocs/*"
             |> Glob.toPaths
@@ -48,8 +48,15 @@ let clean =
             do! Cmd.createWithArgs "dotnet" [ "clean"; "-v"; "m" ] |> Cmd.run
         else
             Console.warn "Skipping clean, "
-            |> Console.appendParts [ Console.Token "--clean"; Console.Text " not specified" ]
+            |> Console.appendParts [ Console.Token "CLEAN=1"; Console.Text " env var not set" ]
             |> ctx.Console.WriteLine
+    }
+
+let restore =
+    Step.create "restore" {
+        do!
+            Cmd.createWithArgs "dotnet" [ "restore" ]
+            |> Cmd.run
     }
 
 let assemblyinfo = Step.create "assemblyinfo" { do! Cmd.createWithArgs "dotnet" [ "gitversion"; "/updateassemblyinfo" ] |> Cmd.run }
@@ -58,7 +65,7 @@ let build =
     Step.create "build" {
         do!
             Cmd.createWithArgs "dotnet" [ "build"; "--warnaserror" ]
-            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.argMaybe useAnsi "/consoleloggerparameters:ForceConsoleColor"
             |> Cmd.run
     }
@@ -70,7 +77,7 @@ let ``test:tests`` =
     Step.create "test:tests" {
         do!
             Cmd.createWithArgs "dotnet" [ "run"; "--no-build" ]
-            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.workingDir "FsMake.Tests"
             |> Cmd.run
     }
@@ -82,7 +89,7 @@ let ``nupkg:create`` =
 
         do!
             Cmd.createWithArgs "dotnet" [ "pack"; "--no-build" ]
-            |> Cmd.argsOption buildConfigArg
+            |> Cmd.args [ "-c"; buildConfig ]
             |> Cmd.args [ $"/p:Version=%s{semver}"; "-o"; "nupkgs"; "FsMake" ]
             |> Cmd.run
     }
@@ -123,7 +130,7 @@ let docs =
         do!
             Cmd.createWithArgs "dotnet" [ "fsdocs"; "build" ]
             |> Cmd.args [ "--output"; "docs-output" ]
-            |> Cmd.argsOption (buildConfig |> Option.map (fun x -> [ "--properties"; $"Configuration={x}" ]))
+            |> Cmd.args [ "--properties"; $"Configuration={buildConfig}" ]
             |> Cmd.run
     }
 
@@ -203,6 +210,7 @@ Pipelines.create {
     let! build =
         Pipeline.create "build" {
             run clean
+            run restore
             maybe_run assemblyinfo isRelease
             run build
         }

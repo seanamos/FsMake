@@ -21,8 +21,8 @@ on:
         default: "true"
 
 env:
-  RELEASING: "true"
-  ANSI: "true"
+  RELEASING: "1"
+  ANSI: "1"
   BUILD_CONFIG: Release
   NUGET_LIST_PKG: ${{ github.event.inputs.list_pkg }}
   PUBLISH_TO_NUGET: ${{ github.event.inputs.publish_to_nuget }}
@@ -48,7 +48,7 @@ jobs:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: |
         [ "${PUBLISH_TO_NUGET}" != "true" ] && exit 0
-        ./build.sh publish:nupkg -o ansi -- --clean
+        CLEAN=1 ./build.sh publish:nupkg -o ansi
 
   github-pages:
     if: ${{ github.event.inputs.github_pages == 'true' }}
@@ -78,7 +78,7 @@ jobs:
         git config --global user.email '${{ github.actor }}@users.noreply.github.com'
 
     - name: Github Pages
-      run: ./build.sh github:pages -o ansi -- --clean
+      run: CLEAN=1 ./build.sh github:pages -o ansi
 
   github-release:
     if: ${{ github.event.inputs.github_release == 'true' }}

@@ -3,7 +3,7 @@ name: Test incoming commits
 on: [ push, pull_request ]
 
 env:
-  ANSI: "true"
+  ANSI: "1"
   BUILD_CONFIG: Release
 
 jobs:
