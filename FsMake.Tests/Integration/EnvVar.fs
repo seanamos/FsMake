@@ -144,4 +144,34 @@ let tests =
 
                 result |> Expect.isError "Expected Error when env var cannot be converted"
             }
+
+            test "set sets environment variable" {
+                let envVar = (Guid.NewGuid().ToString (), Guid.NewGuid().ToString ())
+                let (key, value) = envVar
+
+                EnvVar.set envVar
+
+                let result = EnvVar.get key
+
+                result |> Expect.equal "Environment variable value did not match expected" value
+            }
+
+            test "setMany sets all environment variables" {
+                let envVars =
+                    [
+                        (Guid.NewGuid().ToString (), Guid.NewGuid.ToString ())
+                        (Guid.NewGuid().ToString (), Guid.NewGuid.ToString ())
+                        (Guid.NewGuid().ToString (), Guid.NewGuid.ToString ())
+                        (Guid.NewGuid().ToString (), Guid.NewGuid.ToString ())
+                    ]
+
+                EnvVar.setMany envVars
+
+                envVars
+                |> List.iter (fun (key, value) ->
+                    let result = EnvVar.get key
+
+                    result |> Expect.equal "Environment variable value did not match expected" value
+                )
+            }
         ]
