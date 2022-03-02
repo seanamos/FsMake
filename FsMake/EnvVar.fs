@@ -9,8 +9,7 @@ open System.ComponentModel
 module EnvVar =
 
     /// <summary>
-    /// The exception that is thrown when an environment variable with a given name
-    /// could not be found.
+    /// The exception that is thrown when an environment variable with a given name could not be found.
     /// </summary>
     /// <param name="envVar">The name of the environment variable.</param>
     type NotFoundException(envVar: string) =
@@ -34,7 +33,7 @@ module EnvVar =
     /// Gets an environment variable by name.
     /// </summary>
     /// <param name="name">The name of the env var to get.</param>
-    /// <returns><c>Some</c> if env var exists, <c>None</c> if it does not.</returns>
+    /// <returns><c>Some</c> if env var exists, <c>None</c> if it does not exist.</returns>
     let getOption (name: string) : Option<string> =
         let var = Environment.GetEnvironmentVariable (name)
 
@@ -59,7 +58,7 @@ module EnvVar =
     /// </summary>
     /// <param name="name">The name of the env var to get.</param>
     /// <typeparam name="'T">The type to convert the env var to.</typeparam>
-    /// <returns><c>Some</c> if the env var exists and can be converted, <c>None</c> if it does not or cannot be converted.</returns>
+    /// <returns><c>Some</c> if the env var exists and can be converted, <c>None</c> if it does not exist or cannot be converted.</returns>
     let getOptionAs<'T when 'T: struct> (name: string) =
         try
             let var = getAs<'T> name
@@ -129,3 +128,19 @@ module EnvVar =
         let opt = getOptionAs<'T> name
 
         opt |> someOrFail name
+
+    /// <summary>
+    /// Sets the specified environment variable.
+    /// </summary>
+    /// <param name="envVar">A pair representing the name and value of the environment variable.</param>
+    /// <returns>A <see cref="T:unit" /> when complete.</returns>
+    let set (envVar: string * string) : unit =
+        envVar |> Environment.SetEnvironmentVariable
+
+    /// <summary>
+    /// Sets the specified <see cref="T:seq`1" /> of environment variables.
+    /// </summary>
+    /// <param name="envVars">A <see cref="T:seq`1" /> of pairs representing the names and values of the environment variables.</param>
+    /// <returns>A <see cref="T:unit" /> when complete.</returns>
+    let setMany (envVars: (string * string) seq) : unit =
+        envVars |> Seq.iter set
