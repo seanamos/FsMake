@@ -1,6 +1,7 @@
 body {
     background-color: #0a0c10;
     color: #f0f3f6;
+    padding-top: 45px;
 }
 
 hr {
@@ -123,4 +124,16 @@ div.fsdocs-tip {
     border-color: #f0f3f6;
     border-width: 1px;
     border-style: solid;
+}
+
+.navbar {
+    padding-bottom: 15px;
+}
+
+.navbar-light .navbar-toggler {
+    border-color: #f0f3f6;
+}
+
+.navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='48' height='36' viewBox='0 0 48 36' fill='rgb(255,255,255)'%3E%3Crect x='16' y='8' width='21' height='4' /%3E%3Crect x='16' y='15' width='21' height='4' /%3E%3Crect x='16' y='22' width='21' height='4' /%3E%3C/svg>");
 }
