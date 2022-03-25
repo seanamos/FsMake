@@ -29,11 +29,11 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-light bg-secondary navbar-nav-scroll fixed-left" id="fsdocs-nav">
+    <nav class="navbar navbar-expand-md navbar-light bg-secondary container fixed-left" id="fsdocs-nav">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <div class="collapse navbar-collapse navbar-nav-scroll" id="navbarsExampleDefault">
             <a href="https://seanamos.github.io/FsMake"><img id="fsdocs-logo" src="https://seanamos.github.io/FsMake/img/logo.png" /></a>
             <!-- BEGIN SEARCH BOX: this adds support for the search box -->
             <div id="header">
@@ -152,14 +152,13 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L16-16" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L15-15" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- The exception that is thrown when an environment variable with a given name
- could not be found.
+ The exception that is thrown when an environment variable with a given name could not be found.
  
               </p>
             </div>
@@ -236,7 +235,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L25-25" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L24-24" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -339,7 +338,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L51-51" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L50-50" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -452,7 +451,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L128-128" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L127-127" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -542,7 +541,7 @@
                     Returns: 
                     <code><span><a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-core-fsharpoption-1">Option</a>&lt;string&gt;</span></code>
                   </span>
-                  <code>Some</code> if env var exists, <code>None</code> if it does not.
+                  <code>Some</code> if env var exists, <code>None</code> if it does not exist.
                   <br/>
                 </div>
               </div>
@@ -558,7 +557,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L38-38" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L37-37" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -591,7 +590,7 @@
               </dt>
               <dd class="fsdocs-return-docs">
                 <p>
-                  <code>Some</code> if env var exists, <code>None</code> if it does not.
+                  <code>Some</code> if env var exists, <code>None</code> if it does not exist.
                 </p>
               </dd>
             </dl>
@@ -633,7 +632,7 @@
                     Returns: 
                     <code><span>'T&#32;option</span></code>
                   </span>
-                  <code>Some</code> if the env var exists and can be converted, <code>None</code> if it does not or cannot be converted.
+                  <code>Some</code> if the env var exists and can be converted, <code>None</code> if it does not exist or cannot be converted.
                   <br/>
                 </div>
               </div>
@@ -649,7 +648,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L63-63" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L62-62" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -682,7 +681,7 @@
               </dt>
               <dd class="fsdocs-return-docs">
                 <p>
-                  <code>Some</code> if the env var exists and can be converted, <code>None</code> if it does not or cannot be converted.
+                  <code>Some</code> if the env var exists and can be converted, <code>None</code> if it does not exist or cannot be converted.
                 </p>
               </dd>
             </dl>
@@ -740,7 +739,7 @@
                 <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L103-103" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L102-102" class="fsdocs-source-link">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
                 <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
               </a>
@@ -794,6 +793,160 @@
             </p>
           </td>
         </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '43', 43)" onmouseover="showTip(event, '43', 43)">
+                <p>
+                  <a id="set">
+                    <a href="#set">
+                      <code><span>set&#32;<span><span>(<span>arg1,&#32;arg2</span>)</span></span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="43">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>set&#32;<span><span>(<span>arg1,&#32;arg2</span>)</span></span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        arg0
+                      </b>
+                      :
+                      <code>string</code>
+                    </span>
+                    <br/>
+                    <span>
+                      <b>
+                        arg1
+                      </b>
+                      :
+                      <code>string</code>
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.EnvVar.set`')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.EnvVar.set\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L137-137" class="fsdocs-source-link">
+                <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+ Sets the specified environment variable.
+ 
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  arg0
+                </span>
+                :
+                <code>string</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  arg1
+                </span>
+                :
+                <code>string</code>
+              </dt>
+              <dd class="fsdocs-param-docs"></dd>
+            </dl>
+          </td>
+        </tr>
+        <tr>
+          <td class="fsdocs-member-usage">
+            <div>
+              <code onmouseout="hideTip(event, '44', 44)" onmouseover="showTip(event, '44', 44)">
+                <p>
+                  <a id="setMany">
+                    <a href="#setMany">
+                      <code><span>setMany&#32;<span>envVars</span></span></code>
+                    </a>
+                  </a>
+                </p>
+              </code>
+              <div class="fsdocs-tip" id="44">
+                <div class="member-tooltip">
+                  Full Usage: 
+                  <code><span>setMany&#32;<span>envVars</span></span></code>
+                  <br/>
+                  <br/>
+                  Parameters: 
+                  <ul>
+                    <span>
+                      <b>
+                        envVars
+                      </b>
+                      :
+                      <code><span>seq&lt;<span>string&#32;*&#32;string</span>&gt;</span></code>
+                       - 
+                      A <a href="https://docs.microsoft.com/dotnet/api/seq-1">seq</a> of pairs representing the names and values of the environment variables.
+                    </span>
+                    <br/>
+                  </ul>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="fsdocs-member-xmldoc">
+            <div class="fsdocs-summary">
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.EnvVar.setMany`')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+              </div>
+              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.EnvVar.setMany\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              </div>
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/EnvVar.fs#L145-145" class="fsdocs-source-link">
+                <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+              </a>
+              <p class="fsdocs-summary">
+                
+ Sets the specified <a href="https://docs.microsoft.com/dotnet/api/seq-1">seq</a> of environment variables.
+ 
+              </p>
+            </div>
+            <dl class="fsdocs-params">
+              <dt class="fsdocs-param">
+                <span class="fsdocs-param-name">
+                  envVars
+                </span>
+                :
+                <code><span>seq&lt;<span>string&#32;*&#32;string</span>&gt;</span></code>
+              </dt>
+              <dd class="fsdocs-param-docs">
+                <p>
+                  A <a href="https://docs.microsoft.com/dotnet/api/seq-1">seq</a> of pairs representing the names and values of the environment variables.
+                </p>
+              </dd>
+            </dl>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -820,4 +973,3 @@
 </body>
 
 </html>
-
