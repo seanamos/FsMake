@@ -117,65 +117,76 @@ let regexTests =
         [
             test "Directory matches" {
                 let parsed = ParsedPattern.create "/tmp" "dir"
+                printfn "%A" parsed
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ regex.IsMatch "/tmp/dir" @>
+                let path = "/tmp/dir" |> normalizePathSeperator
+                teste <@ regex.IsMatch path @>
             }
 
             test "Directory does not match" {
                 let parsed = ParsedPattern.create "/tmp" "dir"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ not <| regex.IsMatch "/tmp/notmatch" @>
+                let path = "/tmp/notmatch" |> normalizePathSeperator
+                teste <@ not <| regex.IsMatch path @>
             }
 
             test "Recursive matches" {
                 let parsed = ParsedPattern.create "/tmp" "dir/**/file"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ regex.IsMatch "/tmp/dir/dir2/dir3/file" @>
+                let path = "/tmp/dir/dir2/dir3/file" |> normalizePathSeperator
+                teste <@ regex.IsMatch path @>
             }
 
             test "Recursive does not match" {
                 let parsed = ParsedPattern.create "/tmp" "dir/**/file"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ not <| regex.IsMatch "/tmp/dir/dir2/dir3/file2" @>
+                let path = "/tmp/dir/dir2/dir3/file2" |> normalizePathSeperator
+                teste <@ not <| regex.IsMatch path @>
             }
 
             test "File wildcard matches" {
                 let parsed = ParsedPattern.create "/tmp" "dir/*.ext"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ regex.IsMatch "/tmp/dir/file.ext" @>
+                let path = "/tmp/dir/file.ext" |> normalizePathSeperator
+                teste <@ regex.IsMatch path @>
             }
 
             test "File wildcard does not match" {
                 let parsed = ParsedPattern.create "/tmp" "dir/*.ext"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ not <| regex.IsMatch "/tmp/dir/file.txt" @>
+                let path = "/tmp/dir/file.txt" |> normalizePathSeperator
+                teste <@ not <| regex.IsMatch path @>
             }
 
             test "Recursive file token matches" {
                 let parsed = ParsedPattern.create "/tmp" "dir/**"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ regex.IsMatch "/tmp/dir/dir2/dir3/file.ext" @>
-                teste <@ regex.IsMatch "/tmp/dir/dir2/dir3/dir" @>
+                let path1 = "/tmp/dir/dir2/dir3/file.ext" |> normalizePathSeperator
+                let path2 = "/tmp/dir/dir2/dir3/dir" |> normalizePathSeperator
+                teste <@ regex.IsMatch path1 @>
+                teste <@ regex.IsMatch path2 @>
             }
 
             test "Recursive file token does not match" {
                 let parsed = ParsedPattern.create "/tmp" "dir/**"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ not <| regex.IsMatch "/tmp/notmatch/dir/dir2/file.ext" @>
+                let path = "/tmp/notmatch/dir/dir2/file.ext" |> normalizePathSeperator
+                teste <@ not <| regex.IsMatch path @>
             }
 
             test "Complex match" {
                 let parsed = ParsedPattern.create "/tmp" "dir/**/dir2/*/dir3/*.ext"
                 let regex = parsed |> ParsedPattern.toRegex
 
-                teste <@ regex.IsMatch "/tmp/dir/x/y/z/dir2/xyz/dir3/file.ext" @>
+                let path = "/tmp/dir/x/y/z/dir2/xyz/dir3/file.ext" |> normalizePathSeperator
+                teste <@ regex.IsMatch path @>
             }
         ]

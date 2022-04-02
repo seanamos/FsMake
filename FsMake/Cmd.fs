@@ -409,16 +409,14 @@ module Cmd =
             | ToConsole
             | ToProcess
             | ToBoth
-            | NoRedirect
 
-        let getRedirectDecision (shouldPrefix: bool) (redirect: RedirectOption option) : RedirectDecision =
+        let getRedirectDecision (redirect: RedirectOption option) : RedirectDecision =
             match redirect with
             | Some x ->
                 match x with
                 | Redirect -> ToProcess
                 | RedirectToBoth -> ToBoth
-            | None when shouldPrefix -> ToConsole
-            | None -> NoRedirect
+            | None -> ToConsole
 
         let createProcessStartInfo (redirectDecision: RedirectDecision) (opts: CmdOptions<'a>) : ProcessStartInfo =
             let startInfo = ProcessStartInfo (opts.Command)
@@ -430,11 +428,8 @@ module Cmd =
             startInfo.UseShellExecute <- false
             startInfo.CreateNoWindow <- true
 
-            match redirectDecision with
-            | NoRedirect -> ()
-            | _ ->
-                startInfo.RedirectStandardOutput <- true
-                startInfo.RedirectStandardError <- true
+            startInfo.RedirectStandardOutput <- true
+            startInfo.RedirectStandardError <- true
 
             opts.EnvVars
             |> List.iter (fun (key, value) -> startInfo.EnvironmentVariables.[key] <- value)
@@ -524,7 +519,7 @@ module Cmd =
                 | PrefixAlways -> true
                 | PrefixPipeline -> Prefix.Internal.shouldPrefix ctx.IsParallel ctx.PrefixOption
 
-            let redirectDecision = opts.Redirect |> getRedirectDecision shouldPrefix
+            let redirectDecision = opts.Redirect |> getRedirectDecision
             let startInfo = opts |> createProcessStartInfo redirectDecision
             use proc = new Process ()
             proc.StartInfo <- startInfo
@@ -576,7 +571,6 @@ module Cmd =
                 | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
                 | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
                 | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputBuilderWriters) |> beginDataRead
-                | NoRedirect -> ()
 
                 let processCompleted =
                     match opts.Timeout with
