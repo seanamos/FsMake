@@ -117,7 +117,6 @@ let regexTests =
         [
             test "Directory matches" {
                 let parsed = ParsedPattern.create "/tmp" "dir"
-                printfn "%A" parsed
                 let regex = parsed |> ParsedPattern.toRegex
 
                 let path = "/tmp/dir" |> normalizePathSeperator
