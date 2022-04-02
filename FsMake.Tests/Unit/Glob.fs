@@ -54,13 +54,13 @@ let parseTests =
             test "Root directory parsed" {
                 let parsed = ParsedPattern.create "/test" "" |> ParsedPattern.value
 
-                teste <@ parsed = [ RootDirectoryToken "/test" ] @>
+                teste <@ parsed = [ RootDirectoryToken ("/test" |> normalizePathSeperator) ] @>
             }
 
             test "Recursive wildcard parsed" {
                 let parsed = ParsedPattern.create "/test" "**" |> ParsedPattern.value
 
-                teste <@ parsed = [ RootDirectoryToken "/test"; RecursiveToken ] @>
+                teste <@ parsed = [ RootDirectoryToken ("/test" |> normalizePathSeperator); RecursiveToken ] @>
             }
 
             test "Directory/file parsed" {
@@ -68,7 +68,7 @@ let parseTests =
 
                 teste
                     <@ parsed = [
-                        RootDirectoryToken "/test"
+                        RootDirectoryToken ("/test" |> normalizePathSeperator)
                         DirectoryToken "dir"
                         FileOrDirectoryToken "file"
                     ] @>
@@ -79,7 +79,7 @@ let parseTests =
 
                 teste
                     <@ parsed = [
-                        RootDirectoryToken "/test"
+                        RootDirectoryToken ("/test" |> normalizePathSeperator)
                         DirectoryToken "dir"
                         FileOrDirectoryWildcardToken "*file"
                     ] @>
@@ -90,7 +90,7 @@ let parseTests =
 
                 teste
                     <@ parsed = [
-                        RootDirectoryToken "/test"
+                        RootDirectoryToken ("/test" |> normalizePathSeperator)
                         DirectoryWildcardToken
                         FileOrDirectoryToken "file"
                     ] @>
@@ -101,7 +101,7 @@ let parseTests =
 
                 teste
                     <@ parsed = [
-                        RootDirectoryToken "/test"
+                        RootDirectoryToken ("/test" |> normalizePathSeperator)
                         DirectoryToken "dir"
                         DirectoryWildcardToken
                         RecursiveToken

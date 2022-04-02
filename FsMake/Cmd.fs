@@ -418,7 +418,7 @@ module Cmd =
                 | RedirectToBoth -> ToBoth
             | None -> ToConsole
 
-        let createProcessStartInfo (redirectDecision: RedirectDecision) (opts: CmdOptions<'a>) : ProcessStartInfo =
+        let createProcessStartInfo (opts: CmdOptions<'a>) : ProcessStartInfo =
             let startInfo = ProcessStartInfo (opts.Command)
 
             opts.Args
@@ -520,7 +520,7 @@ module Cmd =
                 | PrefixPipeline -> Prefix.Internal.shouldPrefix ctx.IsParallel ctx.PrefixOption
 
             let redirectDecision = opts.Redirect |> getRedirectDecision
-            let startInfo = opts |> createProcessStartInfo redirectDecision
+            let startInfo = opts |> createProcessStartInfo
             use proc = new Process ()
             proc.StartInfo <- startInfo
 
