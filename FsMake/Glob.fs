@@ -60,16 +60,17 @@ module Glob =
 
         module ParsedPattern =
             let create (rootDir: string) (pattern: string) : ParsedPattern =
+                let normalizedRootDir = rootDir |> normalizePathSeperator
                 let normalizedPattern = pattern |> normalizePathSeperator
 
                 let initialParts =
                     if normalizedPattern.StartsWith (Path.DirectorySeparatorChar) then
                         [ RootToken ]
                     else
-                        [ RootDirectoryToken rootDir ]
+                        [ RootDirectoryToken normalizedRootDir ]
 
                 let splitPattern =
-                    normalizedPattern.Split ('/', StringSplitOptions.RemoveEmptyEntries)
+                    normalizedPattern.Split (Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
                     |> List.ofArray
 
                 let rec parseNext parts rem =
