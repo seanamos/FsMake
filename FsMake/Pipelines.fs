@@ -89,7 +89,7 @@ module Pipelines =
             (pipelines, vars)
 
         /// <summary>
-        /// Sets the default <see cref="T:Pipeline" /> to be run when one is not specified.
+        /// Sets the default <see cref="T:Pipeline" /> to be run when a pipeline is not specified in the arguments.
         /// </summary>
         /// <param name="state">The current state of the computation expression.</param>
         /// <param name="pipeline">The <see cref="T:Pipeline" /> to be used as the default.</param>

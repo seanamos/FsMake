@@ -383,26 +383,32 @@ module Cmd =
 
     [<AutoOpen>]
     module internal Internal =
+        let prettyWorkdirPrefix (workdir: string option) =
+            match workdir with
+            | Some x ->
+                let fullPath = System.IO.Path.GetFullPath x
+                $"{fullPath}> "
+            | None -> "> "
+
         let prettyCommand (command: string) (args: string list) =
             if args.Length = 0 then
                 command
             else
                 let sb = StringBuilder ()
                 sb.Append command |> ignore
-                sb.Append " [ " |> ignore
 
                 args
-                |> List.iteri (fun i x ->
-                    if i <> 0 then sb.Append ' ' |> ignore
+                |> List.iter (fun x ->
+                    sb.Append ' ' |> ignore
 
-                    sb.Append '"' |> ignore
-                    sb.Append x |> ignore
-                    sb.Append '"' |> ignore
-
-                    if i <> args.Length - 1 then sb.Append ';' |> ignore
+                    if x.Contains (' ') then
+                        sb.Append '"' |> ignore
+                        sb.Append x |> ignore
+                        sb.Append '"' |> ignore
+                    else
+                        sb.Append x |> ignore
                 )
 
-                sb.Append " ]" |> ignore
                 sb.ToString ()
 
         type RedirectDecision =
@@ -428,7 +434,7 @@ module Cmd =
             |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
 
             startInfo.UseShellExecute <- false
-            startInfo.CreateNoWindow <- true
+            startInfo.CreateNoWindow <- false
 
             match redirectDecision with
             | NoRedirect -> ()
@@ -529,7 +535,8 @@ module Cmd =
             use proc = new Process ()
             proc.StartInfo <- startInfo
 
-            let fullCommand = prettyCommand opts.Command (opts.Args |> Arg.toSafeStrList)
+            let prettyCmdPrefix = prettyWorkdirPrefix opts.WorkingDirectory
+            let prettyCmdText = prettyCommand opts.Command (opts.Args |> Arg.toSafeStrList)
 
             let writeOutputOpts =
                 match shouldPrefix with
@@ -538,7 +545,7 @@ module Cmd =
 
             let writeOutput = writeOutput writeOutputOpts ctx.Console
 
-            let cmdText = sprintf "> %s" fullCommand
+            let cmdText = $"{prettyCmdPrefix}{prettyCmdText}"
             writeOutput (fun x -> x |> Console.appendColor Console.infoColor cmdText)
 
             proc.Start () |> ignore
@@ -590,7 +597,7 @@ module Cmd =
 
                     [
                         Console.error ""
-                        |> Console.appendToken fullCommand
+                        |> Console.appendToken prettyCmdText
                         |> Console.append " failed to complete before timeout expired"
                     ]
                     |> MakeError
@@ -598,7 +605,7 @@ module Cmd =
                 else if ctx.ProcessMonitor |> ProcessMonitor.isKilled proc then
                     [
                         Console.error ""
-                        |> Console.appendToken fullCommand
+                        |> Console.appendToken prettyCmdText
                         |> Console.append " was aborted"
                     ]
                     |> MakeAbort
@@ -606,7 +613,7 @@ module Cmd =
                 else
                     let exitCode = proc.ExitCode
 
-                    let exitCodeDecision = exitCode |> exitCodeDecision opts.ExitCodeCheck fullCommand
+                    let exitCodeDecision = exitCode |> exitCodeDecision opts.ExitCodeCheck prettyCmdText
 
                     match exitCodeDecision with
                     | UnexpectedExitCode x -> MakeError [ x ] |> Error
