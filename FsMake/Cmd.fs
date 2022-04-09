@@ -409,16 +409,18 @@ module Cmd =
             | ToConsole
             | ToProcess
             | ToBoth
+            | NoRedirect
 
-        let getRedirectDecision (redirect: RedirectOption option) : RedirectDecision =
+        let getRedirectDecision (shouldPrefix: bool) (redirect: RedirectOption option) : RedirectDecision =
             match redirect with
             | Some x ->
                 match x with
                 | Redirect -> ToProcess
                 | RedirectToBoth -> ToBoth
-            | None -> ToConsole
+            | None when shouldPrefix -> ToConsole
+            | None -> NoRedirect
 
-        let createProcessStartInfo (opts: CmdOptions<'a>) : ProcessStartInfo =
+        let createProcessStartInfo (redirectDecision: RedirectDecision) (opts: CmdOptions<'a>) : ProcessStartInfo =
             let startInfo = ProcessStartInfo (opts.Command)
 
             opts.Args
@@ -426,10 +428,13 @@ module Cmd =
             |> List.iter (fun x -> startInfo.ArgumentList.Add (x))
 
             startInfo.UseShellExecute <- false
-            startInfo.CreateNoWindow <- true
+            startInfo.CreateNoWindow <- false
 
-            startInfo.RedirectStandardOutput <- true
-            startInfo.RedirectStandardError <- true
+            match redirectDecision with
+            | NoRedirect -> ()
+            | _ ->
+                startInfo.RedirectStandardOutput <- true
+                startInfo.RedirectStandardError <- true
 
             opts.EnvVars
             |> List.iter (fun (key, value) -> startInfo.EnvironmentVariables.[key] <- value)
@@ -519,8 +524,8 @@ module Cmd =
                 | PrefixAlways -> true
                 | PrefixPipeline -> Prefix.Internal.shouldPrefix ctx.IsParallel ctx.PrefixOption
 
-            let redirectDecision = opts.Redirect |> getRedirectDecision
-            let startInfo = opts |> createProcessStartInfo
+            let redirectDecision = opts.Redirect |> getRedirectDecision shouldPrefix
+            let startInfo = opts |> createProcessStartInfo redirectDecision
             use proc = new Process ()
             proc.StartInfo <- startInfo
 
@@ -571,6 +576,7 @@ module Cmd =
                 | ToConsole -> proc |> addOutputConsoleWriters |> beginDataRead
                 | ToProcess -> proc |> addOutputBuilderWriters |> beginDataRead
                 | ToBoth -> proc |> (addOutputConsoleWriters >> addOutputBuilderWriters) |> beginDataRead
+                | NoRedirect -> ()
 
                 let processCompleted =
                     match opts.Timeout with
