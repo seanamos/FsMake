@@ -59,14 +59,27 @@ module internal Cli =
             Pipeline: string option
             ConsoleOutput: ConsoleOutput
             Verbosity: Verbosity
+            NoLogo: bool
             ExtraArgs: string list
         }
 
-    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) (pipelines: Pipeline list) : unit =
+    let printLogo (writer: Console.IWriter) (level: Console.Level) =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
 
+        let logo = "
+█▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀
+█▀░ ▄█ █░▀░█ █▀█ █░█ ██▄ "
+
+        level
+        |> Console.message logo
+        |> Console.appendToken version
+        |> Console.append Environment.NewLine
+        |> writer.WriteLine
+
+
+    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) (pipelines: Pipeline list) : unit =
         let usageText =
             match args.Executable with
             | Some x ->
@@ -86,22 +99,18 @@ module internal Cli =
             else
                 "  No pipelines"
 
-        let helpText =
-            @$"
-Usage: {usageText} [pipeline] [options] [-- extra args]
+        let helpText = $"Usage: {usageText} [pipeline] [options] [-- extra args]
 
 Options:
   --help                                       Shows help and usage information
   -v, --verbosity <disabled|quiet|normal|all>  The verbosity level of FsMake's output [default: normal]
   -o, --console-output <standard|ansi>         The type of console output produced by FsMake
+  -n, --no-logo                                Prevents the logo from being printed
 
 Pipelines:
 {pipelineText}"
 
-        Console.Important
-        |> Console.message "FsMake "
-        |> Console.appendToken version
-        |> writer.WriteLine
+        Console.Important |> printLogo writer
 
         if not errors.IsEmpty then
             Console.Error |> writer.WriteLine
@@ -149,6 +158,9 @@ Pipelines:
                 | xss ->
                     options
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
+            | (NormalArgs, "-n" :: xs)
+            | (NormalArgs, "--no-logo" :: xs) ->
+                { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
             | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
                 match (idx, options.Executable) with
@@ -178,6 +190,7 @@ Pipelines:
                 Pipeline = None
                 ConsoleOutput = Standard
                 Verbosity = Normal
+                NoLogo = false
                 ExtraArgs = []
             }
             |> parseNextArg args [] 0 NormalArgs
