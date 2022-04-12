@@ -1,7 +1,7 @@
-<h2 align="center">
+<h3>
   █▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀<br />
   █▀░ ▄█ █░▀░█ █▀█ █░█ ██▄
-</h2>
+</h3>
 
 > Simple build pipelines with F#
 
