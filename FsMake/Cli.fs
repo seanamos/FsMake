@@ -68,7 +68,8 @@ module internal Cli =
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
 
-        let logo = "
+        let logo =
+            "
 █▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀
 █▀░ ▄█ █░▀░█ █▀█ █░█ ██▄ "
 
@@ -99,7 +100,8 @@ module internal Cli =
             else
                 "  No pipelines"
 
-        let helpText = $"Usage: {usageText} [pipeline] [options] [-- extra args]
+        let helpText =
+            $"Usage: {usageText} [pipeline] [options] [-- extra args]
 
 Options:
   --help                                       Shows help and usage information
@@ -159,8 +161,7 @@ Pipelines:
                     options
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
             | (NormalArgs, "-n" :: xs)
-            | (NormalArgs, "--no-logo" :: xs) ->
-                { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
+            | (NormalArgs, "--no-logo" :: xs) -> { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
             | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
                 match (idx, options.Executable) with
