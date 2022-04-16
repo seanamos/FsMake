@@ -83,7 +83,7 @@ module EnvVar =
     /// <summary>
     /// Gets an environment variable by name.
     /// <para>
-    /// This is creates a <see cref="T:Make`1" /> that can be used in a step.
+    /// This creates a <see cref="T:Make`1" /> that can be used in a step.
     /// When unable to get the env var, the step will fail.
     /// </para>
     /// </summary>
@@ -107,7 +107,7 @@ module EnvVar =
     /// <summary>
     /// Gets an environment variable by name and converts it to the specified type.
     /// <para>
-    /// This is creates a <see cref="T:Make`1" /> that can be used in a step.
+    /// This creates a <see cref="T:Make`1" /> that can be used in a step.
     /// When unable to get the env var, the step will fail.
     /// </para>
     /// </summary>

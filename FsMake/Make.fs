@@ -24,7 +24,7 @@ type MakeContext =
         IsParallel: bool
 
         /// <summary>
-        /// Gets the current <see cref="T:Console.IWriter" /> that can be used to write to the console.
+        /// Gets the current <see cref="T:FsMake.Console.IWriter" /> that can be used to write to the console.
         /// </summary>
         Console: Console.IWriter
 
@@ -34,12 +34,12 @@ type MakeContext =
         Prefix: Console.TextPart
 
         /// <summary>
-        /// Gets the globally configured <see cref="T:Prefix.PrefixOption" />.
+        /// Gets the globally configured <see cref="T:FsMake.Prefix.PrefixOption" />.
         /// </summary>
         PrefixOption: Prefix.PrefixOption
 
         /// <summary>
-        /// Gets the <see cref="T:ProcessMonitor.Agent" /> for the currently running <see cref="T:Pipeline" />.
+        /// Gets the process monitor <see cref="T:FsMake.ProcessMonitor.Agent" /> for the currently running <see cref="T:Pipeline" />.
         /// </summary>
         ProcessMonitor: ProcessMonitor.Agent
 
@@ -253,7 +253,7 @@ module Make =
             MakeError [ msg ] |> Error
 
     /// <summary>
-    /// Fails the current <see cref="T:Make`1" /> with a list of <see cref="T:Console.Message" /> to be printed.
+    /// Fails the current <see cref="T:Make`1" /> with a list of <see cref="T:FsMake.Console.Message" /> to be printed.
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>
@@ -342,7 +342,7 @@ module Make =
 
     /// <summary>
     /// Creates a new <see cref="T:Make`1" /> from an existing one, that adds retry behaviour.
-    /// This will "catch" all errors except for <see cref="T:MakeError.MakeAbort" />.
+    /// This will "catch" all errors except for <see cref="P:FsMake.MakeError.MakeAbort" />.
     /// </summary>
     /// <param name="attempts">The amount of attempts in total to try.</param>
     /// <param name="make">The <see cref="T:Make`1" /> to add retries to.</param>
@@ -468,7 +468,7 @@ module Make =
 
     /// <summary>
     /// Memoizes a <see cref="T:Make`1" /> so it is only executed once. Subsequent executions return the result immediately.
-    /// Unlike <see cref="M:Make.memo" />, this allows parallel executions to occur.
+    /// Unlike <see cref="M:FsMake.Make.memo``1(Microsoft.FSharp.Core.FSharpFunc{FsMake.MakeContext,Microsoft.FSharp.Core.FSharpResult{``0,FsMake.MakeError}})" />, this allows parallel executions to occur.
     /// <para>
     /// If it is run in parallel, it will be run multiple times until a result has been stored. Once a result has been stored, subsequent
     /// runs will immediately return the result.
@@ -516,7 +516,7 @@ module Make =
 [<AutoOpen>]
 module MakeBuilders =
     /// <summary>
-    /// Creates a <see cref="T:Make`1" /> using a <see cref="T:Make.Builder" /> computation expression.
+    /// Creates a <see cref="T:Make`1" /> using a <see cref="T:FsMake.Make.Builder" /> computation expression.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
@@ -530,7 +530,7 @@ module MakeBuilders =
     let make = Make.Builder ()
 
     /// <summary>
-    /// Creates a retry <see cref="T:Make`1" /> using a <see cref="T:Make.RetryBuilder" /> computation expression.
+    /// Creates a retry <see cref="T:Make`1" /> using a <see cref="T:FsMake.Make.RetryBuilder" /> computation expression.
     /// </summary>
     /// <example>
     /// <code lang="fsharp">
@@ -546,7 +546,7 @@ module MakeBuilders =
         Make.RetryBuilder (attempts)
 
     /// <summary>
-    /// Creates a single access memo <see cref="T:Make`1" /> using a <see cref="T:Make.MemoBuilder" /> computation expression.
+    /// Creates a single access memo <see cref="T:Make`1" /> using a <see cref="T:FsMake.Make.MemoBuilder" /> computation expression.
     /// <para>
     /// Once a memo has run, it will return the same value without running again.
     /// </para>
@@ -562,7 +562,7 @@ module MakeBuilders =
     let memo = Make.MemoBuilder ()
 
     /// <summary>
-    /// Creates a parallel access memo <see cref="T:Make`1" /> using a <see cref="T:Make.MemoRaceBuilder" /> computation expression.
+    /// Creates a parallel access memo <see cref="T:Make`1" /> using a <see cref="T:FsMake.Make.MemoRaceBuilder" /> computation expression.
     /// <para>
     /// Once a memoRace has run, it will return the same value without running again.
     /// </para>
