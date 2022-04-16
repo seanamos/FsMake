@@ -90,10 +90,10 @@ module Step =
                 (runStat, MakeUnhandledEx ex) |> Error
 
     /// <summary>
-    /// Creates a step using a <see cref="T:Step.Builder" /> computation expression.
+    /// Creates a step using a <see cref="T:FsMake.StepModule.Builder" /> computation expression.
     /// </summary>
     /// <param name="name">The name of the step.</param>
-    /// <returns>A <see cref="T:Step.Builder" />.</returns>
+    /// <returns>A <see cref="T:FsMake.StepModule.Builder" />.</returns>
     /// <example>
     /// <code lang="fsharp">
     /// let emptyStep =
@@ -138,7 +138,7 @@ module Step =
         Make.fail message
 
     /// <summary>
-    /// Fails the current step with a list of <see cref="T:Console.Message" /> to be printed.
+    /// Fails the current step with a list of <see cref="T:FsMake.Console.Message" /> to be printed.
     /// This can be used to create detailed multi-line failures.
     /// </summary>
     /// <param name="messages">The messages to be printed.</param>

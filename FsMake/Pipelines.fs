@@ -20,7 +20,7 @@ type Pipelines =
         Pipelines: Pipeline list
 
         /// <summary>
-        /// Gets the <see cref="T:Prefix.PrefixOption" /> for the <see cref="T:Step" />s that will run.
+        /// Gets the <see cref="T:FsMake.Prefix.PrefixOption" /> for the <see cref="T:Step" />s that will run.
         /// </summary>
         StepPrefix: Prefix.PrefixOption
     }

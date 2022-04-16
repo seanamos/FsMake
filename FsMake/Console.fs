@@ -107,22 +107,22 @@ module Console =
             | Yellow -> "\u001b[38;5;11m"
 
     /// <summary>
-    /// The info status message <see cref="T:Console.Color" />.
+    /// The info status message <see cref="T:FsMake.Console.Color" />.
     /// </summary>
     let infoColor = Cyan
 
     /// <summary>
-    /// The success status message <see cref="T:Console.Color" />.
+    /// The success status message <see cref="T:FsMake.Console.Color" />.
     /// </summary>
     let successColor = Green
 
     /// <summary>
-    /// The warn status message <see cref="T:Console.Color" />.
+    /// The warn status message <see cref="T:FsMake.Console.Color" />.
     /// </summary>
     let warnColor = Yellow
 
     /// <summary>
-    /// The error status message <see cref="T:Console.Color" />.
+    /// The error status message <see cref="T:FsMake.Console.Color" />.
     /// </summary>
     let errorColor = Red
 
@@ -267,8 +267,8 @@ module Console =
     /// <summary>
     /// Creates a <see cref="T:FsMake.Console.IWriter" />.
     /// </summary>
-    /// <param name="outputType">The <see cref="T:Console.OutputType" /> of the console.</param>
-    /// <param name="verbosity">The <see cref="T:Console.Verbosity" /> of the console.</param>
+    /// <param name="outputType">The <see cref="T:FsMake.Console.OutputType" /> of the console.</param>
+    /// <param name="verbosity">The <see cref="T:FsMake.Console.Verbosity" /> of the console.</param>
     /// <returns>The new <see cref="T:FsMake.Console.IWriter" />.</returns>
     let createWriter (outputType: OutputType) (verbosity: Verbosity) : IWriter =
         match outputType with
@@ -276,9 +276,9 @@ module Console =
         | Standard -> StandardWriter (verbosity) :> IWriter
 
     /// <summary>
-    /// Creates an empty <see cref="Console.Message" />.
+    /// Creates an empty <see cref="FsMake.Console.Message" />.
     /// </summary>
-    /// <param name="tokenColor">The color of <see cref="Console.TokenPart" />s in the message.</param>
+    /// <param name="tokenColor">The color of <see cref="T:FsMake.Console.TextPart" /> tokens in the message.</param>
     /// <param name="level">The level of the message.</param>
     /// <returns>The new message.</returns>
     let messageEmpty (tokenColor: Color) (level: Level) : Message =
@@ -290,9 +290,9 @@ module Console =
         }
 
     /// <summary>
-    /// Creates a <see cref="Console.Message" /> from the given parts.
+    /// Creates a <see cref="FsMake.Console.Message" /> from the given parts.
     /// </summary>
-    /// <param name="tokenColor">The color of <see cref="Console.TokenPart" />s in the message.</param>
+    /// <param name="tokenColor">The color of <see cref="T:FsMake.Console.TextPart" /> tokens in the message.</param>
     /// <param name="textParts">The list of parts that make up message.</param>
     /// <param name="level">The level of the message.</param>
     /// <returns>The new message.</returns>
@@ -344,7 +344,7 @@ module Console =
         level |> messageParts color [ Token "==> "; Text text ]
 
     /// <summary>
-    /// Appends <see cref="T:Console.Textpart" />s to a message.
+    /// Appends <see cref="T:FsMake.Console.TextPart" />s to a message.
     /// </summary>
     /// <param name="textParts">The parts to append.</param>
     /// <param name="message">The message to append the parts to.</param>
@@ -363,7 +363,7 @@ module Console =
         }
 
     /// <summary>
-    /// Appends a <see cref="T:Console.Textpart" /> to a message.
+    /// Appends a <see cref="T:FsMake.Console.TextPart" /> to a message.
     /// </summary>
     /// <param name="textPart">The part to append.</param>
     /// <param name="message">The message to append the part to.</param>
@@ -457,7 +457,7 @@ module Console =
 module IWriterExtensions =
     type Console.IWriter with
         /// <summary>
-        /// Writes a <see cref="T:Console.Message" /> to the console.
+        /// Writes a <see cref="T:FsMake.Console.Message" /> to the console.
         /// </summary>
         /// <param name="message">The message to be written.</param>
         member this.Write(message: Console.Message) : unit =
@@ -468,13 +468,13 @@ module IWriterExtensions =
         /// </summary>
         /// <param name="level">The level of the newline.</param>
         /// <remarks>
-        /// If the <c>level</c> is not high enough for the <see cref="T:Console.Verbosity" />, the line will not be written.
+        /// If the <c>level</c> is not high enough for the <see cref="T:FsMake.Console.Verbosity" />, the line will not be written.
         /// </remarks>
         member this.WriteLine(level: Console.Level) : unit =
             level |> Console.message Environment.NewLine |> this.Write
 
         /// <summary>
-        /// Writes a <see cref="T:Console.Message" /> to the console, with a newline at the end.
+        /// Writes a <see cref="T:FsMake.Console.Message" /> to the console, with a newline at the end.
         /// </summary>
         /// <param name="message">The message to write.</param>
         member this.WriteLine(message: Console.Message) : unit =
@@ -486,7 +486,7 @@ module IWriterExtensions =
             |> this.Write
 
         /// <summary>
-        /// Writes a <see cref="T:Console.Message" /> <c>list</c> to the console, with newlines at the end of each.
+        /// Writes a <see cref="T:FsMake.Console.Message" /> <c>list</c> to the console, with newlines at the end of each.
         /// </summary>
         /// <param name="messages">The messages to write.</param>
         member this.WriteLines(messages: Console.Message list) : unit =
