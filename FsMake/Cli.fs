@@ -95,7 +95,11 @@ module internal Cli =
             if pipelines.Length > 0 then
                 pipelines
                 |> List.rev
-                |> List.map (fun x -> $"  {x.Name}")
+                |> List.map (fun x ->
+                    match x.Description with
+                    | Some desc -> $"  {x.Name}{String (' ', 45 - x.Name.Length)}{desc}"
+                    | None -> $"  {x.Name}"
+                )
                 |> String.concat Environment.NewLine
             else
                 "  No pipelines"
@@ -127,6 +131,7 @@ Pipelines:
 
     let parseArgs (args: string array) : Result<ParsedArgs, ParsedArgs * ParseError list> =
         let args = args |> List.ofArray
+        printfn "%A" args
 
         let rec parseNextArg remArgs errors idx state options =
             match (state, remArgs) with
@@ -162,7 +167,13 @@ Pipelines:
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
             | (NormalArgs, "-n" :: xs)
             | (NormalArgs, "--no-logo" :: xs) -> { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
-            | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
+            | (NormalArgs, "--" :: xs) ->
+                // there was a breaking change in .NET 6 with dotnet fsi parsing "--help" everywhere.
+                // to work around this, "--" needs to be passed to dotnet fsi.
+                // we need to expect the format dotnet fsi build.fsx -- -o ansi -- extra_arg (double --) now.
+                match (idx, options.Executable) with
+                | (1, Some (ExecutableType.Fsx _)) -> options |> parseNextArg xs errors (idx + 1) NormalArgs
+                | _ -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
                 match (idx, options.Executable) with
                 | (0, _) when x.EndsWith (".fsx") ->
