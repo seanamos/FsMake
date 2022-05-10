@@ -14,9 +14,13 @@ type Pipeline =
         Name: string
 
         /// <summary>
+        /// Gets the description of the <see cref="T:Pipeline" />.
+        /// </summary>
+        Description: string option
+
+        /// <summary>
         /// Gets the <see cref="T:Stage" />s.
         /// </summary>
-        /// <returns></returns>
         Stages: Stage list
     }
 
@@ -262,7 +266,12 @@ module Pipeline =
         let mutable pipeline =
             match from with
             | Some x -> { x with Name = name }
-            | None -> { Name = name; Stages = [] }
+            | None ->
+                {
+                    Name = name
+                    Description = None
+                    Stages = []
+                }
 
         member _.Zero() : unit =
             ()
@@ -287,6 +296,19 @@ module Pipeline =
 
         member _.Combine(_: 'T, _: 'T) : unit =
             ()
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="desc"></param>
+        /// <returns>Unit.</returns>
+        [<CustomOperation("desc")>]
+        member _.Desc(state: unit, desc: string) : unit =
+            pipeline <-
+                { pipeline with
+                    Description = Some desc
+                }
 
         /// <summary>
         /// Adds a <see cref="T:Step" /> that will always be run.
