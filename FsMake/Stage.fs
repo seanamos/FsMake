@@ -87,8 +87,7 @@ module internal Stage =
             let stepsText = steps |> Step.Internal.concatNames
 
             console |> printRunning stepsText (Some " in parallel")
-        | SequentialMaybeStage (step, _) ->
-            console |> printRunning step.Name (Some ", condition passed")
+        | SequentialMaybeStage (step, _) -> console |> printRunning step.Name (Some ", condition passed")
         | ParallelMaybeStage (steps, _) ->
             let stepsText = steps |> Step.Internal.concatNames
 

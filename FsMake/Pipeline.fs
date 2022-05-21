@@ -76,7 +76,10 @@ module Pipeline =
                 let totalTime = pipelineResults |> totalTime
 
                 Console.Info |> writer.WriteLine
-                Console.Info |> Console.message ("╔══════════════════════════════════════╦═══════════╗") |> writer.WriteLine
+
+                Console.Info
+                |> Console.message ("╔══════════════════════════════════════╦═══════════╗")
+                |> writer.WriteLine
 
                 pipelineResults
                 |> List.iter (fun x ->
@@ -101,7 +104,9 @@ module Pipeline =
                         |> writer.WriteLine
                 )
 
-                Console.Info |> Console.message ("╠══════════════════════════════════════╬═══════════╣") |> writer.WriteLine
+                Console.Info
+                |> Console.message ("╠══════════════════════════════════════╬═══════════╣")
+                |> writer.WriteLine
 
                 Console.Info
                 |> Console.message (sprintf "║ %-37s║ %s ║" "Total" (totalTime |> formatTime))
@@ -200,7 +205,7 @@ module Pipeline =
 
                     match x with
                     | SequentialStage step ->
-                        x  |> Stage.printHeader ctx.Console
+                        x |> Stage.printHeader ctx.Console
                         step |> runStep stepArgs
                     | ParallelStage steps ->
                         x |> Stage.printHeader ctx.Console
@@ -212,6 +217,7 @@ module Pipeline =
                             step |> runStep stepArgs
                         else
                             Console.Info |> ctx.Console.WriteLine
+
                             Console.warn "Skipping step "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition not met"
@@ -227,6 +233,7 @@ module Pipeline =
                             steps |> runParallelSteps stepArgs
                         else
                             Console.Info |> ctx.Console.WriteLine
+
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken stepNames
                             |> Console.append ", condition not met"
@@ -240,6 +247,7 @@ module Pipeline =
 
                         if toSkip.Length > 0 then
                             Console.Info |> ctx.Console.WriteLine
+
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken (toSkip |> Step.Internal.concatNames)
                             |> Console.append ", condition not met"
