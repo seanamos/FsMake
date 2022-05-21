@@ -210,7 +210,11 @@ Pipelines.create {
             run build
         }
 
-    do! Pipeline.createFrom build "test" { run_parallel [ ``test:format``; ``test:lint``; ``test:tests`` ] }
+    do!
+        Pipeline.createFrom build "test" {
+            run_parallel [ ``test:format``; ``test:lint`` ]
+            run ``test:tests``
+        }
 
     let! nupkgCreate = Pipeline.createFrom build "nupkg:create" { run ``nupkg:create`` }
 
