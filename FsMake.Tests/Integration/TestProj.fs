@@ -7,10 +7,11 @@ open System.IO
 open System.Diagnostics
 
 let testProjDir =
-    let currDir = Directory.GetCurrentDirectory()
+    let currDir = Directory.GetCurrentDirectory ()
 
     let rec walkDirs from =
         let testDir = from + "/testproj"
+
         if Directory.Exists (testDir) then
             testDir
         else
@@ -57,6 +58,7 @@ let tests =
                 process'.Start () |> ignore
                 process'.WaitForExit ()
 
-                (process'.ExitCode, 0) |> Expect.isGreaterThan "Expected exit code to be greater than 0"
+                (process'.ExitCode, 0)
+                |> Expect.isGreaterThan "Expected exit code to be greater than 0"
             }
         ]
