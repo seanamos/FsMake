@@ -10,6 +10,7 @@
     <Compile Include="Integration\Cmd.fs" />
     <Compile Include="Integration\EnvVar.fs" />
     <Compile Include="Integration\Pipelines.fs" />
+    <Compile Include="Integration\TestProj.fs" />
     <Compile Include="Unit\Console.fs" />
     <Compile Include="Unit\Cli.fs" />
     <Compile Include="Unit\Glob.fs" />
