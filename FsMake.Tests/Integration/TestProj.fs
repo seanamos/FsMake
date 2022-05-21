@@ -30,6 +30,8 @@ let createRunnerProcStartInfo args =
     if args |> String.IsNullOrEmpty |> not then
         procStartInfo.Arguments <- procStartInfo.Arguments + $" {args}"
 
+    procStartInfo.Arguments <- procStartInfo.Arguments + " -o ansi"
+
     procStartInfo.WorkingDirectory <- testProjDir
 
     let process' = new Process ()
