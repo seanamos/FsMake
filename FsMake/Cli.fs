@@ -131,7 +131,6 @@ Pipelines:
 
     let parseArgs (args: string array) : Result<ParsedArgs, ParsedArgs * ParseError list> =
         let args = args |> List.ofArray
-        printfn "%A" args
 
         let rec parseNextArg remArgs errors idx state options =
             match (state, remArgs) with

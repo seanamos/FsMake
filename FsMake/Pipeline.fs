@@ -74,34 +74,39 @@ module Pipeline =
                     time.ToString (@"mm\:ss\:fff")
 
                 let totalTime = pipelineResults |> totalTime
-                let line = "----------------------------------------------"
 
-                Console.Info |> Console.message line |> writer.WriteLine
+                Console.Info |> writer.WriteLine
+                Console.Info |> Console.message ("╔══════════════════════════════════════╦═══════════╗") |> writer.WriteLine
 
                 pipelineResults
                 |> List.iter (fun x ->
                     match x with
                     | Success (_, stat) ->
                         Console.Info
-                        |> Console.messageColor Console.successColor (sprintf "%-35s" stat.StepName)
-                        |> Console.append (sprintf ": %s" (stat.ExecutionTime |> formatTime))
+                        |> Console.message "║ "
+                        |> Console.appendColor Console.successColor (sprintf "☑ %-35s" stat.StepName)
+                        |> Console.append (sprintf "║ %s ║" (stat.ExecutionTime |> formatTime))
                         |> writer.WriteLine
                     | Failed (_, stat, _) ->
                         Console.Info
-                        |> Console.messageColor Console.errorColor (sprintf "%-25s" stat.StepName)
-                        |> Console.append (sprintf " (failed) : %s" (stat.ExecutionTime |> formatTime))
+                        |> Console.message "║ "
+                        |> Console.appendColor Console.errorColor (sprintf "☒ %-25s" stat.StepName)
+                        |> Console.append (sprintf " (failed) ║ %s ║" (stat.ExecutionTime |> formatTime))
                         |> writer.WriteLine
                     | Skipped step ->
                         Console.Info
-                        |> Console.messageColor Console.warnColor (sprintf "%-24s" step.Name)
-                        |> Console.append " (skipped) : 00:00:000"
+                        |> Console.message "║ "
+                        |> Console.appendColor Console.warnColor (sprintf "☐ %-24s" step.Name)
+                        |> Console.append " (skipped) ║ 00:00:000 ║"
                         |> writer.WriteLine
                 )
 
-                Console.Info |> Console.message line |> writer.WriteLine
+                Console.Info |> Console.message ("╠══════════════════════════════════════╬═══════════╣") |> writer.WriteLine
 
                 Console.Info
-                |> Console.message (sprintf "%-35s: %s" "Total" (totalTime |> formatTime))
+                |> Console.message (sprintf "║ %-37s║ %s ║" "Total" (totalTime |> formatTime))
+                |> Console.append Environment.NewLine
+                |> Console.append "╚══════════════════════════════════════╩═══════════╝"
                 |> writer.WriteLine
 
         let createMakeContext (ctx: Context) (isParallel: bool) (step: Step) : MakeContext =
@@ -152,10 +157,10 @@ module Pipeline =
                 steps
                 |> Array.ofList
                 |> Array.Parallel.map (fun step ->
-                    let makeContext = createMakeContext args.Context true step
-                    let stepResult = step |> Step.Internal.run makeContext
+                    let ctx = createMakeContext args.Context true step
+                    let stepResult = step |> Step.Internal.run ctx
 
-                    (step, makeContext, stepResult)
+                    (step, ctx, stepResult)
                 )
                 |> Array.map (
                     function
@@ -195,27 +200,18 @@ module Pipeline =
 
                     match x with
                     | SequentialStage step ->
-                        Console.info "Running "
-                        |> Console.appendToken step.Name
-                        |> ctx.Console.WriteLine
-
+                        x  |> Stage.printHeader ctx.Console
                         step |> runStep stepArgs
                     | ParallelStage steps ->
-                        Console.info "Running "
-                        |> Console.appendToken (steps |> Step.Internal.concatNames)
-                        |> Console.append " in parallel"
-                        |> ctx.Console.WriteLine
-
+                        x |> Stage.printHeader ctx.Console
                         steps |> runParallelSteps stepArgs
                     | SequentialMaybeStage (step, cond) ->
                         if cond then
-                            Console.info "Running "
-                            |> Console.appendToken step.Name
-                            |> Console.append ", condition passed"
-                            |> ctx.Console.WriteLine
+                            x |> Stage.printHeader ctx.Console
 
                             step |> runStep stepArgs
                         else
+                            Console.Info |> ctx.Console.WriteLine
                             Console.warn "Skipping step "
                             |> Console.appendToken step.Name
                             |> Console.append ", condition not met"
@@ -226,13 +222,11 @@ module Pipeline =
                         let stepNames = steps |> Step.Internal.concatNames
 
                         if cond then
-                            Console.info "Running "
-                            |> Console.appendToken (stepNames)
-                            |> Console.append " in parallel"
-                            |> ctx.Console.WriteLine
+                            x |> Stage.printHeader ctx.Console
 
                             steps |> runParallelSteps stepArgs
                         else
+                            Console.Info |> ctx.Console.WriteLine
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken stepNames
                             |> Console.append ", condition not met"
@@ -245,6 +239,7 @@ module Pipeline =
                         let (toRun, toSkip) = pmaybes |> ParallelMaybe.Internal.partionedSteps
 
                         if toSkip.Length > 0 then
+                            Console.Info |> ctx.Console.WriteLine
                             Console.warn "Skipping step(s) "
                             |> Console.appendToken (toSkip |> Step.Internal.concatNames)
                             |> Console.append ", condition not met"
@@ -430,14 +425,14 @@ module Pipeline =
 
         Console.info "Running pipeline "
         |> Console.appendToken pipeline.Name
+        |> Console.append " 🚀"
         |> args.Writer.WriteLine
 
         let results = pipeline.Stages |> runStages context
 
-        args.Writer.WriteLine (Console.Info)
         results |> StepResult.printResults args.Writer
 
-        args.Writer.WriteLine (Console.Info)
+        Console.Info |> args.Writer.WriteLine
 
         let failed = results |> StepResult.anyFailed
 
@@ -445,13 +440,13 @@ module Pipeline =
             Console.Info
             |> Console.statusMessage Console.errorColor ""
             |> Console.appendToken pipeline.Name
-            |> Console.append " pipeline failed"
+            |> Console.append " pipeline failed 💥"
             |> args.Writer.WriteLine
         else
             Console.Info
             |> Console.statusMessage Console.successColor ""
             |> Console.appendToken pipeline.Name
-            |> Console.append " pipeline complete"
+            |> Console.append " pipeline complete 🍻"
             |> args.Writer.WriteLine
 
         not failed
