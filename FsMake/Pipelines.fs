@@ -20,7 +20,7 @@ type Pipelines =
         Pipelines: Pipeline list
 
         /// <summary>
-        /// Gets the <see cref="T:Prefix.PrefixOption" /> for the <see cref="T:Step" />s that will run.
+        /// Gets the <see cref="T:FsMake.Prefix.PrefixOption" /> for the <see cref="T:Step" />s that will run.
         /// </summary>
         StepPrefix: Prefix.PrefixOption
     }
@@ -147,16 +147,21 @@ module Pipelines =
                     | Some pipeline -> PipelineFound pipeline
                     | None -> PipelineNotFound arg
 
-        let runWithParsedArgs (args: Cli.ParsedArgs) (pipelines: Pipelines) : int =
+        let createConsoleWriter (args: Cli.ParsedArgs) : Console.IWriter =
             let consoleOutput = args.ConsoleOutput |> Cli.ConsoleOutput.toConsoleOutputType
-
             let verbosity = args.Verbosity |> Cli.Verbosity.toConsoleVerbosity
-            let writer = Console.createWriter consoleOutput verbosity
+
+            Console.createWriter consoleOutput verbosity
+
+        let runWithParsedArgs (args: Cli.ParsedArgs) (pipelines: Pipelines) : int =
+            let writer = createConsoleWriter args
 
             if args.PrintHelp then
                 Cli.printUsage writer args [] pipelines.Pipelines
                 0
             else
+                if not args.NoLogo then Console.Info |> Cli.printLogo writer
+
                 let findResult = args.Pipeline |> findPipelineFromArg pipelines
 
                 match findResult with

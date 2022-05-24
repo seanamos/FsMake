@@ -1,6 +1,9 @@
-# FsMake
+<h4>
+  █▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀<br />
+  █▀░ ▄█ █░▀░█ █▀█ █░█ ██▄
+</h4>
 
-F# pipeline step/task runner.
+> Simple build pipelines with F#
 
 [![Nuget](https://img.shields.io/nuget/v/FsMake?style=flat-square)](https://www.nuget.org/packages/FsMake)
 [![develop branch status](https://img.shields.io/github/workflow/status/seanamos/FsMake/Test%20incoming%20commits/develop?style=flat-square)](https://github.com/seanamos/FsMake/actions/workflows/test.yml?query=branch%3Adevelop+)
@@ -15,7 +18,7 @@ Documentation with examples and API reference can be found [here](https://seanam
 
 ## Demo
 
-[![FsMake Demo](https://user-images.githubusercontent.com/10598927/122659251-67a2ca00-d176-11eb-9ebd-42c8243a9ff8.png)](https://asciinema.org/a/3qDaGJBnqyyEhHU1IRJi1g8Ta)
+[![FsMake Demo](https://user-images.githubusercontent.com/10598927/162595619-df03188b-a0ad-4efd-b9c5-6d68730c2efd.png)](https://asciinema.org/a/x9sSRWYgWDRfRr1xYdClANUSK)
 
 ## Usage
 

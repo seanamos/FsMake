@@ -58,3 +58,38 @@ module internal Stage =
                     xs |> nextStage (Math.Max (longestStep, longest))
 
         stages |> nextStage 0
+
+    let private printRunning (steps: string) (trailer: string option) (console: Console.IWriter) : unit =
+        let lineVariableLength =
+            match trailer with
+            | Some x -> steps.Length + x.Length
+            | None -> steps.Length
+
+        let line = "═════════" + String ('═', lineVariableLength) + "═"
+
+        Console.Info
+        |> Console.message Environment.NewLine
+        |> Console.append ("╔" + line + "╗" + Environment.NewLine)
+        |> Console.append "║ Running "
+        |> Console.appendToken steps
+        |> fun m ->
+            match trailer with
+            | Some x -> m |> Console.append x
+            | _ -> m
+        |> Console.append " ║"
+        |> Console.append (Environment.NewLine + "╚" + line + "╝" + Environment.NewLine)
+        |> console.WriteLine
+
+    let printHeader (console: Console.IWriter) (stage: Stage) : unit =
+        match stage with
+        | SequentialStage step -> console |> printRunning step.Name None
+        | ParallelStage steps ->
+            let stepsText = steps |> Step.Internal.concatNames
+
+            console |> printRunning stepsText (Some " in parallel")
+        | SequentialMaybeStage (step, _) -> console |> printRunning step.Name (Some ", condition passed")
+        | ParallelMaybeStage (steps, _) ->
+            let stepsText = steps |> Step.Internal.concatNames
+
+            console |> printRunning stepsText (Some " in parallel, condition passed")
+        | ParallelMaybesStage _ -> ()

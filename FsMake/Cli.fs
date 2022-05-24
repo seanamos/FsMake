@@ -59,14 +59,28 @@ module internal Cli =
             Pipeline: string option
             ConsoleOutput: ConsoleOutput
             Verbosity: Verbosity
+            NoLogo: bool
             ExtraArgs: string list
         }
 
-    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) (pipelines: Pipeline list) : unit =
+    let printLogo (writer: Console.IWriter) (level: Console.Level) =
         let assembly = Assembly.GetExecutingAssembly ()
         let assemblyAttr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()
         let version = assemblyAttr.InformationalVersion.ToString ()
 
+        let logo =
+            "
+█▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀
+█▀░ ▄█ █░▀░█ █▀█ █░█ ██▄ "
+
+        level
+        |> Console.message logo
+        |> Console.appendToken version
+        |> Console.append Environment.NewLine
+        |> writer.WriteLine
+
+
+    let printUsage (writer: Console.IWriter) (args: ParsedArgs) (errors: ParseError list) (pipelines: Pipeline list) : unit =
         let usageText =
             match args.Executable with
             | Some x ->
@@ -81,27 +95,28 @@ module internal Cli =
             if pipelines.Length > 0 then
                 pipelines
                 |> List.rev
-                |> List.map (fun x -> $"  {x.Name}")
+                |> List.map (fun x ->
+                    match x.Description with
+                    | Some desc -> $"  {x.Name}{String (' ', 45 - x.Name.Length)}{desc}"
+                    | None -> $"  {x.Name}"
+                )
                 |> String.concat Environment.NewLine
             else
                 "  No pipelines"
 
         let helpText =
-            @$"
-Usage: {usageText} [pipeline] [options] [-- extra args]
+            $"Usage: {usageText} [pipeline] [options] [-- extra args]
 
 Options:
   --help                                       Shows help and usage information
   -v, --verbosity <disabled|quiet|normal|all>  The verbosity level of FsMake's output [default: normal]
   -o, --console-output <standard|ansi>         The type of console output produced by FsMake
+  -n, --no-logo                                Prevents the logo from being printed
 
 Pipelines:
 {pipelineText}"
 
-        Console.Important
-        |> Console.message "FsMake "
-        |> Console.appendToken version
-        |> writer.WriteLine
+        Console.Important |> printLogo writer
 
         if not errors.IsEmpty then
             Console.Error |> writer.WriteLine
@@ -149,7 +164,15 @@ Pipelines:
                 | xss ->
                     options
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
-            | (NormalArgs, "--" :: xs) -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
+            | (NormalArgs, "-n" :: xs)
+            | (NormalArgs, "--no-logo" :: xs) -> { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
+            | (NormalArgs, "--" :: xs) ->
+                // there was a breaking change in .NET 6 with dotnet fsi parsing "--help" everywhere.
+                // to work around this, "--" needs to be passed to dotnet fsi.
+                // we need to expect the format dotnet fsi build.fsx -- -o ansi -- extra_arg (double --) now.
+                match (idx, options.Executable) with
+                | (1, Some (ExecutableType.Fsx _)) -> options |> parseNextArg xs errors (idx + 1) NormalArgs
+                | _ -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
             | (NormalArgs, x :: xs) ->
                 match (idx, options.Executable) with
                 | (0, _) when x.EndsWith (".fsx") ->
@@ -178,6 +201,7 @@ Pipelines:
                 Pipeline = None
                 ConsoleOutput = Standard
                 Verbosity = Normal
+                NoLogo = false
                 ExtraArgs = []
             }
             |> parseNextArg args [] 0 NormalArgs

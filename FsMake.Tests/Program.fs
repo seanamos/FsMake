@@ -4,7 +4,15 @@ open Expecto
 open FsMake.Tests
 
 [<Tests>]
-let integrationTests = testList "Integration" [ Integration.Cmd.tests; Integration.EnvVar.tests; Integration.Pipelines.tests ]
+let integrationTests =
+    testList
+        "Integration"
+        [
+            Integration.Cmd.tests
+            Integration.EnvVar.tests
+            Integration.Pipelines.tests
+            Integration.TestProj.tests
+        ]
 
 [<Tests>]
 let unitTests =
