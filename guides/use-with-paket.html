@@ -137,21 +137,124 @@
 </code></pre></td></tr></table>
 
             <div class="fsdocs-tip" id="fs1">namespace FsMake</div>
-<div class="fsdocs-tip" id="fs2">val restore : Step</div>
-<div class="fsdocs-tip" id="fs3">Multiple items<br />module Step<br /><br />from FsMake<br /><br />--------------------<br />type Step =<br />&#160;&#160;{ Name: string<br />&#160;&#160;&#160;&#160;Make: Make&lt;unit&gt; }</div>
-<div class="fsdocs-tip" id="fs4">val create : name:string -&gt; Step.Builder</div>
-<div class="fsdocs-tip" id="fs5">module Cmd<br /><br />from FsMake</div>
-<div class="fsdocs-tip" id="fs6">val createWithArgs : cmd:string -&gt; args:string list -&gt; Cmd.CmdOptions&lt;unit&gt;</div>
-<div class="fsdocs-tip" id="fs7">val run : opts:Cmd.CmdOptions&lt;&#39;a&gt; -&gt; ctx:MakeContext -&gt; Result&lt;unit,MakeError&gt;</div>
-<div class="fsdocs-tip" id="fs8">val build : Step</div>
-<div class="fsdocs-tip" id="fs9">Multiple items<br />module Pipelines<br /><br />from FsMake<br /><br />--------------------<br />type Pipelines =<br />&#160;&#160;{ Default: Pipeline option<br />&#160;&#160;&#160;&#160;Pipelines: Pipeline list<br />&#160;&#160;&#160;&#160;StepPrefix: PrefixOption }</div>
-<div class="fsdocs-tip" id="fs10">val create : Pipelines.Builder</div>
-<div class="fsdocs-tip" id="fs11">val build : Pipeline</div>
-<div class="fsdocs-tip" id="fs12">Multiple items<br />module Pipeline<br /><br />from FsMake<br /><br />--------------------<br />type Pipeline =<br />&#160;&#160;{ Name: string<br />&#160;&#160;&#160;&#160;Stages: Stage list }</div>
-<div class="fsdocs-tip" id="fs13">val create : name:string -&gt; Pipeline.Builder</div>
-<div class="fsdocs-tip" id="fs14">custom operation: run (Step)<br /><br />Calls Pipeline.Builder.RunStep</div>
-<div class="fsdocs-tip" id="fs15">custom operation: default_pipeline (Pipeline)<br /><br />Calls Pipelines.Builder.DefaultPipeline</div>
-<div class="fsdocs-tip" id="fs16">val runWithArgsAndExit : args:string [] -&gt; pipelines:Pipelines -&gt; unit</div>
+<div class="fsdocs-tip" id="fs2">val restore: Step</div>
+<div class="fsdocs-tip" id="fs3">Multiple items<br />module Step
+
+from FsMake<br /><em>&lt;summary&gt;
+ Module for creating and working with steps.
+ &lt;/summary&gt;</em><br /><br />--------------------<br />type Step =
+  {
+    Name: string
+    Make: Make&lt;unit&gt;
+  }<br /><em>&lt;summary&gt;
+ Represents a pipeline step.
+ &lt;/summary&gt;</em></div>
+<div class="fsdocs-tip" id="fs4">val create: name: string -&gt; Step.Builder<br /><em>&lt;summary&gt;
+ Creates a step using a &lt;see cref=&quot;T:FsMake.StepModule.Builder&quot; /&gt; computation expression.
+ &lt;/summary&gt;<br />&lt;param name=&quot;name&quot;&gt;The name of the step.&lt;/param&gt;<br />&lt;returns&gt;A &lt;see cref=&quot;T:FsMake.StepModule.Builder&quot; /&gt;.&lt;/returns&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let emptyStep =
+     Step.create &quot;emptyStep&quot; {
+         ()
+     }
+ &lt;/code&gt;&lt;/example&gt;</em></div>
+<div class="fsdocs-tip" id="fs5">module Cmd
+
+from FsMake<br /><em>&lt;summary&gt;
+ Module for building and executing commands or processes.
+ &lt;/summary&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let step = Step.create &quot;mStep&quot; {
+     do! Cmd.createWithArgs &quot;dotnet&quot; [ &quot;build&quot; ] |&amp;gt; Cmd.run
+     let! result = Cmd.createWithArgs &quot;dotnet&quot; [ &quot;gitversion&quot; ] |&amp;gt; Cmd.result
+     printfn &quot;%s&quot; result.Output.Std
+ }
+ &lt;/code&gt;&lt;/example&gt;</em></div>
+<div class="fsdocs-tip" id="fs6">val createWithArgs: cmd: string -&gt; args: string list -&gt; Cmd.CmdOptions&lt;unit&gt;<br /><em>&lt;summary&gt;
+ Creates a &lt;see cref=&quot;T:FsMake.Cmd.CmdOptions`1&quot; /&gt; with a command to run.
+ &lt;/summary&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let cmd = Cmd.createWithArgs &quot;dotnet&quot; [ &quot;build&quot;; &quot;--no-restore&quot; ]
+ &lt;/code&gt;&lt;/example&gt;<br />&lt;param name=&quot;cmd&quot;&gt;The command to run.&lt;/param&gt;<br />&lt;param name=&quot;args&quot;&gt;A list of arguments to be passed to the command.&lt;/param&gt;<br />&lt;returns&gt;The new &lt;see cref=&quot;T:FsMake.Cmd.CmdOptions`1&quot; /&gt;.&lt;/returns&gt;</em></div>
+<div class="fsdocs-tip" id="fs7">val run: opts: Cmd.CmdOptions&lt;&#39;a&gt; -&gt; ctx: MakeContext -&gt; Result&lt;unit,MakeError&gt;<br /><em>&lt;summary&gt;
+ Runs a command/process with the specified options.
+ &lt;/summary&gt;<br />&lt;param name=&quot;opts&quot;&gt;The &lt;see cref=&quot;T:FsMake.Cmd.CmdOptions`1&quot; /&gt;.&lt;/param&gt;<br />&lt;param name=&quot;ctx&quot;&gt;The &lt;see cref=&quot;T:MakeContext&quot; /&gt; of the current &lt;see cref=&quot;T:Make`1&quot; /&gt;.&lt;/param&gt;<br />&lt;typeparam name=&quot;&#39;a&quot;&gt;The command output type.&lt;/typeparam&gt;<br />&lt;returns&gt;The result.&lt;/returns&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let build =
+     Step.create &quot;build&quot; {
+         do! Cmd.createWithArgs &quot;dotnet&quot; [ &quot;build&quot; ] |&amp;gt; Cmd.run
+     }
+ &lt;/code&gt;&lt;/example&gt;</em></div>
+<div class="fsdocs-tip" id="fs8">val build: Step</div>
+<div class="fsdocs-tip" id="fs9">Multiple items<br />module Pipelines
+
+from FsMake<br /><em>&lt;summary&gt;
+ Module for creating and working with &lt;see cref=&quot;T:Pipelines&quot; /&gt;.
+ &lt;/summary&gt;</em><br /><br />--------------------<br />type Pipelines =
+  {
+    Default: Pipeline option
+    Pipelines: Pipeline list
+    StepPrefix: PrefixOption
+  }<br /><em>&lt;summary&gt;
+ Represents a set of pipelines and settings.
+ &lt;/summary&gt;</em></div>
+<div class="fsdocs-tip" id="fs10">val create: Pipelines.Builder<br /><em>&lt;summary&gt;
+ Use a computation expression builder to define &lt;see cref=&quot;T:Pipelines&quot; /&gt;.
+ &lt;/summary&gt;<br />&lt;returns&gt;A &lt;see cref=&quot;T:Pipelines.Builder&quot; /&gt;.&lt;/returns&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let clean = Step.create &quot;clean&quot; { () }
+ let build = Step.create &quot;build&quot; { () }
+ let testUnit = Step.create &quot;test:unit&quot; { () }
+ let testInt = Step.create &quot;test:integration&quot; { () }
+
+ let pipelines =
+     Pipelines.create {
+         // adds the build pipeline to the `Pipelines`
+         let! build = Pipeline.create &quot;build&quot; {
+             run clean
+             run build
+         }
+
+         // adds the test pipeline to the &lt;see cref=&quot;Pipelines&quot; /&gt;
+         do! Pipeline.createFrom build &quot;test&quot; {
+             run_parallel [ testUnit; testInt ]
+         }
+
+         default_pipeline build
+     }
+ &lt;/code&gt;&lt;/example&gt;</em></div>
+<div class="fsdocs-tip" id="fs11">val build: Pipeline</div>
+<div class="fsdocs-tip" id="fs12">Multiple items<br />module Pipeline
+
+from FsMake<br /><em>&lt;summary&gt;
+ Module for creating and working with a &lt;see cref=&quot;T:Pipeline&quot; /&gt;.
+ &lt;/summary&gt;</em><br /><br />--------------------<br />type Pipeline =
+  {
+    Name: string
+    Description: string option
+    Stages: Stage list
+  }<br /><em>&lt;summary&gt;
+ Represents a pipeline and its stages.
+ &lt;/summary&gt;</em></div>
+<div class="fsdocs-tip" id="fs13">val create: name: string -&gt; Pipeline.Builder<br /><em>&lt;summary&gt;
+ Creates a pipeline using a &lt;see cref=&quot;T:FsMake.PipelineModule.Builder&quot; /&gt; computation expression.
+ &lt;/summary&gt;<br />&lt;param name=&quot;name&quot;&gt;The name of the pipeline.&lt;/param&gt;<br />&lt;returns&gt;A &lt;see cref=&quot;T:FsMake.PipelineModule.Builder&quot; /&gt;.&lt;/returns&gt;<br />&lt;example&gt;&lt;code lang=&quot;fsharp&quot;&gt;
+ let emptyStep = Step.create &quot;emptyStep&quot; { () }
+ let pipeline =
+     Pipeline.create &quot;pipeline&quot; {
+         run emptyStep
+     }
+ &lt;/code&gt;&lt;/example&gt;</em></div>
+<div class="fsdocs-tip" id="fs14">custom operation: run (Step)
+
+Calls Pipeline.Builder.RunStep<br /><em>&lt;summary&gt;
+ Adds a &lt;see cref=&quot;T:Step&quot; /&gt; that will always be run.
+ &lt;/summary&gt;<br />&lt;param name=&quot;state&quot;&gt;Unused.&lt;/param&gt;<br />&lt;param name=&quot;step&quot;&gt;The &lt;see cref=&quot;T:Step&quot; /&gt; to add.&lt;/param&gt;<br />&lt;returns&gt;Unit.&lt;/returns&gt;</em></div>
+<div class="fsdocs-tip" id="fs15">custom operation: default_pipeline (Pipeline)
+
+Calls Pipelines.Builder.DefaultPipeline<br /><em>&lt;summary&gt;
+ Sets the default &lt;see cref=&quot;T:Pipeline&quot; /&gt; to be run when a pipeline is not specified in the arguments.
+ &lt;/summary&gt;<br />&lt;param name=&quot;state&quot;&gt;The current state of the computation expression.&lt;/param&gt;<br />&lt;param name=&quot;pipeline&quot;&gt;The &lt;see cref=&quot;T:Pipeline&quot; /&gt; to be used as the default.&lt;/param&gt;<br />&lt;typeparam name=&quot;&#39;a&quot;&gt;The types of the variables in the computation expression&#39;s state.&lt;/typeparam&gt;<br />&lt;returns&gt;Updated computation expression state.&lt;/returns&gt;</em></div>
+<div class="fsdocs-tip" id="fs16">val runWithArgsAndExit: args: string[] -&gt; pipelines: Pipelines -&gt; unit<br /><em>&lt;summary&gt;
+ Runs a &lt;see cref=&quot;T:Pipeline&quot; /&gt; from the given &lt;c&gt;pipelines&lt;/c&gt; based on the command line arguments given in &lt;c&gt;args&lt;/c&gt;.
+ &lt;para&gt;
+ Based on success or failure, exits the process with a &lt;c&gt;0&lt;/c&gt; or &lt;c&gt;1&lt;/c&gt; exit code.
+ &lt;/para&gt;&lt;/summary&gt;<br />&lt;param name=&quot;args&quot;&gt;Command line arguments to be parsed.&lt;/param&gt;<br />&lt;param name=&quot;pipelines&quot;&gt;&lt;see cref=&quot;T:Pipelines&quot; /&gt; definition.&lt;/param&gt;</em></div>
 
         </div>
 

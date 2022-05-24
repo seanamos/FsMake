@@ -161,21 +161,21 @@
           </td>
           <td class="fsdocs-member-xmldoc">
             <div class="fsdocs-summary">
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.make`')">
+              <div class="fsdocs-source-link" title="Copy signature (Markdown)" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.make`')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-hover.png" class="hover"/>
               </div>
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.make\'/>')">
-                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              <div class="fsdocs-source-link" title="Copy signature (XML)" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.make\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml-hover.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L530-530" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L530-530" class="fsdocs-source-link" title="Source on GitHub">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-hover.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- Creates a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://docs.microsoft.com/dotnet/api/make.builder">Builder</a> computation expression.
+ Creates a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-builder.html">Builder</a> computation expression.
  
               </p>
             </div>
@@ -191,12 +191,12 @@
             <h5 class="fsdocs-example-header">
               Example
             </h5>
-            <p class="fsdocs-example">
+            <p class="fsdocs-example" id="example">
               <pre>
  let newMake =
      make {
          let ctx = Make.context
-         printfn "%s" ctx.StepName
+         printfn &quot;%s&quot; ctx.StepName
      }</pre>
             </p>
           </td>
@@ -230,21 +230,21 @@
           </td>
           <td class="fsdocs-member-xmldoc">
             <div class="fsdocs-summary">
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.memo`')">
+              <div class="fsdocs-source-link" title="Copy signature (Markdown)" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.memo`')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-hover.png" class="hover"/>
               </div>
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.memo\'/>')">
-                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              <div class="fsdocs-source-link" title="Copy signature (XML)" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.memo\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml-hover.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L562-562" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L562-562" class="fsdocs-source-link" title="Source on GitHub">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-hover.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- Creates a single access memo <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://docs.microsoft.com/dotnet/api/make.memobuilder">MemoBuilder</a> computation expression.
+ Creates a single access memo <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-memobuilder.html">MemoBuilder</a> computation expression.
  <p class='fsdocs-para'>
  Once a memo has run, it will return the same value without running again.
  </p>
@@ -262,11 +262,11 @@
             <h5 class="fsdocs-example-header">
               Example
             </h5>
-            <p class="fsdocs-example">
+            <p class="fsdocs-example" id="example">
               <pre>
  let versionMake =
      memo {
-         return! Cmd.createWithArgs "dotnet" [ "gitversion" ] |> Cmd.result
+         return! Cmd.createWithArgs &quot;dotnet&quot; [ &quot;gitversion&quot; ] |&gt; Cmd.result
      }</pre>
             </p>
           </td>
@@ -300,21 +300,21 @@
           </td>
           <td class="fsdocs-member-xmldoc">
             <div class="fsdocs-summary">
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.memoRace`')">
+              <div class="fsdocs-source-link" title="Copy signature (Markdown)" onclick="Clipboard_CopyTo('`cref:P:FsMake.MakeBuilders.memoRace`')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-hover.png" class="hover"/>
               </div>
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.memoRace\'/>')">
-                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              <div class="fsdocs-source-link" title="Copy signature (XML)" onclick="Clipboard_CopyTo('<see cref=\'P:FsMake.MakeBuilders.memoRace\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml-hover.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L578-578" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L578-578" class="fsdocs-source-link" title="Source on GitHub">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-hover.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- Creates a parallel access memo <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://docs.microsoft.com/dotnet/api/make.memoracebuilder">MemoRaceBuilder</a> computation expression.
+ Creates a parallel access memo <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-memoracebuilder.html">MemoRaceBuilder</a> computation expression.
  <p class='fsdocs-para'>
  Once a memoRace has run, it will return the same value without running again.
  </p>
@@ -332,11 +332,11 @@
             <h5 class="fsdocs-example-header">
               Example
             </h5>
-            <p class="fsdocs-example">
+            <p class="fsdocs-example" id="example">
               <pre>
  let versionMake =
      memoRace {
-         return! Cmd.createWithArgs "dotnet" [ "gitversion" ] |> Cmd.result
+         return! Cmd.createWithArgs &quot;dotnet&quot; [ &quot;gitversion&quot; ] |&gt; Cmd.result
      }</pre>
             </p>
           </td>
@@ -382,21 +382,21 @@
           </td>
           <td class="fsdocs-member-xmldoc">
             <div class="fsdocs-summary">
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('`cref:M:FsMake.MakeBuilders.retry`')">
+              <div class="fsdocs-source-link" title="Copy signature (Markdown)" onclick="Clipboard_CopyTo('`cref:M:FsMake.MakeBuilders.retry`')">
                 <img src="https://seanamos.github.io/FsMake/content/img/copy-md.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-md-hover.png" class="hover"/>
               </div>
-              <div class="fsdocs-source-link" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.MakeBuilders.retry\'/>')">
-                <img src="https://seanamos.github.io/FsMake/content/img/copy.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/copy-blue.png" class="hover"/>
+              <div class="fsdocs-source-link" title="Copy signature (XML)" onclick="Clipboard_CopyTo('<see cref=\'M:FsMake.MakeBuilders.retry\'/>')">
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml.png" class="normal"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/copy-xml-hover.png" class="hover"/>
               </div>
-              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L545-545" class="fsdocs-source-link">
+              <a href="https://github.com/seanamos/FsMake/tree/master/FsMake/Make.fs#L545-545" class="fsdocs-source-link" title="Source on GitHub">
                 <img src="https://seanamos.github.io/FsMake/content/img/github.png" class="normal"/>
-                <img src="https://seanamos.github.io/FsMake/content/img/github-blue.png" class="hover"/>
+                <img src="https://seanamos.github.io/FsMake/content/img/github-hover.png" class="hover"/>
               </a>
               <p class="fsdocs-summary">
                 
- Creates a retry <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://docs.microsoft.com/dotnet/api/make.retrybuilder">RetryBuilder</a> computation expression.
+ Creates a retry <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-1.html">Make</a> using a <a href="https://seanamos.github.io/FsMake/reference/fsmake-make-retrybuilder.html">RetryBuilder</a> computation expression.
  
               </p>
             </div>
@@ -422,12 +422,12 @@
             <h5 class="fsdocs-example-header">
               Example
             </h5>
-            <p class="fsdocs-example">
+            <p class="fsdocs-example" id="example">
               <pre>
  let test =
-     Step.create "test" {
+     Step.create &quot;test&quot; {
          do! retry 2 {
-             do! Cmd.createWithArgs "dotnet" [ "test" ] |> Cmd.run
+             do! Cmd.createWithArgs &quot;dotnet&quot; [ &quot;test&quot; ] |&gt; Cmd.run
          }
      }</pre>
             </p>
