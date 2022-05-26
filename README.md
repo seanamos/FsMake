@@ -89,5 +89,5 @@ Pipelines.create {
 
 To run:
 ```sh
-dotnet fsi build.fsx
+dotnet fsi build.fsx --
 ```

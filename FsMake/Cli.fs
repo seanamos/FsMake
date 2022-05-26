@@ -85,11 +85,11 @@ module internal Cli =
             match args.Executable with
             | Some x ->
                 match x with
-                | ExecutableType.Fsx file -> $"dotnet fsi {file}"
+                | ExecutableType.Fsx file -> $"dotnet fsi {file} --"
                 | ExecutableType.Dll file ->
                     let file = file |> Path.GetFileName |> Path.GetFileNameWithoutExtension
                     $"dotnet run {file}"
-            | _ -> "dotnet fsi <script>.fsx"
+            | _ -> "dotnet fsi <script>.fsx --"
 
         let pipelineText =
             if pipelines.Length > 0 then
@@ -126,7 +126,7 @@ Pipelines:
         Console.Important |> Console.message helpText |> writer.WriteLine
 
     type ParserState =
-        | NormalArgs
+        | NormalArgs of leadingDashes: bool
         | ExtraArgs
 
     let parseArgs (args: string array) : Result<ParsedArgs, ParsedArgs * ParseError list> =
@@ -135,9 +135,9 @@ Pipelines:
         let rec parseNextArg remArgs errors idx state options =
             match (state, remArgs) with
             | (_, []) -> (options, errors)
-            | (NormalArgs, "--help" :: _) -> ({ options with PrintHelp = true }, [])
-            | (NormalArgs, "-v" :: xs)
-            | (NormalArgs, "--verbosity" :: xs) ->
+            | (NormalArgs _, "--help" :: _) -> ({ options with PrintHelp = true }, [])
+            | (NormalArgs _, "-v" :: xs)
+            | (NormalArgs _, "--verbosity" :: xs) ->
                 match xs with
                 | "disabled" :: xss -> { options with Verbosity = Disabled } |> parseNextArg xss errors (idx + 1) state
                 | "quiet" :: xss -> { options with Verbosity = Quiet } |> parseNextArg xss errors (idx + 1) state
@@ -149,8 +149,8 @@ Pipelines:
                 | xss ->
                     options
                     |> parseNextArg xss (OptionParamMissing "-v, --verbosity" :: errors) (idx + 1) state
-            | (NormalArgs, "-o" :: xs)
-            | (NormalArgs, "--console-output" :: xs) ->
+            | (NormalArgs _, "-o" :: xs)
+            | (NormalArgs _, "--console-output" :: xs) ->
                 match xs with
                 | "ansi" :: xss -> { options with ConsoleOutput = Ansi } |> parseNextArg xss errors (idx + 1) state
                 | "standard" :: xss ->
@@ -164,29 +164,30 @@ Pipelines:
                 | xss ->
                     options
                     |> parseNextArg xss (OptionParamMissing "-o, --console-output" :: errors) (idx + 1) state
-            | (NormalArgs, "-n" :: xs)
-            | (NormalArgs, "--no-logo" :: xs) -> { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
-            | (NormalArgs, "--" :: xs) ->
+            | (NormalArgs _, "-n" :: xs)
+            | (NormalArgs _, "--no-logo" :: xs) -> { options with NoLogo = true } |> parseNextArg xs errors (idx + 1) state
+            | (NormalArgs _, "--" :: xs) ->
                 // there was a breaking change in .NET 6 with dotnet fsi parsing "--help" everywhere.
                 // to work around this, "--" needs to be passed to dotnet fsi.
-                // we need to expect the format dotnet fsi build.fsx -- -o ansi -- extra_arg (double --) now.
+                // we need to expect the format `dotnet fsi build.fsx -- pipeline -o ansi -- extra_arg` (double --) now.
                 match (idx, options.Executable) with
-                | (1, Some (ExecutableType.Fsx _)) -> options |> parseNextArg xs errors (idx + 1) NormalArgs
+                | (1, Some (ExecutableType.Fsx _)) -> options |> parseNextArg xs errors (idx + 1) (NormalArgs true)
                 | _ -> options |> parseNextArg xs errors (idx + 1) ExtraArgs
-            | (NormalArgs, x :: xs) ->
+            | (NormalArgs leadingDashes, x :: xs) ->
                 match (idx, options.Executable) with
-                | (0, _) when x.EndsWith (".fsx") ->
+                | (0, None) when x.EndsWith (".fsx") ->
                     { options with
                         Executable = Some (ExecutableType.Fsx x)
                     }
                     |> parseNextArg xs errors (idx + 1) state
-                | (0, _) when x.EndsWith (".dll") ->
+                | (0, None) when x.EndsWith (".dll") ->
                     { options with
                         Executable = Some (ExecutableType.Dll x)
                     }
                     |> parseNextArg xs errors (idx + 1) state
-                | (0, _)
-                | (1, Some _) -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
+                | (0, None) // no .dll or .fsx arg, fall through to next
+                | (1, Some _) when not <| leadingDashes -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
+                | (2, Some _) when leadingDashes -> { options with Pipeline = Some x } |> parseNextArg xs errors (idx + 1) state
                 | _ -> options |> parseNextArg xs (InvalidArgument x :: errors) (idx + 1) state
             | (ExtraArgs, x :: xs) ->
                 { options with
@@ -204,6 +205,6 @@ Pipelines:
                 NoLogo = false
                 ExtraArgs = []
             }
-            |> parseNextArg args [] 0 NormalArgs
+            |> parseNextArg args [] 0 (NormalArgs false)
 
         if errors.IsEmpty then Ok args else Error (args, errors)

@@ -11,7 +11,8 @@ let integrationTests =
             Integration.Cmd.tests
             Integration.EnvVar.tests
             Integration.Pipelines.tests
-            Integration.TestProj.tests
+            Integration.TestProjFsx.tests
+            Integration.TestProjRun.tests
         ]
 
 [<Tests>]

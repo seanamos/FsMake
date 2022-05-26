@@ -53,6 +53,13 @@ let tests =
                 teste <@ args.Executable = None @>
             }
 
+            test "parseArgs should parse first arg as pipeline when no script file arg" {
+                let parsed = [| "pipeline" |] |> Cli.parseArgs
+
+                let args = parsed |> Expect.wantOk "parsed should be Ok"
+                teste <@ args.Pipeline = Some "pipeline" @>
+            }
+
             test "parseArgs should parse second arg as pipeline when script file arg" {
                 let parsed = [| "test.fsx"; "pipeline" |] |> Cli.parseArgs
 
@@ -60,8 +67,8 @@ let tests =
                 teste <@ args.Pipeline = Some "pipeline" @>
             }
 
-            test "parseArgs should parse first arg as pipeline when no script file arg" {
-                let parsed = [| "pipeline" |] |> Cli.parseArgs
+            test "parseArgs should parse third arg as pipeline when leading -- when script file arg" {
+                let parsed = [| "test.fsx"; "--"; "pipeline" |] |> Cli.parseArgs
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
                 teste <@ args.Pipeline = Some "pipeline" @>
@@ -79,7 +86,15 @@ let tests =
                 let parsed = [| "--"; "--help" |] |> Cli.parseArgs
 
                 let args = parsed |> Expect.wantOk "parsed should be Ok"
+                teste <@ not args.PrintHelp @>
                 teste <@ args.ExtraArgs = [ "--help" ] @>
+            }
+
+            test "parseArgs should parse --help after leading -- when using .fsx" {
+                let parsed = [| "test.fsx"; "--"; "--help" |] |> Cli.parseArgs
+
+                let args = parsed |> Expect.wantOk "parsed should be Ok"
+                teste <@ args.PrintHelp @>
             }
 
             test "parseArgs parses -v/--verbosity" {
