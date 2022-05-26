@@ -24,14 +24,14 @@ It uses a simple `pipeline` approach to define execution order that is easy to r
 In your project root create a `build.cmd` file for Windows users:
 
     [lang=sh]
-    dotnet fsi build.fsx %*
+    dotnet fsi build.fsx -- %*
 
 Create a `build.sh` for non Windows users:
 
     [lang=sh]
     #!/bin/sh
 
-    dotnet fsi build.fsx "$@"
+    dotnet fsi build.fsx -- "$@"
 
 **Don't forget to `chmod +x build.sh`!**
 

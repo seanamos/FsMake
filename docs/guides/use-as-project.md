@@ -63,4 +63,4 @@ Open `MyProject.Build/Program.fs` and replace its contents with:
 To run your build:
 
     [lang=sh]
-    dotnet run --project MyProject.Build
+    dotnet run --project MyProject.Build --
