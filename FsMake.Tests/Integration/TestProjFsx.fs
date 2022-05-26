@@ -1,4 +1,4 @@
-module FsMake.Tests.Integration.TestProj
+module FsMake.Tests.Integration.TestProjFsx
 
 open Expecto
 open Expecto.Flip
@@ -24,7 +24,7 @@ let createRunnerProcStartInfo args =
 #if RELEASE
     let procStartInfo = ProcessStartInfo ("dotnet", "fsi --define:RELEASE build.fsx")
 #else
-    let procStartInfo = ProcessStartInfo ("dotnet", "fsi build.fsx")
+    let procStartInfo = ProcessStartInfo ("dotnet", "fsi build.fsx --")
 #endif
 
     if args |> String.IsNullOrEmpty |> not then
@@ -42,7 +42,7 @@ let createRunnerProcStartInfo args =
 let tests =
     testSequenced
     <| testList
-        "TestProject tests"
+        "TestProjectFsx tests"
         [
             test "kitchen sink" {
                 use process' = createRunnerProcStartInfo "kitchen-sink"

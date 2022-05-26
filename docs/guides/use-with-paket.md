@@ -58,4 +58,4 @@ Create a `build.fsx` file at the root of your solution:
 To run your build:
 
     [lang=sh]
-    dotnet fsi build.fsx
+    dotnet fsi build.fsx --

@@ -7,7 +7,6 @@ open System
 /// </summary>
 type MakeContext =
     {
-
         /// <summary>
         /// Gets the name of the currently executing <see cref="T:Pipeline" />.
         /// </summary>
@@ -45,7 +44,7 @@ type MakeContext =
 
         /// <summary>
         /// Gets the extra arguments passed to the runner.
-        /// <para>These are arguments that were passed after "--". eg. <c>dotnet fsi build.fsx build -- --clean</c></para>
+        /// <para>These are arguments that were passed after "--". eg. <c>dotnet fsi build.fsx -- build -- --clean</c></para>
         /// </summary>
         ExtraArgs: string list
     }
@@ -70,7 +69,6 @@ type MakeError =
     /// </summary>
     | MakeUnhandledEx of ex: exn
 
-
 module internal MakeError =
     let toConsoleMessage (error: MakeError) : Console.Message list =
         match error with
@@ -85,7 +83,6 @@ module internal MakeError =
 /// </para>
 /// </summary>
 type Make<'T> = MakeContext -> Result<'T, MakeError>
-
 
 /// <summary>
 /// Module for working with a <see cref="T:Make`1" />
@@ -155,7 +152,6 @@ module Make =
                 let bound = binder x
                 bound ctx
             | Error x -> Error x
-
 
     /// <summary>
     /// Takes two <see cref="T:Make`1" /> and creates a tuple <see cref="T:Make`1" /> of their results.
