@@ -105,12 +105,12 @@ This makes it easier to maintain and reduces churn when other tools have breakin
 </ul>
 <h2><a name="Getting-Started" class="anchor" href="#Getting-Started">Getting Started</a></h2>
 <p>In your project root create a <code>build.cmd</code> file for Windows users:</p>
-<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="sh">dotnet fsi build.fsx %*
+<table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="sh">dotnet fsi build.fsx -- %*
 </code></pre></td></tr></table>
 <p>Create a <code>build.sh</code> for non Windows users:</p>
 <table class="pre"><tr><td class="snippet"><pre class="fssnip"><code lang="sh">#!/bin/sh
 
-dotnet fsi build.fsx "$@"
+dotnet fsi build.fsx -- "$@"
 </code></pre></td></tr></table>
 <p><strong>Don't forget to <code>chmod +x build.sh</code>!</strong></p>
 <p>Create a <code>build.fsx</code> file:</p>
