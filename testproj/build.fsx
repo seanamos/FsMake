@@ -9,7 +9,7 @@ open FsMake
 let args = fsi.CommandLineArgs
 
 let fail = EnvVar.getOptionAs<int> "FAIL" |> Option.contains 1
-let build = Step.create "build" { do! Cmd.createWithArgs "dotnet" [ "build" ] |> Cmd.run }
+let build = Step.create "build" { do! Cmd.createWithArgs "echo" [ "building..." ] |> Cmd.run }
 let emptyStep = Step.create "empty" { () }
 let emptyStepFail = Step.create "emptyFail" { do! Step.fail "Oh no!" }
 
@@ -28,19 +28,19 @@ Pipelines.create {
             run_maybe emptyStep false
             run_maybe emptyStep true
             run_parallel [ emptyStep; build ]
-            run_parallel_maybe [ emptyStep; emptyStep ] false
-            run_parallel_maybe [ emptyStep; emptyStep ] true
+            run_parallel_maybe [ emptyStep; build ] false
+            run_parallel_maybe [ emptyStep; build ] true
 
             run_parallel_maybes {
                 run_maybe emptyStep false
                 run_maybe emptyStep true
                 run emptyStep
-                run emptyStep
+                run build
             }
 
             run_parallel_maybes {
                 run emptyStep
-                run emptyStep
+                run build
             }
         }
 

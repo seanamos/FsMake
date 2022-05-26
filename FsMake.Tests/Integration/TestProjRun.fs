@@ -21,7 +21,7 @@ let testProjDir =
     walkDirs currDir
 
 let createRunnerProcStartInfo args =
-    let procStartInfo = ProcessStartInfo ("dotnet", "run --project Build --")
+    let procStartInfo = ProcessStartInfo ("dotnet", "run --")
 
     if args |> String.IsNullOrEmpty |> not then
         procStartInfo.Arguments <- procStartInfo.Arguments + $" {args}"
