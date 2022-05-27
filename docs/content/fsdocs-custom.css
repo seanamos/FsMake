@@ -53,10 +53,15 @@ hr {
     margin: 0 0 1em;
 }
 
-#fsdocs-content table.pre, #fsdocs-content pre.fssnip, #fsdocs-content pre {
+#fsdocs-content table.pre, #fsdocs-content pre.fssnip, #fsdocs-content pre, #fsdocs-content table.pre pre {
 	background-color: #161b22;
 	border-radius: 5px;
 	color: #c6c6c6;
+}
+
+#fsdocs-content pre.fssnip code {
+    font: 0.85rem 'Roboto Mono', monospace;
+    font-weight: 500;
 }
 
 .table {
