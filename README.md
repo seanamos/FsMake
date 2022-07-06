@@ -1,7 +1,7 @@
-<h4>
-  █▀▀ █▀ █▀▄▀█ ▄▀█ █▄▀ █▀▀<br />
-  █▀░ ▄█ █░▀░█ █▀█ █░█ ██▄
-</h4>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/fsmake-logo-dark.png">
+  <img alt="FsMake" src="assets/fsmake-logo-light.png" width="300">
+</picture>
 
 > Simple build pipelines with F#
 
@@ -18,7 +18,7 @@ Documentation with examples and API reference can be found [here](https://seanam
 
 ## Demo
 
-[![FsMake Demo](https://user-images.githubusercontent.com/10598927/162595619-df03188b-a0ad-4efd-b9c5-6d68730c2efd.png)](https://asciinema.org/a/x9sSRWYgWDRfRr1xYdClANUSK)
+[![FsMake Demo](https://user-images.githubusercontent.com/10598927/177481897-a91238ed-5c03-441c-81dd-45a46c117bdf.png)](https://asciinema.org/a/UjWSBocFRQRJ2tOJzY1PCW1F0)
 
 ## Usage
 
@@ -53,7 +53,7 @@ let build =
             |> Cmd.run
     }
 
-let testUnit =
+let ``test:unit`` =
     Step.create "test:unit" {
         do!
             Cmd.createWithArgs "dotnet" [ "test" ]
@@ -61,7 +61,7 @@ let testUnit =
             |> Cmd.run
     }
 
-let testInt =
+let ``test:integration`` =
     Step.create "test:integration" {
         do!
             retry 2 {
@@ -80,7 +80,7 @@ Pipelines.create {
             run build
         }
 
-    do! Pipeline.createFrom build "test" { run_parallel [ testUnit; testInt ] }
+    do! Pipeline.createFrom build "test" { run_parallel [ ``test:unit``; ``test:integration`` ] }
 
     default_pipeline build
 }
